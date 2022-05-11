@@ -170,10 +170,13 @@ class SQLHelper {
       String quarterName, String color) async {
     final db = await SQLHelper.db();
 
-    final data = {'quarter_name': quarterName, 'color': color};
+    final data = {'name': quarterName, 'color': color};
 
     final id = await db.insert(_livingQuarter, data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
+    if (kDebugMode) {
+      print(" Quarter with $id inserted");
+    }
     return id;
   }
 }

@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:otis/helper.dart';
 import 'package:otis/models/sql_helper.dart';
 import 'package:otis/widgets/add_quarter.dart';
 
@@ -22,31 +24,52 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text(" Otis"),),
+      appBar: AppBar(
+        title: const Text(" Otis"),
+      ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const AddQuarter()));
-        },),
-      //backgroundColor: Colors.lightGreenAccent,
+          Navigator.of(context)
+              .push(
+                MaterialPageRoute(
+                  builder: (context) => const AddQuarter(),
+                  fullscreenDialog: true,
+                ),
+              )
+              .then((value) => value ? _loadData() : null);
+        },
+      ),
       body: ListView.builder(
           itemCount: _livingQuarters.length,
-          itemBuilder: (context, index) => GestureDetector(
-                child: const Card(
-                  child: ListTile(
-                    title: Text(" Nouveau quartier"),
-                  ),
+          itemBuilder: (context, index) {
+            var livingQuarter = _livingQuarters[index];
+            var name = livingQuarter['name'];
+            var colorName = livingQuarter['color'];
+            var color = colorMap[colorName];
+
+            return GestureDetector(
+              child: Card(
+                color: color,
+                child: ListTile(
+                  title: Text(name),
                 ),
-              )),
+              ),
+            );
+          }),
     );
   }
 
   _loadData() async {
     final data = await SQLHelper.getLivingQuarters();
+    if (kDebugMode) {
+      print(" living quarter loaded and size is ${data.length}");
+    }
 
     setState(() {
       _livingQuarters = data;
     });
   }
+
+  _getRequests() async {}
 }
