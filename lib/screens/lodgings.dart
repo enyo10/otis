@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-
 import '../models/lodging.dart';
 import '../models/sql_helper.dart';
 import 'lodging_details.dart';
@@ -63,14 +62,13 @@ class _LodgingListState extends State<LodgingList> {
                 // this will prevent the soft keyboard from covering the text fields
                 bottom: MediaQuery.of(context).viewInsets.bottom + 120,
               ),
-              decoration:  const BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(25.0),
                   topRight: Radius.circular(25.0),
                 ),
               ),
-              
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -85,7 +83,8 @@ class _LodgingListState extends State<LodgingList> {
                     ),
                     TextField(
                       controller: _descriptionController,
-                      decoration: const InputDecoration(hintText: 'Description'),
+                      decoration:
+                          const InputDecoration(hintText: 'Description'),
                     ),
                     TextField(
                       controller: _rentController,
@@ -152,11 +151,12 @@ class _LodgingListState extends State<LodgingList> {
     _refreshJournals();
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ottis'),
+        title: const Text('Otis'),
       ),
       body: _isLoading
           ? const Center(
@@ -169,7 +169,6 @@ class _LodgingListState extends State<LodgingList> {
                   Map<String, dynamic> data = _apartments[index];
                   Lodging lodging = Lodging(
                       id: data['id'],
-                      address: data['address'],
                       description: data['description'],
                       rent: data['rent'],
                       type: data['type']);

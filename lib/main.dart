@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       // Remove the debug banner
       debugShowCheckedModeBanner: false,
-      title: 'Ottis',
+      title: 'Otis',
       theme: ThemeData(
         primarySwatch: Colors.red,
         //  primaryColor: Colors.orange

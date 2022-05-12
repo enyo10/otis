@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:otis/models/payment_period.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:path/path.dart';
@@ -10,12 +9,23 @@ class SQLHelper {
   static const String _payments = "payments";
   static const String _periods = "periods";
   static const String _livingQuarter = "living_quarter";
+  static const String _building = "building";
 
   static Future<void> _onCreateTables(sql.Database database) async {
     await database.execute("""CREATE TABLE $_livingQuarter(
      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
      name TEXT,
      color TEXT  )
+    """);
+    await database.execute("""CREATE TABLE $_building(
+     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+     name TEXT,
+     color TEXT,
+     quarter_id INTEGER,
+      FOREIGN KEY (quarter_id)
+        REFERENCES $_livingQuarter (id) 
+        ON UPDATE CASCADE
+        ON DELETE CASCADE  )
     """);
 
     await database.execute("""CREATE TABLE $_apartments(
@@ -34,10 +44,10 @@ class SQLHelper {
         lastname TEXT NOT NULL,
         entry_date TEXT NOT NULL,
         lodging_id INTEGER,
-        FOREIGN KEY (lodging_id)
-        REFERENCES $_apartments (id) 
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
+         FOREIGN KEY (lodging_id)
+         REFERENCES $_apartments (id) 
+         ON UPDATE CASCADE
+         ON DELETE CASCADE
         )
         """);
     await database.execute("""CREATE TABLE $_payments(
@@ -178,5 +188,24 @@ class SQLHelper {
       print(" Quarter with $id inserted");
     }
     return id;
+  }
+
+  static Future<int> insertBuilding(String buildingName, String color, int quarterId) async {
+    final db = await SQLHelper.db();
+
+    final data = {'name': buildingName, 'color': color, 'quarter_id': quarterId};
+
+    final id = await db.insert(_building, data,
+        conflictAlgorithm: sql.ConflictAlgorithm.replace);
+    if (kDebugMode) {
+      print(" Building with $id inserted");
+    }
+    return id;
+  }
+
+  static Future<List<Map<String, dynamic>>> getBuildings(int quarterId) async {
+    final db = await SQLHelper.db();
+    return db.query(_building,
+        where: "quarter_id = ?", whereArgs: [quarterId], orderBy: "id");
   }
 }

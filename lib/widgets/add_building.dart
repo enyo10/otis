@@ -1,37 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:otis/models/sql_helper.dart';
+import 'package:otis/models/living_quarter.dart';
 
 import '../helper.dart';
+import '../models/sql_helper.dart';
 
-class AddQuarter extends StatefulWidget {
-  const AddQuarter({Key? key}) : super(key: key);
+class AddBuilding extends StatefulWidget {
+   final LivingQuarter livingQuarter;
+   const AddBuilding({Key? key, required this.livingQuarter}) : super(key: key);
 
   @override
-  _AddQuarterState createState() => _AddQuarterState();
+  _AddBuildingState createState() => _AddBuildingState();
 }
 
-class _AddQuarterState extends State<AddQuarter> {
+class _AddBuildingState extends State<AddBuilding> {
 
   var _selectedColorData = colorMap.entries.first;
-  final quarterNameController = TextEditingController();
-  final quarterDescriptionController = TextEditingController();
+  final buildingNameController = TextEditingController();
+  final buildingDescriptionController = TextEditingController();
   bool isSaving = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(" Ajouter une categorie"),
+        title: const Text(" Ajouter une immeuble"),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          var name = quarterNameController.text;
-          var desc = quarterDescriptionController.text;
+          var name = buildingNameController.text;
+          var desc = buildingDescriptionController.text;
           if (name.isNotEmpty && name.length > 2) {
             setState(() {
               isSaving = true;
             });
-            SQLHelper.insertLivingQuarter(name, _selectedColorData.key)
+            SQLHelper.insertBuilding(name, _selectedColorData.key, widget.livingQuarter.id)
                 .whenComplete(() => Navigator.pop(context, true));
           }
         },
@@ -47,10 +49,10 @@ class _AddQuarterState extends State<AddQuarter> {
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: TextField(
               textAlign: TextAlign.center,
-              controller: quarterNameController,
+              controller: buildingNameController,
               decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'Quarter name',
+                  labelText: 'Building name',
                   hintText: 'Enter description'),
             ),
           ),
@@ -59,13 +61,13 @@ class _AddQuarterState extends State<AddQuarter> {
                 left: 15.0, right: 15.0, top: 15, bottom: 0),
             //padding: EdgeInsets.symmetric(horizontal: 15),
             child: TextField(
-              controller: quarterDescriptionController,
+              controller: buildingDescriptionController,
               // Only numbers can be entered
               decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   // Only numbers can be entered
                   labelText: 'Description ',
-                  hintText: 'Une petite description du quartier'),
+                  hintText: 'Une petite description de l\'immeuble'),
             ),
           ),
           Container(
@@ -87,7 +89,7 @@ class _AddQuarterState extends State<AddQuarter> {
                   },
                 ).then((dynamic value) => setState(() {
 
-                    }));
+                }));
               },
             ),
           ),
@@ -118,7 +120,7 @@ class _AddQuarterState extends State<AddQuarter> {
                   color: colorData.value,
                 ),
                 title: //Text(_colorNames[index]),
-                    Text(colorData.key),
+                Text(colorData.key),
                 onTap: () {
                   setState(() {
                     // _selectedColorIndex = index;
@@ -140,7 +142,7 @@ class _AddQuarterState extends State<AddQuarter> {
   @override
   void dispose() {
     super.dispose();
-    quarterDescriptionController.dispose();
-    quarterNameController.dispose();
+    buildingDescriptionController.dispose();
+    buildingNameController.dispose();
   }
 }

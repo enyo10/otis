@@ -47,3 +47,5 @@ Map<String, Color> colorMap = {
   'navy': const Color(0xFF0B0F26),
   'indigo': const Color(0xFF7C6DAF),
 };
+
+
