@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:otis/models/buiding.dart';
 import 'package:otis/models/living_quarter.dart';
+import 'package:otis/screens/lodgings_list.dart';
 import 'package:otis/widgets/add_building.dart';
 
 import '../helper.dart';
@@ -37,6 +39,7 @@ class _BuildingsListState extends State<BuildingsList> {
           Navigator.of(context)
               .push(
                 MaterialPageRoute(
+                  fullscreenDialog: true,
                   builder: (context) => AddBuilding(livingQuarter: widget.livingQuarter),
                 ),
               )
@@ -56,12 +59,21 @@ class _BuildingsListState extends State<BuildingsList> {
           : ListView.builder(
               itemCount: _buildings.length,
               itemBuilder: (context, index) {
-                var building = _buildings[index];
-                var name = building['name'];
-                var colorName = building['color'];
+                var building = Building.fromMap(_buildings[index]);
+                var name = building.name;
+                var colorName = building.colorName;
                 var color = colorMap[colorName];
 
                 return GestureDetector(
+                  onDoubleTap: (){
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            LodgingList(building: building),
+                      ),
+                    );
+
+                  },
                   child: SizedBox(
                     height: 200,
                     child: Card(
@@ -92,5 +104,4 @@ class _BuildingsListState extends State<BuildingsList> {
     });
   }
 
-  _getRequests() async {}
 }

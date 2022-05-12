@@ -35,7 +35,14 @@ class SQLHelper {
         address Text,
         description TEXT,
         rent REAL,
-        createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        building_id INTEGER,
+         FOREIGN KEY (building_id)
+          REFERENCES $_building (id) 
+          ON UPDATE CASCADE
+          ON DELETE CASCADE
+        
+        
       )
       """);
     await database.execute("""CREATE TABLE $_occupants( 
@@ -47,8 +54,8 @@ class SQLHelper {
          FOREIGN KEY (lodging_id)
          REFERENCES $_apartments (id) 
          ON UPDATE CASCADE
-         ON DELETE CASCADE
-        )
+         ON DELETE CASCADE )
+         
         """);
     await database.execute("""CREATE TABLE $_payments(
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -79,11 +86,12 @@ class SQLHelper {
 
   // Create new apartment(journal)
   static Future<int> insertApartment(
-      int type, String address, String? description, double rent) async {
+      int type,int buildingId, String address, String? description, double rent) async {
     final db = await SQLHelper.db();
 
     final data = {
       'type': type,
+      'building_id':buildingId,
       'address': address,
       'description': description,
       'rent': rent
@@ -93,10 +101,11 @@ class SQLHelper {
     return id;
   }
 
-  // Read all apartments (journals)
-  static Future<List<Map<String, dynamic>>> getApartments() async {
+  static Future<List<Map<String, dynamic>>> getApartments(
+      int buildingId) async {
     final db = await SQLHelper.db();
-    return db.query(_apartments, orderBy: "id");
+    return db.query(_apartments,
+        where: "building_id = ?", whereArgs: [buildingId], orderBy: "id");
   }
 
   // Read a single apartment by id
@@ -190,10 +199,15 @@ class SQLHelper {
     return id;
   }
 
-  static Future<int> insertBuilding(String buildingName, String color, int quarterId) async {
+  static Future<int> insertBuilding(
+      String buildingName, String color, int quarterId) async {
     final db = await SQLHelper.db();
 
-    final data = {'name': buildingName, 'color': color, 'quarter_id': quarterId};
+    final data = {
+      'name': buildingName,
+      'color': color,
+      'quarter_id': quarterId
+    };
 
     final id = await db.insert(_building, data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);

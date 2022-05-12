@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:otis/helper.dart';
 import 'package:otis/models/living_quarter.dart';
 import 'package:otis/models/sql_helper.dart';
@@ -28,7 +27,7 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text(" Otis"),
+        title: const Text(" liste des quartiers"),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),

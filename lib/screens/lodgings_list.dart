@@ -1,12 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../models/buiding.dart';
 import '../models/lodging.dart';
 import '../models/sql_helper.dart';
 import 'lodging_details.dart';
 
 class LodgingList extends StatefulWidget {
-  const LodgingList({Key? key}) : super(key: key);
+  final Building building;
+  const LodgingList({Key? key, required this.building}) : super(key: key);
 
   @override
   _LodgingListState createState() => _LodgingListState();
@@ -19,7 +22,10 @@ class _LodgingListState extends State<LodgingList> {
   bool _isLoading = true;
   // This function is used to fetch all data from the database
   void _refreshJournals() async {
-    final data = await SQLHelper.getApartments();
+    if (kDebugMode) {
+      print(" building with id ${widget.building.id}");
+    }
+    final data = await SQLHelper.getApartments(widget.building.id);
 
     setState(() {
       _apartments = data;
@@ -129,7 +135,7 @@ class _LodgingListState extends State<LodgingList> {
 
 // Insert a new journal to the database
   Future<void> _addApartment() async {
-    await SQLHelper.insertApartment(1, _addressController.text,
+    await SQLHelper.insertApartment(1, widget.building.id,_addressController.text,
         _descriptionController.text, double.parse(_rentController.text));
     _refreshJournals();
   }
@@ -156,7 +162,7 @@ class _LodgingListState extends State<LodgingList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Otis'),
+        title: const Text('Les appartements'),
       ),
       body: _isLoading
           ? const Center(
@@ -172,6 +178,7 @@ class _LodgingListState extends State<LodgingList> {
                       description: data['description'],
                       rent: data['rent'],
                       type: data['type']);
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
