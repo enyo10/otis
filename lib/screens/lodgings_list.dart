@@ -117,7 +117,6 @@ class _LodgingListState extends State<LodgingList> {
                         if (id != null) {
                           await _updateItem(id);
                         }
-
                         // Clear the text fields
                         _addressController.text = '';
                         _descriptionController.text = '';
@@ -135,8 +134,13 @@ class _LodgingListState extends State<LodgingList> {
 
 // Insert a new journal to the database
   Future<void> _addApartment() async {
-    await SQLHelper.insertApartment(1, widget.building.id,_addressController.text,
-        _descriptionController.text, double.parse(_rentController.text));
+    await SQLHelper.insertApartment(
+        1,
+        widget.building.id,
+        _addressController.text,
+        _descriptionController.text,
+        double.parse(_rentController.text));
+
     _refreshJournals();
   }
 
@@ -156,7 +160,6 @@ class _LodgingListState extends State<LodgingList> {
     ));
     _refreshJournals();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +185,8 @@ class _LodgingListState extends State<LodgingList> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => LodgingDetails(lodging: lodging)),
+                      builder: (context) => LodgingDetails(lodging: lodging),
+                    ),
                   );
                 },
                 child: Card(

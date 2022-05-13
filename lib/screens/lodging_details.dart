@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../models/lodging.dart';
@@ -64,7 +65,8 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           onPressed: () {},
           style: ElevatedButton.styleFrom(
               //  primary: Colors.purple,
-              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+              // padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+              padding: const EdgeInsets.all(10),
               textStyle:
                   const TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
           child: const Text(" Ajouter payement"),
@@ -126,7 +128,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       builder: (context) => AddOccupantForm(
         lodgingId: id,
       ),
-    );
+    ).then((value) => _loadOccupantMap());
   }
 
   bool isOccupied() => _occupantMap != null;
