@@ -84,7 +84,9 @@ class _BuildingsListState extends State<BuildingsList> {
                       ),
                       color: color,
                       child: ListTile(
-                        title: Center(child: Text(name)),
+                        title: Center(child: Text(name, style: const TextStyle(
+                          fontSize: 25.0
+                        ),)),
                       ),
                     ),
                   ),

@@ -190,11 +190,15 @@ class _LodgingListState extends State<LodgingList> {
                   );
                 },
                 child: Card(
-                  color: Colors.orange[200],
+                  color: Colors.orange[100],
                   margin: const EdgeInsets.all(15),
                   child: ListTile(
-                      title: Text(_apartments[index]['address']),
-                      subtitle: Text(_apartments[index]['description']),
+                      title: Text(_apartments[index]['address'], style: const TextStyle(
+                        fontSize: 20.0
+                      ),),
+                      subtitle: Text(_apartments[index]['description'], style: const TextStyle(
+                        fontSize: 20.0
+                      ),),
                       trailing: SizedBox(
                         width: 100,
                         child: Row(
