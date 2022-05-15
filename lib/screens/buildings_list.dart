@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:otis/models/buiding.dart';
+import 'package:otis/models/building.dart';
 import 'package:otis/models/living_quarter.dart';
 import 'package:otis/screens/lodgings_list.dart';
 import 'package:otis/widgets/add_building.dart';

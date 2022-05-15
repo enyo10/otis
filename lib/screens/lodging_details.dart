@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:otis/helper.dart';
+import 'package:otis/models/payment.dart';
 
 import '../models/lodging.dart';
 import '../models/occupant.dart';
@@ -91,53 +93,89 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                     ? const Center(
                         child: Text("Pas d'occupant"),
                       )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 30.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  " Nom du locataire : ${_occupantMap!['firstname']} ",
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                    " Prénom du locataire : ${_occupantMap!['lastname']} ",
-                                style: const TextStyle(fontSize: 20),)
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-              )
+                    : Builder(
+                        builder: (context) {
+                          var entryDate =
+                              DateTime.parse(_occupantMap!['entry_date']);
 
-        /* body: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text("Label"),
-              SizedBox(
-                width: 20,
-              ),
-              Center(child: Text("Data")),
-            ],
-          ),
-        ],
-      ),*/
-        );
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 30.0),
+                                    child: Row(
+                                      children: [
+                                        const Text("Nom:"),
+                                        Text(
+                                          " : ${_occupantMap!['firstname']} ",
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: Row(
+                                      children: [
+                                        const Text("Prenom:"),
+                                        Text(
+                                          "  ${_occupantMap!['lastname']} ",
+                                          style: const TextStyle(fontSize: 20),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 10.0, bottom: 20.0),
+                                    child: Row(
+                                      children: [
+                                        const Text("Date d'entrée:"),
+                                        Text(
+                                          ' ${entryDate.day}/${entryDate.month}/${entryDate.year}',
+                                          style:
+                                              const TextStyle(fontSize: 20.0),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Padding(
+                                    padding:
+                                        EdgeInsets.only(top: 10, bottom: 30),
+                                    child: Text(
+                                      "Situation des payements ",
+                                      style: TextStyle(
+                                          fontSize: 20.0,
+                                          fontStyle: FontStyle.italic,
+                                          color: Colors.blue),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              Expanded(
+                                child: ListView.separated(
+                                    separatorBuilder: (context, index) =>
+                                        const Divider(
+                                          color: Colors.black,
+                                        ),
+                                    itemCount: monthMap.values.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      var month =
+                                          monthMap.values.elementAt(index);
+                                      return _situationWidget(
+                                          month, 2000, null);
+                                    }),
+                              )
+                            ],
+                          );
+                        },
+                      ),
+              ));
   }
 
   void addPayment(double payment) {
@@ -158,4 +196,40 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   }
 
   bool isOccupied() => _occupantMap != null;
+
+  Icon _statusIcon(String mount, int year, Payment? payment) {
+    var icon = const Icon(
+      Icons.close,
+      color: Colors.red,
+    );
+    if (payment != null) {
+      if (payment.amount == widget.lodging.rent) {
+        icon = const Icon(
+          Icons.check,
+          color: Colors.green,
+        );
+      } else {
+        icon = const Icon(
+          Icons.check_box_outlined,
+          color: Colors.orange,
+        );
+      }
+    }
+    return icon;
+  }
+
+  Widget _situationWidget(String month, int year, Payment? payment) {
+
+    var icon = _statusIcon(month, year, payment);
+
+    return Row(
+      children: [
+        Text(
+          month,
+          style: const TextStyle(fontSize: 20.0),
+        ),
+        icon
+      ],
+    );
+  }
 }

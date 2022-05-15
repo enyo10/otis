@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../models/buiding.dart';
+import '../models/building.dart';
 import '../models/lodging.dart';
 import '../models/sql_helper.dart';
 import 'lodging_details.dart';

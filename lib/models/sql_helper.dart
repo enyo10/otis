@@ -85,13 +85,13 @@ class SQLHelper {
   }
 
   // Create new apartment(journal)
-  static Future<int> insertApartment(
-      int type,int buildingId, String address, String? description, double rent) async {
+  static Future<int> insertApartment(int type, int buildingId, String address,
+      String? description, double rent) async {
     final db = await SQLHelper.db();
 
     final data = {
       'type': type,
-      'building_id':buildingId,
+      'building_id': buildingId,
       'address': address,
       'description': description,
       'rent': rent
@@ -158,19 +158,23 @@ class SQLHelper {
     return id;
   }
 
+  static Future<List<Map<String, dynamic>>> getOccupants() async {
+    final db = await SQLHelper.db();
+    return db.query(_occupants, orderBy: "id");
+  }
+
   static Future<int> insertPayment(int ownerId, double amount,
       DateTime paymentDate, PaymentPeriod periodOfPayment) async {
     final db = await SQLHelper.db();
 
-    final data = {'ownerId': ownerId, 'amount': amount};
+    final data = {
+      'ownerId': ownerId,
+      'amount': amount,
+      'date_payment': paymentDate.toIso8601String()
+    };
     final id = await db.insert(_payments, data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
     return id;
-  }
-
-  static Future<List<Map<String, dynamic>>> getOccupants() async {
-    final db = await SQLHelper.db();
-    return db.query(_occupants, orderBy: "id");
   }
 
   static Future<List<Map<String, dynamic>>> getOccupantsWithLodgingId(

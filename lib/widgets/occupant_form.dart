@@ -121,9 +121,6 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
     int lodgingId = widget.lodgingId;
     var id = await SQLHelper.insertOccupant(
         firstname, lastname, selectedDate.toIso8601String(),lodgingId) ;
-    if (kDebugMode) {
-      print(" Occupant with id : $id was added.");
-    }
 
   }
 
