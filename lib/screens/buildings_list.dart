@@ -29,7 +29,7 @@ class _BuildingsListState extends State<BuildingsList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black26,
+     // backgroundColor: Colors.black26,
       appBar: AppBar(
         title: const Text(" Immeubles"),
       ),

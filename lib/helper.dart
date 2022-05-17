@@ -48,7 +48,7 @@ Map<String, Color> colorMap = {
   'indigo': const Color(0xFF7C6DAF),
 };
 
-
+var color = const Color(0xFFEFFFFD);
 Map<int, String>monthMap = {
   1:'Janvier',
   2:'Février',

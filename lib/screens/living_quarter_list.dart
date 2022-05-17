@@ -25,7 +25,8 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFFEFFFFD) ,
+
       appBar: AppBar(
         title: const Text(" liste des quartiers"),
       ),

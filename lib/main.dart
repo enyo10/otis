@@ -21,7 +21,8 @@ class MyApp extends StatelessWidget {
       title: 'Otis',
       theme: ThemeData(
         primarySwatch: Colors.red,
-        //  primaryColor: Colors.orange
+          //primaryColor: Colors.orange
+       // backgroundColor: Colors.black12
       ),
 
       home: const HomeScreen(),
