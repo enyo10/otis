@@ -165,7 +165,9 @@ class _LodgingListState extends State<LodgingList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Les appartements'),
+        title: const Text('Les appartements', style: TextStyle(
+          fontSize: 30.0
+        ),),
       ),
       body: _isLoading
           ? const Center(
@@ -190,14 +192,18 @@ class _LodgingListState extends State<LodgingList> {
                   );
                 },
                 child: Card(
+
                   color: Colors.orange[100],
                   margin: const EdgeInsets.all(15),
                   child: ListTile(
-                      title: Text(_apartments[index]['address'], style: const TextStyle(
-                        fontSize: 20.0
-                      ),),
+                      title: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text(_apartments[index]['address'], style: const TextStyle(
+                          fontSize: 30.0
+                        ),),
+                      ),
                       subtitle: Text(_apartments[index]['description'], style: const TextStyle(
-                        fontSize: 20.0
+                        fontSize: 25.0
                       ),),
                       trailing: SizedBox(
                         width: 100,

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:otis/models/living_quarter.dart';
 import 'package:otis/screens/home.dart';
-import 'package:otis/screens/living_quarter_list.dart';
-
 
 
 void main() {
@@ -21,6 +18,7 @@ class MyApp extends StatelessWidget {
       title: 'Otis',
       theme: ThemeData(
         primarySwatch: Colors.red,
+          scaffoldBackgroundColor: const Color(0xFFEFFFFD)
           //primaryColor: Colors.orange
        // backgroundColor: Colors.black12
       ),

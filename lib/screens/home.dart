@@ -38,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Center(
       child: GestureDetector(
         onDoubleTap: () {
-          print(" Hello Otis");
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => const LivingQuarterList()));
         },
@@ -51,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
             textStyle: const TextStyle(
               fontSize: 80.0,
               fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic
             ),
             boxHeight: 300.0,
           ),

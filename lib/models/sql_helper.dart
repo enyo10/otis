@@ -7,7 +7,7 @@ class SQLHelper {
   static const String _apartments = "apartments";
   static const String _occupants = "occupants";
   static const String _payments = "payments";
-  static const String _periods = "periods";
+  //static const String _periods = "periods";
   static const String _livingQuarter = "living_quarter";
   static const String _building = "building";
 
@@ -16,16 +16,6 @@ class SQLHelper {
      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
      name TEXT,
      color TEXT  )
-    """);
-    await database.execute("""CREATE TABLE $_building(
-     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-     name TEXT,
-     color TEXT,
-     quarter_id INTEGER,
-      FOREIGN KEY (quarter_id)
-        REFERENCES $_livingQuarter (id) 
-        ON UPDATE CASCADE
-        ON DELETE CASCADE  )
     """);
 
     await database.execute("""CREATE TABLE $_apartments(
@@ -40,11 +30,20 @@ class SQLHelper {
          FOREIGN KEY (building_id)
           REFERENCES $_building (id) 
           ON UPDATE CASCADE
-          ON DELETE CASCADE
-        
-        
-      )
+          ON DELETE CASCADE )
       """);
+
+    await database.execute("""CREATE TABLE $_building(
+     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+     name TEXT,
+     color TEXT,
+     quarter_id INTEGER,
+      FOREIGN KEY (quarter_id)
+        REFERENCES $_livingQuarter (id) 
+        ON UPDATE CASCADE
+        ON DELETE CASCADE  )
+    """);
+
     await database.execute("""CREATE TABLE $_occupants( 
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
         firstname TEXT NOT NULL,
@@ -57,16 +56,20 @@ class SQLHelper {
          ON DELETE CASCADE )
          
         """);
+
     await database.execute("""CREATE TABLE $_payments(
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    owner_id INTEGER,
     amount REAL,
-    payment_date TEXT
-    ) """);
-    await database.execute("""CREATE TABLE $_periods(
-     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL
-   )
+    payment_date TEXT,
+    year INTEGER,
+    month INTEGER,
+    owner_id INTEGER,
+    FOREIGN KEY(owner_id)
+    REFERENCES $_occupants (id) 
+         ON UPDATE CASCADE
+         ON DELETE CASCADE ) 
     """);
+
   }
 
   static Future _onConfigure(sql.Database db) async {
@@ -164,17 +167,27 @@ class SQLHelper {
   }
 
   static Future<int> insertPayment(int ownerId, double amount,
-      DateTime paymentDate, PaymentPeriod periodOfPayment) async {
+      DateTime paymentDate, Period periodOfPayment) async {
     final db = await SQLHelper.db();
 
     final data = {
-      'ownerId': ownerId,
+      'owner_id': ownerId,
       'amount': amount,
-      'date_payment': paymentDate.toIso8601String()
+      'payment_date': paymentDate.toIso8601String(),
+      'year':periodOfPayment.year,
+      'month': periodOfPayment.month
     };
     final id = await db.insert(_payments, data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
+
     return id;
+  }
+
+  static Future<List<Map<String, dynamic>>> getCurrentYearPayment(int ownerId) async {
+    var year = DateTime.now().year;
+    final db = await SQLHelper.db();
+    return db.query(_payments, where: "owner_id =? AND year= ?", whereArgs: [ownerId , year]);
+
   }
 
   static Future<List<Map<String, dynamic>>> getOccupantsWithLodgingId(

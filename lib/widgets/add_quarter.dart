@@ -21,7 +21,7 @@ class _AddQuarterState extends State<AddQuarter> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(" Ajouter une categorie"),
+        title: const Text(" Ajouter un quartier"),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

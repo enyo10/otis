@@ -25,10 +25,10 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFEFFFFD) ,
+      /*backgroundColor: const Color(0xFFEFFFFD)*/
 
       appBar: AppBar(
-        title: const Text(" liste des quartiers"),
+        title: const Text(" Liste des quartiers", style: TextStyle(fontSize: 30.0),),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
@@ -72,7 +72,11 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
                   ),
                   color: color,
                   child: ListTile(
-                    title: Center(child: Text(name)),
+                    title: Center(
+                        child: Text(
+                      name,
+                      style: const TextStyle(fontSize: 30),
+                    )),
                   ),
                 ),
               ),

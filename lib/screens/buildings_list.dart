@@ -31,7 +31,9 @@ class _BuildingsListState extends State<BuildingsList> {
     return Scaffold(
      // backgroundColor: Colors.black26,
       appBar: AppBar(
-        title: const Text(" Immeubles"),
+        title: const Text(" Immeubles", style: TextStyle(
+          fontSize: 30.0
+        ),),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
@@ -52,7 +54,6 @@ class _BuildingsListState extends State<BuildingsList> {
                 (" Pas de données"),
                 style: TextStyle(
                   fontSize: 30.0,
-                   color: Colors.white,
                 ),
               ),
             )
@@ -85,7 +86,7 @@ class _BuildingsListState extends State<BuildingsList> {
                       color: color,
                       child: ListTile(
                         title: Center(child: Text(name, style: const TextStyle(
-                          fontSize: 25.0
+                          fontSize: 30.0
                         ),)),
                       ),
                     ),
