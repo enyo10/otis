@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:otis/models/payment.dart';
 
 List<Color> colorCollection = <Color>[
   const Color(0xFFADE2CF),
@@ -49,17 +50,39 @@ Map<String, Color> colorMap = {
 };
 
 var color = const Color(0xFFEFFFFD);
-Map<int, String>monthMap = {
-  1:'Janvier',
-  2:'Février',
-  3:'Mars',
-  4:'Avril',
-  5:'Mai',
-  6:'Juin',
-  7:'Juillet',
-  8:'Août',
-  9:'Septembre',
-  10:'Octobre',
-  11:'Novembre',
-  12:'Décembre'
+Map<int, String> monthMap = {
+  1: 'Janvier',
+  2: 'Février',
+  3: 'Mars',
+  4: 'Avril',
+  5: 'Mai',
+  6: 'Juin',
+  7: 'Juillet',
+  8: 'Août',
+  9: 'Septembre',
+  10: 'Octobre',
+  11: 'Novembre',
+  12: 'Décembre'
 };
+
+class Data {
+  final int month;
+  Payment? payment;
+
+  Data({required this.month});
+}
+
+List<Data> dataList = [
+  Data(month: 1),
+  Data(month: 2),
+  Data(month: 3),
+  Data(month: 4),
+  Data(month: 5),
+  Data(month: 6),
+  Data(month: 7),
+  Data(month: 8),
+  Data(month: 9),
+  Data(month: 10),
+  Data(month: 11),
+  Data(month: 12),
+];

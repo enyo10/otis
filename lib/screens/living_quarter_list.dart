@@ -25,10 +25,12 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /*backgroundColor: const Color(0xFFEFFFFD)*/
 
       appBar: AppBar(
-        title: const Text(" Liste des quartiers", style: TextStyle(fontSize: 30.0),),
+        title: const Text(
+          " Liste des quartiers",
+          style: TextStyle(fontSize: 25.0),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
@@ -87,9 +89,6 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
 
   _loadData() async {
     final data = await SQLHelper.getLivingQuarters();
-    if (kDebugMode) {
-      print(" living quarter loaded and size is ${data.length}");
-    }
 
     setState(() {
       _livingQuarters = data;

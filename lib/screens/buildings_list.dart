@@ -29,11 +29,12 @@ class _BuildingsListState extends State<BuildingsList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     // backgroundColor: Colors.black26,
+      // backgroundColor: Colors.black26,
       appBar: AppBar(
-        title: const Text(" Immeubles", style: TextStyle(
-          fontSize: 30.0
-        ),),
+        title: const Text(
+          " Les immeubles",
+          style: TextStyle(fontSize: 25.0),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
@@ -42,18 +43,19 @@ class _BuildingsListState extends State<BuildingsList> {
               .push(
                 MaterialPageRoute(
                   fullscreenDialog: true,
-                  builder: (context) => AddBuilding(livingQuarter: widget.livingQuarter),
+                  builder: (context) =>
+                      AddBuilding(livingQuarter: widget.livingQuarter),
                 ),
               )
-              .then((value) => value ? _loadData() : null);
+              .then((value) =>  _loadData() );
         },
       ),
       body: _buildings.isEmpty
           ? const Center(
               child: Text(
-                (" Pas de données"),
+                ("La liste est vide"),
                 style: TextStyle(
-                  fontSize: 30.0,
+                  fontSize: 25.0,
                 ),
               ),
             )
@@ -66,14 +68,12 @@ class _BuildingsListState extends State<BuildingsList> {
                 var color = colorMap[colorName];
 
                 return GestureDetector(
-                  onDoubleTap: (){
+                  onDoubleTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) =>
-                            LodgingList(building: building),
+                        builder: (context) => LodgingList(building: building),
                       ),
                     );
-
                   },
                   child: SizedBox(
                     height: 200,
@@ -85,9 +85,11 @@ class _BuildingsListState extends State<BuildingsList> {
                       ),
                       color: color,
                       child: ListTile(
-                        title: Center(child: Text(name, style: const TextStyle(
-                          fontSize: 30.0
-                        ),)),
+                        title: Center(
+                            child: Text(
+                          name,
+                          style: const TextStyle(fontSize: 30.0),
+                        )),
                       ),
                     ),
                   ),
@@ -98,13 +100,8 @@ class _BuildingsListState extends State<BuildingsList> {
 
   _loadData() async {
     final data = await SQLHelper.getBuildings(widget.livingQuarter.id);
-    if (kDebugMode) {
-      print(" buildings loaded and size is ${data.length}");
-    }
-
     setState(() {
       _buildings = data;
     });
   }
-
 }

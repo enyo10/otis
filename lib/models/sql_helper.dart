@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:otis/models/payment_period.dart';
+import 'package:otis/models/period.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:path/path.dart';
 

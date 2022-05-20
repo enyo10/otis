@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-import 'package:otis/models/payment_period.dart';
+import 'package:otis/models/period.dart';
 import 'package:otis/models/sql_helper.dart';
 
 class AddPayment extends StatefulWidget {

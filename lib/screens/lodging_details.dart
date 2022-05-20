@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:otis/helper.dart';
@@ -18,37 +17,14 @@ class LodgingDetails extends StatefulWidget {
 }
 
 class _LodgingDetailsState extends State<LodgingDetails> {
-  /*final TextEditingController _amount = TextEditingController();
-  late final Occupant _occupant;*/
   Map<String, dynamic>? _occupantMap;
   List<Map<String, dynamic>> _occupants = [];
+  final int _currentMonth = DateTime.now().month;
+  List<Data> monthDataList = dataList;
 
-  /* Payment payment1 = Payment(
-      paymentId: 1,
-      amount: 2076,
-      ownerId: 1,
-      paymentDate: DateTime.now(),
-      paymentPeriod: Period(month: 1, year: 2022));
-  Payment payment2 = Payment(
-      paymentId: 1,
-      amount: 39652.0,
-      ownerId: 1,
-      paymentDate: DateTime.now(),
-      paymentPeriod: Period(month: 2, year: 2022));
-  Payment payment3 = Payment(
-      paymentId: 1,
-      amount: 2076,
-      ownerId: 1,
-      paymentDate: DateTime.now(),
-      paymentPeriod: Period(month: 3, year: 2022));
-  Payment payment4 = Payment(
-      paymentId: 1,
-      amount: 39652.0,
-      ownerId: 1,
-      paymentDate: DateTime.now(),
-      paymentPeriod: Period(month: 4, year: 2022));*/
   List<Payment> _payments = [];
   late int ownerId;
+  late DateTime entryDate;
   bool _isLoading = true;
 
   @override
@@ -86,7 +62,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                       fullscreenDialog: false,
                     ),
                   )
-                  .then((value) => value ? _loadData() : null);
+                  .then((value) =>  _loadPayments() );
             },
             style: ElevatedButton.styleFrom(
                 //  primary: Colors.purple,
@@ -94,7 +70,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                 padding: const EdgeInsets.all(10),
                 textStyle:
                     const TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
-            child: const Text(" Ajouter payement"),
+            child: const Text(" Ajouter payement "),
             autofocus: true,
           ),
         ),
@@ -114,7 +90,9 @@ class _LodgingDetailsState extends State<LodgingDetails> {
               ),
               child: !isOccupied()
                   ? const Center(
-                      child: Text("Pas d'occupant"),
+                      child: Text("Pas d'occupant", style: TextStyle(
+                        fontSize: 25.0
+                      ),),
                     )
                   : Builder(
                       builder: (context) {
@@ -236,7 +214,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                                       const Divider(
                                         color: Colors.black,
                                       ),
-                                  itemCount: monthMap.values.length,
+                                  itemCount: monthDataList.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
                                     return _newListItem(index);
@@ -260,11 +238,13 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         ownerId = _occupantMap!['id'];
 
         _loadPayments();
+
       }
     });
 
     setState(() {
       _isLoading = false;
+
     });
   }
 
@@ -278,7 +258,9 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     });
     setState(() {
       _payments = paymentList;
+
     });
+    _updateMonthList();
 
     if (kDebugMode) {
       print("payments size ${_payments.length}");
@@ -299,15 +281,12 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
   bool isOccupied() => _occupantMap != null;
 
-  Icon _statusIcon(int index, Payment? payment) {
+  Icon _statusIcon( Payment? payment) {
     var icon = const Icon(
       Icons.close,
       color: Colors.red,
     );
 
-    if (kDebugMode) {
-      print(widget.lodging.rent);
-    }
     if (payment != null) {
       if (payment.amount == widget.lodging.rent) {
         icon = const Icon(
@@ -327,11 +306,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   bool _isVisible(int index, Payment? payment) {
     var actualMonth = DateTime.now().month;
 
-    if (kDebugMode) {
-      print(" month : $actualMonth");
-      print(" index $index");
-    }
-
     if (index < actualMonth || payment != null) {
       return true;
     } else {
@@ -339,26 +313,53 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     }
   }
 
-  Widget _newListItem(int index) {
-    var month = monthMap.values.elementAt(index);
-    Payment? payment;
-
-    _payments
-        .sort((a, b) => a.paymentPeriod.month.compareTo(b.paymentPeriod.month));
-    if (index < _payments.length) {
-      payment = _payments.elementAt(index);
-    } else {
-      payment = null;
+  _updateMonthList() {
+    if (kDebugMode) {
+      print("payment size ${_payments.length}");
+    }
+    for (var element in _payments) {
+      if (kDebugMode) {
+        print("Element ---- month${element.paymentPeriod.month}");
+      }
     }
 
-    var icon = _statusIcon(index, payment);
+    for (int i = 0; i < monthDataList.length - 1; i++) {
+      for (int j = 0; j < _payments.length - 1; j++) {
+        if (monthDataList.elementAt(i).month ==
+            _payments.elementAt(j).paymentPeriod.month) {
+          setState(() {
+            monthDataList.elementAt(i).payment = _payments.elementAt(j);
+          });
+
+          if (kDebugMode) {
+            print("in update ${monthDataList.elementAt(i).payment}");
+          }
+
+        }
+      }
+    }
+
+    if (kDebugMode) {
+      print("in update payment list ${_payments.length}");
+    }
+
+  }
+
+  Widget _newListItem(int index) {
+    var data = monthDataList.elementAt(index);
+    var month = monthMap[data.month];
+
+    Payment? payment= data.payment;
+    print("payment $payment");
+
+    var icon = _statusIcon( payment);
 
     return Row(
       children: [
         SizedBox(
           width: 150.0,
           child: Text(
-            month,
+            month!,
             style: const TextStyle(fontSize: 20.0),
           ),
         ),

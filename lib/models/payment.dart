@@ -1,4 +1,4 @@
-import 'package:otis/models/payment_period.dart';
+import 'package:otis/models/period.dart';
 
 class Payment {
   final int paymentId;
