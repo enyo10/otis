@@ -19,16 +19,17 @@ class LodgingDetails extends StatefulWidget {
 class _LodgingDetailsState extends State<LodgingDetails> {
   Map<String, dynamic>? _occupantMap;
   List<Map<String, dynamic>> _occupants = [];
-  final int _currentMonth = DateTime.now().month;
+
   List<Data> monthDataList = dataList;
 
   List<Payment> _payments = [];
+  final Map<int, String> _monthMap = monthMap;
   late int ownerId;
   late DateTime entryDate;
   bool _isLoading = true;
 
   @override
-  void initState() {
+  initState() {
     super.initState();
     _loadData();
   }
@@ -59,10 +60,10 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                         initialDate: DateTime.now(),
                         ownerId: ownerId,
                       ),
-                      fullscreenDialog: false,
+                      fullscreenDialog: true,
                     ),
                   )
-                  .then((value) =>  _loadPayments() );
+                  .then((value) => value ? _loadData() : null);
             },
             style: ElevatedButton.styleFrom(
                 //  primary: Colors.purple,
@@ -90,9 +91,10 @@ class _LodgingDetailsState extends State<LodgingDetails> {
               ),
               child: !isOccupied()
                   ? const Center(
-                      child: Text("Pas d'occupant", style: TextStyle(
-                        fontSize: 25.0
-                      ),),
+                      child: Text(
+                        "Pas d'occupant",
+                        style: TextStyle(fontSize: 25.0),
+                      ),
                     )
                   : Builder(
                       builder: (context) {
@@ -229,6 +231,9 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   }
 
   _loadData() async {
+    if (kDebugMode) {
+      print(" Load data is called");
+    }
     var occupantData =
         await SQLHelper.getOccupantsWithLodgingId(widget.lodging.id)
             .then((value) {
@@ -238,29 +243,47 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         ownerId = _occupantMap!['id'];
 
         _loadPayments();
-
       }
     });
 
     setState(() {
       _isLoading = false;
-
     });
   }
 
+  _load() async {
+    /*List<Payment> weightData =
+        mapData.entries.map((entry) => Weight(entry.key, entry.value)).toList();*/
+    List<Payment> payments = await SQLHelper.getCurrentYearPayment(ownerId)
+        .then((value) => value.map((e) => Payment.fromMap(e)).toList());
+  }
+
   _loadPayments() async {
-    List<Payment> paymentList = [];
+    var monthDataList1 = dataList;
+    if (_occupants.isNotEmpty) {
+      List<Payment> paymentList = [];
 
-    await SQLHelper.getCurrentYearPayment(ownerId).then((value) {
-      for (var element in value) {
-        paymentList.add(Payment.fromMap(element));
-      }
-    });
-    setState(() {
-      _payments = paymentList;
+      await SQLHelper.getCurrentYearPayment(ownerId).then((value) {
+        for (var element in value) {
+          paymentList.add(Payment.fromMap(element));
+        }
 
-    });
-    _updateMonthList();
+        for (var i = 0; i < monthDataList1.length; i++) {
+          for (var j = 0; j < paymentList.length; j++) {
+            if (monthDataList1.elementAt(i).month ==
+                paymentList.elementAt(j).paymentPeriod.month) {
+              monthDataList1.elementAt(i).payment = paymentList.elementAt(j);
+
+            }
+          }
+        }
+      });
+
+      setState(() {
+        _payments = paymentList;
+        monthDataList = monthDataList1;
+      });
+    }
 
     if (kDebugMode) {
       print("payments size ${_payments.length}");
@@ -281,7 +304,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
   bool isOccupied() => _occupantMap != null;
 
-  Icon _statusIcon( Payment? payment) {
+  Icon _statusIcon(Payment? payment) {
     var icon = const Icon(
       Icons.close,
       color: Colors.red,
@@ -314,45 +337,22 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   }
 
   _updateMonthList() {
-    if (kDebugMode) {
-      print("payment size ${_payments.length}");
-    }
-    for (var element in _payments) {
-      if (kDebugMode) {
-        print("Element ---- month${element.paymentPeriod.month}");
-      }
-    }
-
     for (int i = 0; i < monthDataList.length - 1; i++) {
       for (int j = 0; j < _payments.length - 1; j++) {
         if (monthDataList.elementAt(i).month ==
             _payments.elementAt(j).paymentPeriod.month) {
-          setState(() {
-            monthDataList.elementAt(i).payment = _payments.elementAt(j);
-          });
-
-          if (kDebugMode) {
-            print("in update ${monthDataList.elementAt(i).payment}");
-          }
-
+          monthDataList.elementAt(i).payment = _payments.elementAt(j);
         }
       }
     }
-
-    if (kDebugMode) {
-      print("in update payment list ${_payments.length}");
-    }
-
   }
 
   Widget _newListItem(int index) {
     var data = monthDataList.elementAt(index);
     var month = monthMap[data.month];
 
-    Payment? payment= data.payment;
-    print("payment $payment");
-
-    var icon = _statusIcon( payment);
+    Payment? payment = data.payment;
+    var icon = _statusIcon(payment);
 
     return Row(
       children: [
@@ -360,6 +360,41 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           width: 150.0,
           child: Text(
             month!,
+            style: const TextStyle(fontSize: 20.0),
+          ),
+        ),
+        //const SizedBox(width: 40,),
+        Visibility(
+          child: icon,
+          visible: _isVisible(index, payment),
+        )
+      ],
+    );
+  }
+
+  Widget _istItem(int index) {
+    /*var data = monthDataList.elementAt(index);
+    var month = monthMap[data.month];*/
+
+    var month = _monthMap.values.elementAt(index);
+    var key = _monthMap.keys.elementAt(index);
+    Payment? payment;
+    for (Payment p in _payments) {
+      if (p.paymentPeriod.month == key) {
+        payment = p;
+      } else {
+        payment = null;
+      }
+    }
+
+    var icon = _statusIcon(payment);
+
+    return Row(
+      children: [
+        SizedBox(
+          width: 150.0,
+          child: Text(
+            month,
             style: const TextStyle(fontSize: 20.0),
           ),
         ),

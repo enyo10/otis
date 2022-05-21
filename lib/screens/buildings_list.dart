@@ -47,7 +47,7 @@ class _BuildingsListState extends State<BuildingsList> {
                       AddBuilding(livingQuarter: widget.livingQuarter),
                 ),
               )
-              .then((value) =>  _loadData() );
+              .then((_) => {_loadData()});
         },
       ),
       body: _buildings.isEmpty
