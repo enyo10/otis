@@ -67,9 +67,18 @@ Map<int, String> monthMap = {
 
 class Data {
   final int month;
-  Payment? payment;
+  final List<Payment>_payments = [];
 
   Data({required this.month});
+
+  addPayment(Payment payment){
+    _payments.add(payment);
+  }
+  get payments =>_payments;
+}
+
+ String stringValue(DateTime dateTime){
+  return "${dateTime.day}/${dateTime.month}/${dateTime.year}";
 }
 
 List<Data> dataList = [
@@ -86,6 +95,9 @@ List<Data> dataList = [
   Data(month: 11),
   Data(month: 12),
 ];
+
+
+
 
 const kBottomContainerHeight = 80.0;
 const kBottomContainerColor = Color(0xFFEB1555);

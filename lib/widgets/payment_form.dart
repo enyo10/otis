@@ -16,10 +16,11 @@ class AddPayment extends StatefulWidget {
 }
 
 class _AddPaymentState extends State<AddPayment> {
-  final TextEditingController _paymentAmountController =
+  final TextEditingController _dollarPaymentController =
       TextEditingController();
 
   late DateTime selectedDate;
+
 
   @override
   void initState() {
@@ -47,7 +48,7 @@ class _AddPaymentState extends State<AddPayment> {
               padding: const EdgeInsets.all(15.0),
               child: TextField(
                 decoration: const InputDecoration(hintText: 'Amount'),
-                controller: _paymentAmountController,
+                controller: _dollarPaymentController,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [
@@ -74,7 +75,8 @@ class _AddPaymentState extends State<AddPayment> {
                   ElevatedButton(
                       onPressed: () {
                         showMonthPicker(
-                                context: context, initialDate: widget.initialDate)
+                                context: context,
+                                initialDate: widget.initialDate)
                             .then((date) => {
                                   if (date != null)
                                     {
@@ -95,29 +97,31 @@ class _AddPaymentState extends State<AddPayment> {
             const SizedBox(
               height: 30,
             ),
-            IconButton(onPressed: () {
-              _savePayment();
+            IconButton(
+                onPressed: () {
+                  _savePayment();
 
-              Navigator.of(context).pop(true);
-             // Navigator.pop(context, true);
-
-            }, icon: const Icon(Icons.save))
+                  Navigator.of(context).pop(true);
+                  // Navigator.pop(context, true);
+                },
+                icon: const Icon(Icons.save))
           ],
         ),
       ),
     );
   }
 
-  _savePayment() async {
+  Future<int> _savePayment() async {
     var paymentDate = DateTime.now();
     var month = selectedDate.month;
     var year = selectedDate.year;
-    var amount = double.parse(_paymentAmountController.text);
+    var amount = double.parse(_dollarPaymentController.text);
     var periodOfPayment = Period(month: month, year: year);
     var id = await SQLHelper.insertPayment(
-        widget.ownerId, amount, paymentDate, periodOfPayment);
+        widget.ownerId, amount, paymentDate, periodOfPayment, "\$", 450);
     if (kDebugMode) {
       print(" Payment with id : $id inserted");
     }
+    return id;
   }
 }

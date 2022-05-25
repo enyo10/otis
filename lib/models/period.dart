@@ -4,12 +4,18 @@ import 'package:otis/models/payment.dart';
 class Period {
   final int month;
   final int year;
-  Payment? payment;
+  //Payment? payment;
+  List<dynamic>payments = [];
 
-  Period({this.payment,required this.month, required this.year});
 
- /* PaymentPeriod.fromMap(Map<String, dynamic> map)
+  Period({required this.month, required this.year});
+
+  Period.fromMap(Map<String, dynamic> map)
       : month = map['month'],
         year = map['year'];
-  */
+
+  void addPayment(Payment payment)=> payments.add(payment);
+
+
+
 }

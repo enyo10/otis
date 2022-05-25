@@ -6,12 +6,14 @@ class Payment {
   final int ownerId;
   final DateTime paymentDate;
   final Period paymentPeriod;
+  final String currency;
 
   Payment(
       {required this.paymentId,
       required this.amount,
       required this.ownerId,
       required this.paymentDate,
+      required this.currency,
       required this.paymentPeriod});
 
   Payment.fromMap(Map<String, dynamic> map)
@@ -19,5 +21,6 @@ class Payment {
         ownerId = map['owner_id'],
         paymentDate = DateTime.parse(map['payment_date']),
         paymentPeriod = Period(month: map['month'], year: map['year']),
-        amount = map['amount'];
+        amount = map['amount'],
+        currency = map['currency'];
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:otis/screens/home.dart';
-
+import 'package:otis/screens/payment_details.dart';
+import 'package:otis/widgets/add_payment.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,13 +18,19 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Otis',
       theme: ThemeData(
-        primarySwatch: Colors.red,
+          primarySwatch: Colors.red,
           scaffoldBackgroundColor: const Color(0xFFEFFFFD)
           //primaryColor: Colors.orange
-       // backgroundColor: Colors.black12
-      ),
+          // backgroundColor: Colors.black12
+          ),
 
-      home: const HomeScreen(),
+       home: const HomeScreen(),
+
+      /*home: AddPayments(
+        ownerId: 1,
+        month: 1,
+        entryDate: DateTime.now(), rent:20,
+      ),*/
     );
   }
 }

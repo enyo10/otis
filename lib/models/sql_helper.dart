@@ -60,6 +60,8 @@ class SQLHelper {
     await database.execute("""CREATE TABLE $_payments(
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     amount REAL,
+    currency TEXT,
+    rate REAL,
     payment_date TEXT,
     year INTEGER,
     month INTEGER,
@@ -69,14 +71,13 @@ class SQLHelper {
          ON UPDATE CASCADE
          ON DELETE CASCADE ) 
     """);
-
   }
 
   static Future _onConfigure(sql.Database db) async {
     await db.execute('PRAGMA foreign_keys = ON');
   }
 
-  static Future<sql.Database> db() async {
+  static Future<sql.Database> _db() async {
     return sql.openDatabase(
       join(await sql.getDatabasesPath(), 'otis.db'),
       version: 1,
@@ -90,7 +91,7 @@ class SQLHelper {
   // Create new apartment(journal)
   static Future<int> insertApartment(int type, int buildingId, String address,
       String? description, double rent) async {
-    final db = await SQLHelper.db();
+    final db = await SQLHelper._db();
 
     final data = {
       'type': type,
@@ -106,7 +107,7 @@ class SQLHelper {
 
   static Future<List<Map<String, dynamic>>> getApartments(
       int buildingId) async {
-    final db = await SQLHelper.db();
+    final db = await SQLHelper._db();
     return db.query(_apartments,
         where: "building_id = ?", whereArgs: [buildingId], orderBy: "id");
   }
@@ -114,14 +115,14 @@ class SQLHelper {
   // Read a single apartment by id
   // The app doesn't use this method but I put here in case you want to see it
   static Future<List<Map<String, dynamic>>> getApartment(int id) async {
-    final db = await SQLHelper.db();
+    final db = await SQLHelper._db();
     return db.query(_apartments, where: "id = ?", whereArgs: [id], limit: 1);
   }
 
   // Update an apartment by id
   static Future<int> updateApartment(
       int id, int type, double rent, String title, String? description) async {
-    final db = await SQLHelper.db();
+    final db = await SQLHelper._db();
 
     final data = {
       'type': type,
@@ -138,7 +139,7 @@ class SQLHelper {
 
   // Delete
   static Future<void> deleteApartment(int id) async {
-    final db = await SQLHelper.db();
+    final db = await SQLHelper._db();
     try {
       await db.delete(_apartments, where: "id = ?", whereArgs: [id]);
     } catch (err) {
@@ -148,7 +149,7 @@ class SQLHelper {
 
   static Future<int> insertOccupant(String firstname, String lastname,
       String entryDate, int lodgingId) async {
-    final db = await SQLHelper.db();
+    final db = await SQLHelper._db();
 
     final data = {
       'firstname': firstname,
@@ -162,20 +163,27 @@ class SQLHelper {
   }
 
   static Future<List<Map<String, dynamic>>> getOccupants() async {
-    final db = await SQLHelper.db();
+    final db = await SQLHelper._db();
     return db.query(_occupants, orderBy: "id");
   }
 
-  static Future<int> insertPayment(int ownerId, double amount,
-      DateTime paymentDate, Period periodOfPayment) async {
-    final db = await SQLHelper.db();
+  static Future<int> insertPayment(
+      int ownerId,
+      double amount,
+      DateTime paymentDate,
+      Period periodOfPayment,
+      String currency,
+      double rate) async {
+    final db = await SQLHelper._db();
 
     final data = {
       'owner_id': ownerId,
       'amount': amount,
       'payment_date': paymentDate.toIso8601String(),
-      'year':periodOfPayment.year,
-      'month': periodOfPayment.month
+      'year': periodOfPayment.year,
+      'month': periodOfPayment.month,
+      'currency': currency,
+      'rate': rate
     };
     final id = await db.insert(_payments, data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
@@ -183,28 +191,42 @@ class SQLHelper {
     return id;
   }
 
-  static Future<List<Map<String, dynamic>>> getCurrentYearPayment(int ownerId) async {
+  static Future<List<Map<String, dynamic>>> getCurrentYearPayment(
+      int ownerId) async {
     var year = DateTime.now().year;
-    final db = await SQLHelper.db();
-    return db.query(_payments, where: "owner_id =? AND year= ?", whereArgs: [ownerId , year]);
+    final db = await SQLHelper._db();
+    return db.query(_payments,
+        where: "owner_id =? AND year= ?", whereArgs: [ownerId, year]);
+  }
 
+  static Future<List<Map<String, dynamic>>> getPayments(int ownerId) async {
+    final db = await SQLHelper._db();
+    return db.query(_payments, where: "owner_id=?", whereArgs: [ownerId]);
+  }
+
+  static Future<List<Map<String, dynamic>>> getPeriodPayments(
+      int ownerId, int year, int month) async {
+    final db = await SQLHelper._db();
+    return db.query(_payments,
+        where: "owner_id =? AND year =? AND month=?",
+        whereArgs: [ownerId, year, month]);
   }
 
   static Future<List<Map<String, dynamic>>> getOccupantsWithLodgingId(
       int lodgingId) async {
-    final db = await SQLHelper.db();
+    final db = await SQLHelper._db();
     return db.query(_occupants,
         where: "lodging_id = ?", whereArgs: [lodgingId], limit: 1);
   }
 
   static Future<List<Map<String, dynamic>>> getLivingQuarters() async {
-    final db = await SQLHelper.db();
+    final db = await SQLHelper._db();
     return db.query(_livingQuarter, orderBy: "id");
   }
 
   static Future<int> insertLivingQuarter(
       String quarterName, String color) async {
-    final db = await SQLHelper.db();
+    final db = await SQLHelper._db();
 
     final data = {'name': quarterName, 'color': color};
 
@@ -218,7 +240,7 @@ class SQLHelper {
 
   static Future<int> insertBuilding(
       String buildingName, String color, int quarterId) async {
-    final db = await SQLHelper.db();
+    final db = await SQLHelper._db();
 
     final data = {
       'name': buildingName,
@@ -235,7 +257,7 @@ class SQLHelper {
   }
 
   static Future<List<Map<String, dynamic>>> getBuildings(int quarterId) async {
-    final db = await SQLHelper.db();
+    final db = await SQLHelper._db();
     return db.query(_building,
         where: "quarter_id = ?", whereArgs: [quarterId], orderBy: "id");
   }

@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:otis/helper.dart';
 import 'package:otis/models/payment.dart';
+import 'package:otis/models/period.dart';
+import 'package:otis/screens/payment_details.dart';
 import 'package:otis/widgets/payment_form.dart';
 
 import '../models/lodging.dart';
@@ -10,6 +12,7 @@ import '../widgets/occupant_form.dart';
 
 class LodgingDetails extends StatefulWidget {
   final Lodging lodging;
+
   const LodgingDetails({Key? key, required this.lodging}) : super(key: key);
 
   @override
@@ -40,11 +43,14 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       appBar: AppBar(
         title: const Text('Logement'),
         actions: [
-          IconButton(
-              onPressed: () {
-                showOccupantForm();
-              },
-              icon: const Icon(Icons.add))
+          Visibility(
+            visible: !isOccupied(),
+            child: IconButton(
+                onPressed: () {
+                  showOccupantForm();
+                },
+                icon: const Icon(Icons.add)),
+          ),
         ],
       ),
       bottomNavigationBar: Padding(
@@ -272,8 +278,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           for (var j = 0; j < paymentList.length; j++) {
             if (monthDataList1.elementAt(i).month ==
                 paymentList.elementAt(j).paymentPeriod.month) {
-              monthDataList1.elementAt(i).payment = paymentList.elementAt(j);
-
+              monthDataList1.elementAt(i).addPayment(paymentList.elementAt(j));
             }
           }
         }
@@ -304,14 +309,15 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
   bool isOccupied() => _occupantMap != null;
 
-  Icon _statusIcon(Payment? payment) {
+  Icon _statusIcon(List<Payment> payments) {
     var icon = const Icon(
       Icons.close,
       color: Colors.red,
     );
 
-    if (payment != null) {
-      if (payment.amount == widget.lodging.rent) {
+    if (payments.isNotEmpty) {
+      if (getSum(payments) == widget.lodging.rent) {
+        
         icon = const Icon(
           Icons.check,
           color: Colors.green,
@@ -326,24 +332,21 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     return icon;
   }
 
-  bool _isVisible(int index, Payment? payment) {
+  double getSum(List<Payment> payments) {
+    var sum = 0.0;
+    for (Payment payment in payments) {
+      sum += payment.amount;
+    }
+    return sum;
+  }
+
+  bool _isVisible(int index, List<Payment> payments) {
     var actualMonth = DateTime.now().month;
 
-    if (index < actualMonth || payment != null) {
+    if (index < actualMonth || payments.isNotEmpty) {
       return true;
     } else {
       return false;
-    }
-  }
-
-  _updateMonthList() {
-    for (int i = 0; i < monthDataList.length - 1; i++) {
-      for (int j = 0; j < _payments.length - 1; j++) {
-        if (monthDataList.elementAt(i).month ==
-            _payments.elementAt(j).paymentPeriod.month) {
-          monthDataList.elementAt(i).payment = _payments.elementAt(j);
-        }
-      }
     }
   }
 
@@ -351,59 +354,35 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     var data = monthDataList.elementAt(index);
     var month = monthMap[data.month];
 
-    Payment? payment = data.payment;
-    var icon = _statusIcon(payment);
+    // Payment? payment = data.payment;
+    List<Payment> payments = data.payments;
+    var icon = _statusIcon(payments);
 
-    return Row(
-      children: [
-        SizedBox(
-          width: 150.0,
-          child: Text(
-            month!,
-            style: const TextStyle(fontSize: 20.0),
+    return GestureDetector(
+      onDoubleTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => PaymentDetails(payments: payments),
+            fullscreenDialog: true,
           ),
-        ),
-        //const SizedBox(width: 40,),
-        Visibility(
-          child: icon,
-          visible: _isVisible(index, payment),
-        )
-      ],
-    );
-  }
-
-  Widget _istItem(int index) {
-    /*var data = monthDataList.elementAt(index);
-    var month = monthMap[data.month];*/
-
-    var month = _monthMap.values.elementAt(index);
-    var key = _monthMap.keys.elementAt(index);
-    Payment? payment;
-    for (Payment p in _payments) {
-      if (p.paymentPeriod.month == key) {
-        payment = p;
-      } else {
-        payment = null;
-      }
-    }
-
-    var icon = _statusIcon(payment);
-
-    return Row(
-      children: [
-        SizedBox(
-          width: 150.0,
-          child: Text(
-            month,
-            style: const TextStyle(fontSize: 20.0),
+        );
+      },
+      child: Row(
+        children: [
+          SizedBox(
+            width: 150.0,
+            child: Text(
+              month!,
+              style: const TextStyle(fontSize: 20.0),
+            ),
           ),
-        ),
-        //const SizedBox(width: 40,),
-        Visibility(
-          child: icon,
-          visible: _isVisible(index, payment),
-        )
-      ],
+          //const SizedBox(width: 40,),
+          Visibility(
+            child: icon,
+            visible: _isVisible(index, payments),
+          )
+        ],
+      ),
     );
   }
 }
