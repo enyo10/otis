@@ -21,7 +21,6 @@ class _AddPaymentState extends State<AddPayment> {
 
   late DateTime selectedDate;
 
-
   @override
   void initState() {
     super.initState();

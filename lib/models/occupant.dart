@@ -10,7 +10,8 @@ class Occupant {
   final List<Payment> payments = [];
 
   Occupant(
-      {required this.id, required this.lodgingId,
+      {required this.id,
+      required this.lodgingId,
       required this.firstname,
       required this.lastname,
       required this.entryDate});
@@ -22,12 +23,17 @@ class Occupant {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'lodging_id':lodgingId,
+      'lodging_id': lodgingId,
       'firstname': firstname,
       'lastname': lastname,
-      'entry_data':entryDate.toIso8601String()
+      'entry_data': entryDate.toIso8601String()
     };
   }
+
+  Occupant.fromMap(Map<String, dynamic> map)
+      : id = map['id'],
+        lodgingId = map['lodging_id'],
+        firstname = map['firstname'],
+        lastname = map['lastname'],
+        entryDate = DateTime.parse(map['entry_date']);
 }
-
-

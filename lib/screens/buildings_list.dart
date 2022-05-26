@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:otis/models/building.dart';
 import 'package:otis/models/living_quarter.dart';

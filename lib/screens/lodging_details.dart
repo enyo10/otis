@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:otis/helper.dart';
+import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
-import 'package:otis/models/period.dart';
 import 'package:otis/screens/payment_details.dart';
+import 'package:otis/widgets/add_payment.dart';
 import 'package:otis/widgets/payment_form.dart';
 
 import '../models/lodging.dart';
@@ -22,11 +23,12 @@ class LodgingDetails extends StatefulWidget {
 class _LodgingDetailsState extends State<LodgingDetails> {
   Map<String, dynamic>? _occupantMap;
   List<Map<String, dynamic>> _occupants = [];
+  late Occupant _occupant;
 
-  List<Data> monthDataList = dataList;
+  late List<Data> monthDataList;
 
-  List<Payment> _payments = [];
-  final Map<int, String> _monthMap = monthMap;
+  late List<Payment> _payments;
+
   late int ownerId;
   late DateTime entryDate;
   bool _isLoading = true;
@@ -34,6 +36,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   @override
   initState() {
     super.initState();
+    _initMonthList();
     _loadData();
   }
 
@@ -59,13 +62,19 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           visible: isOccupied(),
           child: ElevatedButton(
             onPressed: () {
+              var initialDate = DateTime.now();
               Navigator.of(context)
                   .push(
                     MaterialPageRoute(
-                      builder: (context) => AddPayment(
+                      builder:
+                          (context) => /*AddPayment(
                         initialDate: DateTime.now(),
                         ownerId: ownerId,
-                      ),
+                      ),*/
+                              AddPayments(
+                                  occupant: _occupant,
+                                  rent: widget.lodging.rent,
+                                  initialDate: initialDate),
                       fullscreenDialog: true,
                     ),
                   )
@@ -237,16 +246,12 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   }
 
   _loadData() async {
-    if (kDebugMode) {
-      print(" Load data is called");
-    }
-    var occupantData =
-        await SQLHelper.getOccupantsWithLodgingId(widget.lodging.id)
-            .then((value) {
+    await SQLHelper.getOccupantsWithLodgingId(widget.lodging.id).then((value) {
       if (value.isNotEmpty) {
         _occupants = value;
         _occupantMap = _occupants.first;
         ownerId = _occupantMap!['id'];
+        _occupant = Occupant.fromMap(_occupantMap!);
 
         _loadPayments();
       }
@@ -257,15 +262,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     });
   }
 
-  _load() async {
-    /*List<Payment> weightData =
-        mapData.entries.map((entry) => Weight(entry.key, entry.value)).toList();*/
-    List<Payment> payments = await SQLHelper.getCurrentYearPayment(ownerId)
-        .then((value) => value.map((e) => Payment.fromMap(e)).toList());
-  }
-
   _loadPayments() async {
-    var monthDataList1 = dataList;
     if (_occupants.isNotEmpty) {
       List<Payment> paymentList = [];
 
@@ -274,11 +271,11 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           paymentList.add(Payment.fromMap(element));
         }
 
-        for (var i = 0; i < monthDataList1.length; i++) {
+        for (var i = 0; i < monthDataList.length; i++) {
           for (var j = 0; j < paymentList.length; j++) {
-            if (monthDataList1.elementAt(i).month ==
+            if (monthDataList.elementAt(i).month ==
                 paymentList.elementAt(j).paymentPeriod.month) {
-              monthDataList1.elementAt(i).addPayment(paymentList.elementAt(j));
+              monthDataList.elementAt(i).addPayment(paymentList.elementAt(j));
             }
           }
         }
@@ -286,13 +283,24 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
       setState(() {
         _payments = paymentList;
-        monthDataList = monthDataList1;
+        //monthDataList = monthDataList;
       });
     }
 
     if (kDebugMode) {
       print("payments size ${_payments.length}");
     }
+  }
+
+  _initMonthList() {
+    List<Data> list = [];
+    for (var i = 0; i < 12; i++) {
+      list.add(Data(month: i + 1));
+    }
+
+    monthDataList = list;
+
+    print("month: ${monthDataList.length}");
   }
 
   showOccupantForm() {
@@ -309,7 +317,27 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
   bool isOccupied() => _occupantMap != null;
 
-  Icon _statusIcon(List<Payment> payments) {
+  Widget _widgetStatus(List<Payment> payments) {
+    if (payments.isNotEmpty) {
+      if (getSum(payments) == widget.lodging.rent) {
+        return const Icon(
+          Icons.check,
+          color: Colors.green,
+        );
+      } else {
+        return const Icon(
+          Icons.check_box_outlined,
+          color: Colors.orange,
+        );
+      }
+    }
+    return const Icon(
+      Icons.close,
+      color: Colors.red,
+    );
+  }
+
+  /* Icon _statusIcon(List<Payment> payments) {
     var icon = const Icon(
       Icons.close,
       color: Colors.red,
@@ -317,7 +345,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
     if (payments.isNotEmpty) {
       if (getSum(payments) == widget.lodging.rent) {
-        
         icon = const Icon(
           Icons.check,
           color: Colors.green,
@@ -330,7 +357,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       }
     }
     return icon;
-  }
+  }*/
 
   double getSum(List<Payment> payments) {
     var sum = 0.0;
@@ -356,7 +383,8 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
     // Payment? payment = data.payment;
     List<Payment> payments = data.payments;
-    var icon = _statusIcon(payments);
+    // var icon = _statusIcon(payments);
+    var icon = _widgetStatus(payments);
 
     return GestureDetector(
       onDoubleTap: () {

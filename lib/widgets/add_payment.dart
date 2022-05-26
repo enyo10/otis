@@ -1,22 +1,22 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
 import 'package:otis/models/sql_helper.dart';
+
 
 import '../models/period.dart';
 
 class AddPayments extends StatefulWidget {
-  final int ownerId;
-  final int month;
-  final DateTime entryDate;
+  final Occupant occupant;
+  final DateTime initialDate;
   final double rent;
-  const AddPayments(
+
+ const AddPayments(
       {Key? key,
-      required this.ownerId,
+      required this.occupant,
       required this.rent,
-      required this.month,
-      required this.entryDate})
+      required this.initialDate})
       : super(key: key);
 
   @override
@@ -32,11 +32,12 @@ class _AddPaymentsState extends State<AddPayments> {
   double amountInDollar = 0.0;
   DateTime _selectedDate = DateTime.now();
   String _currency = '\$';
+  late DateTime selectedPaymentDate;
 
   @override
   void initState() {
     super.initState();
-    _selectedDate = widget.entryDate;
+    _selectedDate = widget.occupant.entryDate;
   }
 
   @override
@@ -243,3 +244,4 @@ class _AddPaymentsState extends State<AddPayments> {
     return 0;
   }
 }
+

@@ -81,24 +81,6 @@ class Data {
   return "${dateTime.day}/${dateTime.month}/${dateTime.year}";
 }
 
-List<Data> dataList = [
-  Data(month: 1),
-  Data(month: 2),
-  Data(month: 3),
-  Data(month: 4),
-  Data(month: 5),
-  Data(month: 6),
-  Data(month: 7),
-  Data(month: 8),
-  Data(month: 9),
-  Data(month: 10),
-  Data(month: 11),
-  Data(month: 12),
-];
-
-
-
-
 const kBottomContainerHeight = 80.0;
 const kBottomContainerColor = Color(0xFFEB1555);
 const kActiveCardColor = Color(0xFF1D1E33);
