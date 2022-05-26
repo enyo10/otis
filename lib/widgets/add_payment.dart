@@ -1,22 +1,23 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
 import 'package:otis/models/sql_helper.dart';
-
 
 import '../models/period.dart';
 
 class AddPayments extends StatefulWidget {
   final Occupant occupant;
-  final DateTime initialDate;
+  final DateTime initialPaymentPeriodDate;
   final double rent;
 
- const AddPayments(
+  const AddPayments(
       {Key? key,
       required this.occupant,
       required this.rent,
-      required this.initialDate})
+      required this.initialPaymentPeriodDate})
       : super(key: key);
 
   @override
@@ -30,14 +31,15 @@ class _AddPaymentsState extends State<AddPayments> {
   final TextEditingController _taxController = TextEditingController();
 
   double amountInDollar = 0.0;
-  DateTime _selectedDate = DateTime.now();
+  late DateTime _selectedPaymentDate;
   String _currency = '\$';
-  late DateTime selectedPaymentDate;
+  late DateTime _selectedPeriodDate;
 
   @override
   void initState() {
     super.initState();
-    _selectedDate = widget.occupant.entryDate;
+    _selectedPeriodDate = DateTime.now();
+    _selectedPaymentDate = _selectedPeriodDate;
   }
 
   @override
@@ -72,7 +74,7 @@ class _AddPaymentsState extends State<AddPayments> {
                         controller: _dollarPaymentController,
                         decoration: const InputDecoration(
                             border: OutlineInputBorder(),
-                            labelText: 'Payement en Dollar',
+                            labelText: 'Payement ',
                             hintText: 'Enter payement en \$'),
                         style: Theme.of(context).textTheme.labelLarge,
                         keyboardType: const TextInputType.numberWithOptions(
@@ -159,14 +161,31 @@ class _AddPaymentsState extends State<AddPayments> {
                   children: [
                     ElevatedButton(
                         onPressed: () {
-                          _showDatePicker();
+                          _showPaymentMontPicker(context);
+                        },
+                        child: const Text("Periode de payement")),
+                    const SizedBox(
+                      width: 15.0,
+                    ),
+                    Text(
+                        "${_selectedPeriodDate.month}/${_selectedPeriodDate.year}")
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    ElevatedButton(
+                        onPressed: () {
+                          _showPaymentDatePicker();
                         },
                         child: const Text("Date de payement")),
                     const SizedBox(
                       width: 15.0,
                     ),
                     Text(
-                        "${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}")
+                        "${_selectedPaymentDate.day}/${_selectedPaymentDate.month}/${_selectedPaymentDate.year}")
                   ],
                 ),
               ),
@@ -176,7 +195,14 @@ class _AddPaymentsState extends State<AddPayments> {
               Padding(
                 padding: const EdgeInsets.only(right: 30),
                 child: IconButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      if (kDebugMode) {
+                        print("Avant add payment");
+                      }
+                      await _addPayment();
+                      if (kDebugMode) {
+                        print("Après add payment");
+                      }
                       Navigator.of(context).pop(true);
                       // Navigator.pop(context, true);
                     },
@@ -193,6 +219,37 @@ class _AddPaymentsState extends State<AddPayments> {
     );
   }
 
+  void _showPaymentMontPicker(BuildContext context) {
+    showMonthPicker(
+            context: context,
+            initialDate: _selectedPeriodDate,
+            firstDate: widget.initialPaymentPeriodDate)
+        .then((date) => {
+              if (date != null)
+                {
+                  setState(() {
+                    _selectedPeriodDate = date;
+                  })
+                }
+            });
+  }
+
+  void _showPaymentDatePicker() {
+    showDatePicker(
+      context: context,
+      initialDate: _selectedPaymentDate,
+      firstDate: widget.initialPaymentPeriodDate,
+      lastDate: DateTime(2050),
+    ).then((date) => {
+          if (date != null)
+            {
+              setState(() {
+                _selectedPaymentDate = date;
+              })
+            }
+        });
+  }
+
   double convertToDollar(double cdfAmount, double tax) {
     return cdfAmount / tax;
   }
@@ -201,47 +258,64 @@ class _AddPaymentsState extends State<AddPayments> {
     return dollarAmount * tax;
   }
 
-  _showDatePicker() {
-    showDatePicker(
-            context: context,
-            initialDate: _selectedDate,
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2050))
-        .then((date) => {
-              if (date != null)
-                {
-                  setState(() {
-                    _selectedDate = date;
-                  })
-                }
-            });
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 
-  Future<int> _addPayment(
-      int ownerId, int year, int month, double amount) async {
-    double totalAmount = 0;
-
-    List<Payment> payments =
-        await SQLHelper.getPeriodPayments(ownerId, year, month)
-            .then((value) => value.map((e) => Payment.fromMap(e)).toList());
-
-    for (Payment payment in payments) {
-      totalAmount += payment.amount;
+  bool _checkValues() {
+    if (_currency == '\$') {
+      _taxController.text = 1.toString();
     }
-    if (totalAmount < widget.rent) {
-      var paymentDate = _selectedDate;
-      var periodOfPayment = Period(month: month, year: year);
-      double rate;
-      if (_currency == '\$') {
-        rate = 1;
-      } else {
-        rate = double.parse(_taxController.text);
+    if (_dollarPaymentController.text.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<int> _addPayment() async {
+    int id = 0;
+    if (!_checkValues()) {
+      var message = 'Saisir le montant';
+      _showMessage(message);
+      return id;
+    } else {
+      double totalAmount = 0;
+      var ownerId = widget.occupant.id;
+      var year = _selectedPeriodDate.year;
+      var month = _selectedPeriodDate.month;
+      var amount = double.parse(_dollarPaymentController.text);
+
+      List<Payment> payments =
+          await SQLHelper.getPeriodPayments(ownerId, year, month)
+              .then((value) => value.map((e) => Payment.fromMap(e)).toList());
+
+      for (Payment payment in payments) {
+        totalAmount += payment.amount;
       }
+      if (totalAmount < widget.rent) {
+        var paymentDate = _selectedPaymentDate;
+        var periodOfPayment = Period(month: month, year: year);
+        double rate;
+        if (_currency == '\$') {
+          rate = 1;
+        } else {
+          rate = double.parse(_taxController.text);
+        }
 
-      return SQLHelper.insertPayment(
-          ownerId, amount, paymentDate, periodOfPayment, _currency, rate);
+        id = await SQLHelper.insertPayment(
+            ownerId, amount, paymentDate, periodOfPayment, _currency, rate);
+
+        _showMessage(' Le payement est enrégistré');
+        return id;
+      }
+      _showMessage('Erreur: Vérifier les champs');
+
     }
-    return 0;
+    return id ;
   }
 }
-

@@ -19,6 +19,8 @@ class MyApp extends StatelessWidget {
       title: 'Otis',
       theme: ThemeData(
           primarySwatch: Colors.red,
+
+
           scaffoldBackgroundColor: const Color(0xFFEFFFFD)
           //primaryColor: Colors.orange
           // backgroundColor: Colors.black12

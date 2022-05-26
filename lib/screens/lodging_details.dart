@@ -4,8 +4,8 @@ import 'package:otis/helper.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
 import 'package:otis/screens/payment_details.dart';
+import 'package:otis/screens/payments_list.dart';
 import 'package:otis/widgets/add_payment.dart';
-import 'package:otis/widgets/payment_form.dart';
 
 import '../models/lodging.dart';
 import '../models/sql_helper.dart';
@@ -23,11 +23,11 @@ class LodgingDetails extends StatefulWidget {
 class _LodgingDetailsState extends State<LodgingDetails> {
   Map<String, dynamic>? _occupantMap;
   List<Map<String, dynamic>> _occupants = [];
-  late Occupant _occupant;
+  late Occupant occupant;
 
   late List<Data> monthDataList;
 
-  late List<Payment> _payments;
+  //late List<Payment> _payments;
 
   late int ownerId;
   late DateTime entryDate;
@@ -46,14 +46,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       appBar: AppBar(
         title: const Text('Logement'),
         actions: [
-          Visibility(
-            visible: !isOccupied(),
-            child: IconButton(
-                onPressed: () {
-                  showOccupantForm();
-                },
-                icon: const Icon(Icons.add)),
-          ),
+          _actionIcon(),
         ],
       ),
       bottomNavigationBar: Padding(
@@ -62,19 +55,14 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           visible: isOccupied(),
           child: ElevatedButton(
             onPressed: () {
-              var initialDate = DateTime.now();
               Navigator.of(context)
                   .push(
                     MaterialPageRoute(
-                      builder:
-                          (context) => /*AddPayment(
-                        initialDate: DateTime.now(),
-                        ownerId: ownerId,
-                      ),*/
-                              AddPayments(
-                                  occupant: _occupant,
-                                  rent: widget.lodging.rent,
-                                  initialDate: initialDate),
+                      builder: (context) => AddPayments(
+                        occupant: occupant,
+                        rent: widget.lodging.rent,
+                        initialPaymentPeriodDate: occupant.entryDate,
+                      ),
                       fullscreenDialog: true,
                     ),
                   )
@@ -96,9 +84,9 @@ class _LodgingDetailsState extends State<LodgingDetails> {
               child: CircularProgressIndicator(),
             )
           : Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
               decoration: const BoxDecoration(
-                color: Colors.white,
+               //  color: Colors.orangeAccent,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
@@ -116,128 +104,135 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                         var entryDate =
                             DateTime.parse(_occupantMap!['entry_date']);
 
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 30.0),
-                                  child: Row(
-                                    children: [
-                                      const Text(
-                                        "Nom:",
-                                        style: TextStyle(
-                                            fontStyle: FontStyle.italic),
-                                      ),
-                                      Text(
-                                        " : ${_occupantMap!['firstname']} ",
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 10),
-                                  child: Row(
-                                    children: [
-                                      const Text(
-                                        "Prenom:",
-                                        style: TextStyle(
-                                            fontStyle: FontStyle.italic),
-                                      ),
-                                      Text(
-                                        "  ${_occupantMap!['lastname']} ",
-                                        style: const TextStyle(fontSize: 20),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 10.0),
-                                  child: Row(
-                                    children: [
-                                      const Text("Date d'entrée:",
-                                          style: TextStyle(
-                                              fontStyle: FontStyle.italic)),
-                                      Text(
-                                        ' ${entryDate.day}/${entryDate.month}/${entryDate.year}',
-                                        style: const TextStyle(fontSize: 20.0),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 10, bottom: 20),
-                                  child: Row(
-                                    children: [
-                                      const Text(
-                                        "Mensualité:",
-                                        style: TextStyle(
-                                            fontStyle: FontStyle.italic),
-                                      ),
-                                      Text(
-                                        " ${widget.lodging.rent} \$ ",
-                                        style: const TextStyle(fontSize: 20.0),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 10, bottom: 30),
-                                  child: Text(
-                                    "Situation des payements ",
-                                    style: TextStyle(
-                                        fontSize: 20.0,
-                                        fontStyle: FontStyle.italic,
-                                        color: Colors.blue),
-                                  ),
-                                )
-                              ],
-                            ),
-                            Container(
-                              padding: const EdgeInsets.only(left: 0),
-                              color: Colors.black12,
-                              height: 40.0,
-                              child: Row(
+                        return Container(
+                     //     color: Colors.orangeAccent,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Column(
                                 children: [
-                                  Container(
-                                    child: const Text(
-                                      "Mois",
-                                      style: TextStyle(fontSize: 20.0),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10.0),
+                                    child: Row(
+                                      children: [
+                                        const Text(
+                                          "Nom:",
+                                          style: TextStyle(
+                                              fontStyle: FontStyle.italic),
+                                        ),
+                                        Text(
+                                          " : ${_occupantMap!['firstname']} ",
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                          ),
+                                        )
+                                      ],
                                     ),
-                                    padding: const EdgeInsets.only(left: 10),
-                                    width: 150.0,
                                   ),
-                                  //const SizedBox(width: 40,),
-                                  const Text(
-                                    "Status",
-                                    style: TextStyle(
-                                      fontSize: 20.0,
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: Row(
+                                      children: [
+                                        const Text(
+                                          "Prenom:",
+                                          style: TextStyle(
+                                              fontStyle: FontStyle.italic),
+                                        ),
+                                        Text(
+                                          "  ${_occupantMap!['lastname']} ",
+                                          style: const TextStyle(fontSize: 20),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10.0),
+                                    child: Row(
+                                      children: [
+                                        const Text("Date d'entrée:",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic)),
+                                        Text(
+                                          ' ${entryDate.day}/${entryDate.month}/${entryDate.year}',
+                                          style:
+                                              const TextStyle(fontSize: 20.0),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 10, bottom: 10),
+                                    child: Row(
+                                      children: [
+                                        const Text(
+                                          "Mensualité:",
+                                          style: TextStyle(
+                                              fontStyle: FontStyle.italic),
+                                        ),
+                                        Text(
+                                          " ${widget.lodging.rent} \$ ",
+                                          style:
+                                              const TextStyle(fontSize: 20.0),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Padding(
+                                    padding:
+                                        EdgeInsets.only(top: 10, bottom: 10),
+                                    child: Text(
+                                      "Situation des payements ",
+                                      style: TextStyle(
+                                          fontSize: 20.0,
+                                          fontStyle: FontStyle.italic,
+                                          color: Colors.blue),
                                     ),
                                   )
                                 ],
                               ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Expanded(
-                              child: ListView.separated(
-                                  separatorBuilder: (context, index) =>
-                                      const Divider(
-                                        color: Colors.black,
+                              Container(
+                                padding: const EdgeInsets.only(left: 0),
+                                color: Colors.black12,
+                                height: 40.0,
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      child: const Text(
+                                        "Mois",
+                                        style: TextStyle(fontSize: 20.0),
                                       ),
-                                  itemCount: monthDataList.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    return _newListItem(index);
-                                  }),
-                            )
-                          ],
+                                      padding: const EdgeInsets.only(left: 10),
+                                      width: 150.0,
+                                    ),
+                                    //const SizedBox(width: 40,),
+                                    const Text(
+                                      "Status",
+                                      style: TextStyle(
+                                        fontSize: 20.0,
+                                      ),
+                                    )
+                                  ],
+                                ),
+
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Expanded(
+                                child: ListView.separated(
+                                    separatorBuilder: (context, index) =>
+                                        const Divider(
+                                          color: Colors.black,
+                                        ),
+                                    itemCount: monthDataList.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return _newListItem(index);
+                                    }),
+                              )
+                            ],
+                          ),
                         );
                       },
                     ),
@@ -251,7 +246,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         _occupants = value;
         _occupantMap = _occupants.first;
         ownerId = _occupantMap!['id'];
-        _occupant = Occupant.fromMap(_occupantMap!);
+        occupant = Occupant.fromMap(_occupantMap!);
 
         _loadPayments();
       }
@@ -265,6 +260,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   _loadPayments() async {
     if (_occupants.isNotEmpty) {
       List<Payment> paymentList = [];
+      _initMonthList();
 
       await SQLHelper.getCurrentYearPayment(ownerId).then((value) {
         for (var element in value) {
@@ -280,15 +276,10 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           }
         }
       });
-
       setState(() {
-        _payments = paymentList;
+        //_payments = paymentList;
         //monthDataList = monthDataList;
       });
-    }
-
-    if (kDebugMode) {
-      print("payments size ${_payments.length}");
     }
   }
 
@@ -297,10 +288,9 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     for (var i = 0; i < 12; i++) {
       list.add(Data(month: i + 1));
     }
-
-    monthDataList = list;
-
-    print("month: ${monthDataList.length}");
+    setState(() {
+      monthDataList = list;
+    });
   }
 
   showOccupantForm() {
@@ -412,5 +402,27 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         ],
       ),
     );
+  }
+
+  Widget _actionIcon() {
+    return isOccupied()
+        ? IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => PaymentsList(occupant: occupant),
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.info,
+              size: 25.0,
+            ),
+          )
+        : IconButton(
+            onPressed: () {
+              showOccupantForm();
+            },
+            icon: const Icon(Icons.add));
   }
 }

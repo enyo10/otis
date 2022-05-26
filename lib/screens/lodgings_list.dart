@@ -155,9 +155,11 @@ class _LodgingListState extends State<LodgingList> {
   // Delete an item
   void _deleteItem(int id) async {
     await SQLHelper.deleteApartment(id);
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Successfully deleted a journal!'),
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Successfully deleted a journal!'),
+      ),
+    );
     _refreshJournals();
   }
 

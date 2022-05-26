@@ -5,8 +5,7 @@ class Period {
   final int month;
   final int year;
   //Payment? payment;
-  List<dynamic>payments = [];
-
+  List<dynamic> payments = [];
 
   Period({required this.month, required this.year});
 
@@ -14,8 +13,10 @@ class Period {
       : month = map['month'],
         year = map['year'];
 
-  void addPayment(Payment payment)=> payments.add(payment);
+  void addPayment(Payment payment) => payments.add(payment);
 
-
-
+  @override
+  String toString() {
+    return month < 10 ? '0$month/$year' : '0$month/$year';
+  }
 }

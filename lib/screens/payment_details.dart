@@ -5,7 +5,7 @@ import 'package:otis/helper.dart';
 import '../models/payment.dart';
 
 class PaymentDetails extends StatefulWidget {
-  final List<Payment>payments;
+  final List<Payment> payments;
   const PaymentDetails({Key? key, required this.payments}) : super(key: key);
 
   @override
@@ -22,7 +22,6 @@ class _PaymentDetailsState extends State<PaymentDetails>
     super.initState();
     _controller = AnimationController(vsync: this);
     payments = widget.payments;
-
   }
 
   @override
@@ -34,18 +33,18 @@ class _PaymentDetailsState extends State<PaymentDetails>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("Details du payment"),
-        ),
-        body: ListView.builder(
-            itemCount: payments.length,
-            itemBuilder: (_, index) {
-              var payment = payments.elementAt(index);
-          return ListTile(
-            textColor: Colors.black,
-            title: Text(" ${payment.amount} ${payment.currency}"),
-            trailing: Text(" ${stringValue(payment.paymentDate)}"),
-          )
+      appBar: AppBar(
+        title: const Text("Details du payment"),
+      ),
+      body: ListView.builder(
+          itemCount: payments.length,
+          itemBuilder: (_, index) {
+            var payment = payments.elementAt(index);
+            return ListTile(
+              textColor: Colors.black,
+              title: Text(" ${payment.amount} ${payment.currency}"),
+              trailing: Text(" ${stringValue(payment.paymentDate)}"),
+            );
             /*Row(
             children: [
               Padding(
@@ -60,7 +59,8 @@ class _PaymentDetailsState extends State<PaymentDetails>
               Text("Devise ${payment.currency}")
             ],
 
-          )*/;
-        }));
+          )*/
+          }),
+    );
   }
 }
