@@ -66,7 +66,8 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                       fullscreenDialog: true,
                     ),
                   )
-                  .then((value) => value ? _loadData() : null);
+                  .then((value) => value ? _loadData() : null)
+                  .onError((error, stackTrace) => null);
             },
             style: ElevatedButton.styleFrom(
                 //  primary: Colors.purple,
@@ -86,7 +87,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           : Container(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               decoration: const BoxDecoration(
-               //  color: Colors.orangeAccent,
+                //  color: Colors.orangeAccent,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
@@ -104,135 +105,128 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                         var entryDate =
                             DateTime.parse(_occupantMap!['entry_date']);
 
-                        return Container(
-                     //     color: Colors.orangeAccent,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 10.0),
+                                  child: Row(
+                                    children: [
+                                      const Text(
+                                        "Nom:",
+                                        style: TextStyle(
+                                            fontStyle: FontStyle.italic),
+                                      ),
+                                      Text(
+                                        " : ${_occupantMap!['firstname']} ",
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 10),
+                                  child: Row(
+                                    children: [
+                                      const Text(
+                                        "Prenom:",
+                                        style: TextStyle(
+                                            fontStyle: FontStyle.italic),
+                                      ),
+                                      Text(
+                                        "  ${_occupantMap!['lastname']} ",
+                                        style: const TextStyle(fontSize: 20),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 10.0),
+                                  child: Row(
+                                    children: [
+                                      const Text("Date d'entrée:",
+                                          style: TextStyle(
+                                              fontStyle: FontStyle.italic)),
+                                      Text(
+                                        ' ${entryDate.day}/${entryDate.month}/${entryDate.year}',
+                                        style: const TextStyle(fontSize: 20.0),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 10, bottom: 10),
+                                  child: Row(
+                                    children: [
+                                      const Text(
+                                        "Mensualité:",
+                                        style: TextStyle(
+                                            fontStyle: FontStyle.italic),
+                                      ),
+                                      Text(
+                                        " ${widget.lodging.rent} \$ ",
+                                        style: const TextStyle(fontSize: 20.0),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                                  child: Text(
+                                    "Situation des payements ",
+                                    style: TextStyle(
+                                        fontSize: 20.0,
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.blue),
+                                  ),
+                                )
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.only(left: 0),
+                              color: Colors.black12,
+                              height: 40.0,
+                              child: Row(
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 10.0),
-                                    child: Row(
-                                      children: [
-                                        const Text(
-                                          "Nom:",
-                                          style: TextStyle(
-                                              fontStyle: FontStyle.italic),
-                                        ),
-                                        Text(
-                                          " : ${_occupantMap!['firstname']} ",
-                                          style: const TextStyle(
-                                            fontSize: 20,
-                                          ),
-                                        )
-                                      ],
+                                  Container(
+                                    child: const Text(
+                                      "Mois",
+                                      style: TextStyle(fontSize: 20.0),
                                     ),
+                                    padding: const EdgeInsets.only(left: 10),
+                                    width: 150.0,
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 10),
-                                    child: Row(
-                                      children: [
-                                        const Text(
-                                          "Prenom:",
-                                          style: TextStyle(
-                                              fontStyle: FontStyle.italic),
-                                        ),
-                                        Text(
-                                          "  ${_occupantMap!['lastname']} ",
-                                          style: const TextStyle(fontSize: 20),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 10.0),
-                                    child: Row(
-                                      children: [
-                                        const Text("Date d'entrée:",
-                                            style: TextStyle(
-                                                fontStyle: FontStyle.italic)),
-                                        Text(
-                                          ' ${entryDate.day}/${entryDate.month}/${entryDate.year}',
-                                          style:
-                                              const TextStyle(fontSize: 20.0),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 10, bottom: 10),
-                                    child: Row(
-                                      children: [
-                                        const Text(
-                                          "Mensualité:",
-                                          style: TextStyle(
-                                              fontStyle: FontStyle.italic),
-                                        ),
-                                        Text(
-                                          " ${widget.lodging.rent} \$ ",
-                                          style:
-                                              const TextStyle(fontSize: 20.0),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const Padding(
-                                    padding:
-                                        EdgeInsets.only(top: 10, bottom: 10),
-                                    child: Text(
-                                      "Situation des payements ",
-                                      style: TextStyle(
-                                          fontSize: 20.0,
-                                          fontStyle: FontStyle.italic,
-                                          color: Colors.blue),
+                                  //const SizedBox(width: 40,),
+                                  const Text(
+                                    "Status",
+                                    style: TextStyle(
+                                      fontSize: 20.0,
                                     ),
                                   )
                                 ],
                               ),
-                              Container(
-                                padding: const EdgeInsets.only(left: 0),
-                                color: Colors.black12,
-                                height: 40.0,
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      child: const Text(
-                                        "Mois",
-                                        style: TextStyle(fontSize: 20.0),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Expanded(
+                              child: ListView.separated(
+                                  separatorBuilder: (context, index) =>
+                                      const Divider(
+                                        color: Colors.black,
                                       ),
-                                      padding: const EdgeInsets.only(left: 10),
-                                      width: 150.0,
-                                    ),
-                                    //const SizedBox(width: 40,),
-                                    const Text(
-                                      "Status",
-                                      style: TextStyle(
-                                        fontSize: 20.0,
-                                      ),
-                                    )
-                                  ],
-                                ),
-
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Expanded(
-                                child: ListView.separated(
-                                    separatorBuilder: (context, index) =>
-                                        const Divider(
-                                          color: Colors.black,
-                                        ),
-                                    itemCount: monthDataList.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return _newListItem(index);
-                                    }),
-                              )
-                            ],
-                          ),
+                                  itemCount: monthDataList.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return _newListItem(index);
+                                  }),
+                            )
+                          ],
                         );
                       },
                     ),

@@ -23,4 +23,14 @@ class Payment {
         paymentPeriod = Period(month: map['month'], year: map['year']),
         amount = map['amount'],
         currency = map['currency'];
+
+
+  String stringValue(){
+    return '${paymentPeriod.toString()}, $amount, $currency,';
+  }
+
+  @override
+  String toString() {
+    return 'Payment{paymentId: $paymentId, amount: $amount, ownerId: $ownerId, paymentDate: $paymentDate, paymentPeriod: $paymentPeriod, currency: $currency}';
+  }
 }
