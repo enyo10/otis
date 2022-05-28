@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:otis/helper.dart';
 import 'package:otis/screens/home.dart';
 import 'package:otis/screens/payment_details.dart';
 import 'package:otis/widgets/add_payment.dart';
@@ -19,7 +20,6 @@ class MyApp extends StatelessWidget {
       title: 'Otis',
       theme: ThemeData(
           primarySwatch: Colors.red,
-
 
           scaffoldBackgroundColor: const Color(0xFFEFFFFD)
           //primaryColor: Colors.orange

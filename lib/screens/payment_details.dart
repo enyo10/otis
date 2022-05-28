@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:otis/helper.dart';
+import 'package:otis/widgets/payment_list_tile.dart';
 
 import '../models/payment.dart';
 
@@ -40,26 +40,7 @@ class _PaymentDetailsState extends State<PaymentDetails>
           itemCount: payments.length,
           itemBuilder: (_, index) {
             var payment = payments.elementAt(index);
-            return ListTile(
-              textColor: Colors.black,
-              title: Text(" ${payment.amount} ${payment.currency}"),
-              trailing: Text(" ${stringValue(payment.paymentDate)}"),
-            );
-            /*Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text("Date : ${payment.paymentDate}"),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text("Amount : ${payment.amount}"),
-              ),
-              Text("Devise ${payment.currency}")
-            ],
-
-          )*/
+            return PaymentListTile(payment: payment);
           }),
     );
   }
