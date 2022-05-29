@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:otis/helper.dart';
 import 'package:otis/widgets/payment_list_tile.dart';
 
 import '../models/payment.dart';
@@ -36,12 +35,19 @@ class _PaymentDetailsState extends State<PaymentDetails>
       appBar: AppBar(
         title: const Text("Details du payment"),
       ),
-      body: ListView.builder(
-          itemCount: payments.length,
-          itemBuilder: (_, index) {
-            var payment = payments.elementAt(index);
-            return PaymentListTile(payment: payment);
-          }),
+      body: Column(
+        children: [
+          const PaymentTileHeader(),
+          Expanded(
+            child: ListView.builder(
+                itemCount: payments.length,
+                itemBuilder: (_, index) {
+                  var payment = payments.elementAt(index);
+                  return PaymentListTile(payment: payment);
+                }),
+          ),
+        ],
+      ),
     );
   }
 }

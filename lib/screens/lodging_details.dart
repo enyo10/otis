@@ -26,9 +26,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   late Occupant occupant;
 
   late List<Data> monthDataList;
-
-  //late List<Payment> _payments;
-
   late int ownerId;
   late DateTime entryDate;
   bool _isLoading = true;

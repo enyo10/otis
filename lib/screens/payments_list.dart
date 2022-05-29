@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/sql_helper.dart';
@@ -43,12 +42,21 @@ class _PaymentsListState extends State<PaymentsList> {
           )
         ],
       ),
-      body: ListView.builder(
-          itemCount: _items.length,
-          itemBuilder: (_, index) {
-            var payment = _items.elementAt(index);
-            return PaymentListTile(payment: payment);
-          }),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const PaymentTileHeader(),
+          Expanded(
+
+            child: ListView.builder(
+                itemCount: _items.length,
+                itemBuilder: (_, index) {
+                  var payment = _items.elementAt(index);
+                  return PaymentListTile(payment: payment);
+                }),
+          ),
+        ],
+      ),
     );
   }
 
@@ -80,9 +88,8 @@ class _PaymentsListState extends State<PaymentsList> {
       } else {
         _searchIcon = const Icon(Icons.search);
         _appBarTitle = const Text('Les payements');
-        //  filteredNames = names;
         _editingController.clear();
-        //_filter.clear();
+
         setState(() {
           _items.clear();
           _items.addAll(_payments);
