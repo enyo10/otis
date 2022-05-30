@@ -7,10 +7,12 @@ class Payment {
   final DateTime paymentDate;
   final Period paymentPeriod;
   final String currency;
+  final double rate;
 
   Payment(
       {required this.paymentId,
       required this.amount,
+      required this.rate,
       required this.ownerId,
       required this.paymentDate,
       required this.currency,
@@ -22,10 +24,10 @@ class Payment {
         paymentDate = DateTime.parse(map['payment_date']),
         paymentPeriod = Period(month: map['month'], year: map['year']),
         amount = map['amount'],
+        rate = map['rate'],
         currency = map['currency'];
 
-
-  String stringValue(){
+  String stringValue() {
     return '${paymentPeriod.toString()}, $amount, $currency,';
   }
 

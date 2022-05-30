@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:otis/helper.dart';
 import 'package:otis/screens/home.dart';
-import 'package:otis/screens/payment_details.dart';
-import 'package:otis/widgets/add_payment.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,11 +25,6 @@ class MyApp extends StatelessWidget {
 
        home: const HomeScreen(),
 
-      /*home: AddPayments(
-        ownerId: 1,
-        month: 1,
-        entryDate: DateTime.now(), rent:20,
-      ),*/
     );
   }
 }

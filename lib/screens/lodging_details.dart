@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:otis/helper.dart';
 import 'package:otis/models/occupant.dart';
@@ -342,8 +341,9 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
   double getSum(List<Payment> payments) {
     var sum = 0.0;
+
     for (Payment payment in payments) {
-      sum += payment.amount;
+      sum += payment.amount / payment.rate;
     }
     return sum;
   }

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
@@ -6,6 +5,7 @@ import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
 import 'package:otis/models/sql_helper.dart';
 
+import '../helper.dart';
 import '../models/period.dart';
 
 class AddPayments extends StatefulWidget {
@@ -25,14 +25,13 @@ class AddPayments extends StatefulWidget {
 }
 
 class _AddPaymentsState extends State<AddPayments> {
-  final TextEditingController _dollarPaymentController =
-      TextEditingController();
+  final TextEditingController _amountController = TextEditingController();
 
   final TextEditingController _taxController = TextEditingController();
 
   double amountInDollar = 0.0;
   late DateTime _selectedPaymentDate;
-  String _currency = '\$';
+  String _currency = currencies.elementAt(0);
   late DateTime _selectedPeriodDate;
 
   @override
@@ -40,6 +39,7 @@ class _AddPaymentsState extends State<AddPayments> {
     super.initState();
     _selectedPeriodDate = DateTime.now();
     _selectedPaymentDate = _selectedPeriodDate;
+    _updateTaxValue();
   }
 
   @override
@@ -71,7 +71,7 @@ class _AddPaymentsState extends State<AddPayments> {
                     Flexible(
                       flex: 2,
                       child: TextField(
-                        controller: _dollarPaymentController,
+                        controller: _amountController,
                         decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Payement ',
@@ -86,26 +86,29 @@ class _AddPaymentsState extends State<AddPayments> {
                       ),
                     ),
                     Flexible(
-                        flex: 1,
-                        child: DropdownButton<String>(
-                            value: _currency,
-                            items: ["\$", "CDF"]
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem(
-                                  value: value,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 10),
-                                    child: Text(
-                                      value,
-                                      style: const TextStyle(fontSize: 30),
-                                    ),
-                                  ));
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                _currency = newValue!;
-                              });
-                            })),
+                      flex: 1,
+                      child: DropdownButton<String>(
+                          value: _currency,
+                          items: currencies
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem(
+                              value: value,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Text(
+                                  value,
+                                  style: const TextStyle(fontSize: 30),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _currency = newValue!;
+                            });
+                            _updateTaxValue();
+                          }),
+                    ),
                   ],
                 ),
               ),
@@ -137,21 +140,6 @@ class _AddPaymentsState extends State<AddPayments> {
                         style: TextStyle(fontSize: 30.0),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: const Text("Check"),
-                    ),
-                    const SizedBox(
-                      width: 15.0,
-                    ),
-                    const Text("")
                   ],
                 ),
               ),
@@ -196,13 +184,7 @@ class _AddPaymentsState extends State<AddPayments> {
                 padding: const EdgeInsets.only(right: 30),
                 child: IconButton(
                     onPressed: () async {
-                      if (kDebugMode) {
-                        print("Avant add payment");
-                      }
                       await _addPayment();
-                      if (kDebugMode) {
-                        print("Après add payment");
-                      }
                       Navigator.of(context).pop(true);
                       // Navigator.pop(context, true);
                     },
@@ -250,12 +232,13 @@ class _AddPaymentsState extends State<AddPayments> {
         });
   }
 
-  double convertToDollar(double cdfAmount, double tax) {
-    return cdfAmount / tax;
-  }
-
-  double convertToCDF(double dollarAmount, double tax) {
-    return dollarAmount * tax;
+  void _updateTaxValue() {
+    if (_currency == currencies.elementAt(0)) {
+      _taxController.text = 1.toString();
+    } else {
+      _taxController.clear();
+    }
+    setState(() {});
   }
 
   void _showMessage(String message) {
@@ -267,10 +250,7 @@ class _AddPaymentsState extends State<AddPayments> {
   }
 
   bool _checkValues() {
-    if (_currency == '\$') {
-      _taxController.text = 1.toString();
-    }
-    if (_dollarPaymentController.text.isNotEmpty) {
+    if (_amountController.text.isNotEmpty && _taxController.text.isNotEmpty) {
       return true;
     } else {
       return false;
@@ -288,34 +268,29 @@ class _AddPaymentsState extends State<AddPayments> {
       var ownerId = widget.occupant.id;
       var year = _selectedPeriodDate.year;
       var month = _selectedPeriodDate.month;
-      var amount = double.parse(_dollarPaymentController.text);
+      var amount = double.parse(_amountController.text);
 
       List<Payment> payments =
           await SQLHelper.getPeriodPayments(ownerId, year, month)
               .then((value) => value.map((e) => Payment.fromMap(e)).toList());
 
       for (Payment payment in payments) {
-        totalAmount += payment.amount;
+        totalAmount += payment.amount / payment.rate;
       }
       if (totalAmount < widget.rent) {
         var paymentDate = _selectedPaymentDate;
         var periodOfPayment = Period(month: month, year: year);
-        double rate;
-        if (_currency == '\$') {
-          rate = 1;
-        } else {
-          rate = double.parse(_taxController.text);
-        }
+        double rate = double.parse(_taxController.text);
 
         id = await SQLHelper.insertPayment(
             ownerId, amount, paymentDate, periodOfPayment, _currency, rate);
 
         _showMessage(' Le payement est enrégistré');
         return id;
+      } else {
+        _showMessage('Erreur: Vérifier les montants');
       }
-      _showMessage('Erreur: Vérifier les champs');
-
     }
-    return id ;
+    return id;
   }
 }
