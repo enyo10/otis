@@ -2,7 +2,7 @@ class Lodging {
   final int id;
   String description;
   double rent;
-  int type;
+  int level;
   int? occupantId;
 
   Lodging(
@@ -10,10 +10,10 @@ class Lodging {
       required this.id,
       required this.description,
       required this.rent,
-      required this.type});
+      required this.level});
 
   @override
   String toString() {
-    return 'Lodging{id: $id, description: $description, rent: $rent, type: $type, occupantId: $occupantId}';
+    return 'Lodging{id: $id, description: $description, rent: $rent, type: $level, occupantId: $occupantId}';
   }
 }

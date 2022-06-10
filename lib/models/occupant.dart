@@ -26,7 +26,8 @@ class Occupant {
       'lodging_id': lodgingId,
       'firstname': firstname,
       'lastname': lastname,
-      'entry_data': entryDate.toIso8601String()
+      'entry_data': entryDate.toIso8601String(),
+      'release_date': releaseDate?.toIso8601String()
     };
   }
 
@@ -35,5 +36,6 @@ class Occupant {
         lodgingId = map['lodging_id'],
         firstname = map['firstname'],
         lastname = map['lastname'],
-        entryDate = DateTime.parse(map['entry_date']);
+        entryDate = DateTime.parse(map['entry_date']),
+        releaseDate = map['release_date']!=null? DateTime.parse(map['release_date']):null;
 }

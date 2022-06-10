@@ -79,10 +79,13 @@ class Data {
 }
 
 String stringValue(DateTime dateTime) {
-  return "${dateTime.day}/${dateTime.month}/${dateTime.year}";
+  var yearShortCut = dateTime.year.toString().substring(2);
+  return dateTime.day < 10
+      ? "0${dateTime.day}/${dateTime.month}/$yearShortCut"
+      : "${dateTime.day}/${dateTime.month}/$yearShortCut";
 }
 
-List<String> currencies = ['\$','CDF'];
+List<String> currencies = ['\$', 'FC'];
 
 const kBottomContainerHeight = 80.0;
 const kBottomContainerColor = Color(0xFFEB1555);
@@ -103,6 +106,8 @@ const kBodyTextStyle = TextStyle(
   fontSize: 22.0,
 );
 
+const kPassword = "password";
+
 class Palette {
   static const MaterialColor kToDark = MaterialColor(
     0xffe55f48, // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
@@ -120,3 +125,5 @@ class Palette {
     },
   );
 } //
+
+enum CheckedValue { yes, no }

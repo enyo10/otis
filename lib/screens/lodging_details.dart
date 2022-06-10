@@ -43,6 +43,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         title: const Text('Logement'),
         actions: [
           _actionIcon(),
+          Visibility(visible: isOccupied(), child: _changedOwner())
         ],
       ),
       bottomNavigationBar: Padding(
@@ -415,5 +416,52 @@ class _LodgingDetailsState extends State<LodgingDetails> {
               showOccupantForm();
             },
             icon: const Icon(Icons.add));
+  }
+
+  Widget _changedOwner() {
+    return IconButton(
+      onPressed: () {
+        _showMyDialog();
+      },
+      icon: const Icon(Icons.remove_circle_rounded),
+    );
+  }
+
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'ATTENTION',
+            //style: TextStyle(color: Colors.red),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Le locataire quitte vraiment son logement?'),
+
+                Text('Voulez vous vraiment le faire?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Annuler'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Continuer'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

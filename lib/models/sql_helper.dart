@@ -4,18 +4,30 @@ import 'package:sqflite/sqflite.dart' as sql;
 import 'package:path/path.dart';
 
 class SQLHelper {
+  static const String _livingQuarters = "living_quarters";
+  static const String _buildings = "buildings";
   static const String _apartments = "apartments";
   static const String _occupants = "occupants";
   static const String _payments = "payments";
-  //static const String _periods = "periods";
-  static const String _livingQuarter = "living_quarter";
-  static const String _building = "building";
+  static const String _rents = "rents";
 
   static Future<void> _onCreateTables(sql.Database database) async {
-    await database.execute("""CREATE TABLE $_livingQuarter(
+
+    await database.execute("""CREATE TABLE $_livingQuarters(
      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
      name TEXT,
      color TEXT  )
+    """);
+
+    await database.execute("""CREATE TABLE $_buildings(
+     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+     name TEXT,
+     color TEXT,
+     quarter_id INTEGER,
+      FOREIGN KEY (quarter_id)
+        REFERENCES $_livingQuarters (id) 
+        ON UPDATE CASCADE
+        ON DELETE CASCADE  )
     """);
 
     await database.execute("""CREATE TABLE $_apartments(
@@ -28,27 +40,31 @@ class SQLHelper {
         createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         building_id INTEGER,
          FOREIGN KEY (building_id)
-          REFERENCES $_building (id) 
+          REFERENCES $_buildings (id) 
           ON UPDATE CASCADE
           ON DELETE CASCADE )
       """);
 
-    await database.execute("""CREATE TABLE $_building(
-     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-     name TEXT,
-     color TEXT,
-     quarter_id INTEGER,
-      FOREIGN KEY (quarter_id)
-        REFERENCES $_livingQuarter (id) 
-        ON UPDATE CASCADE
-        ON DELETE CASCADE  )
+    await database.execute("""CREATE TABLE $_rents(
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    rent REAL,
+    start_date TEXT NOT NULL,
+    end_date TEXT,
+    lodging_id INTEGER,
+    FOREIGN KEY (lodging_id)
+    REFERENCES $_apartments (id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE)
     """);
+
+
 
     await database.execute("""CREATE TABLE $_occupants( 
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
         firstname TEXT NOT NULL,
         lastname TEXT NOT NULL,
         entry_date TEXT NOT NULL,
+        release_date TEXT,
         lodging_id INTEGER,
          FOREIGN KEY (lodging_id)
          REFERENCES $_apartments (id) 
@@ -167,6 +183,18 @@ class SQLHelper {
     return db.query(_occupants, orderBy: "id");
   }
 
+  static Future<int> updateOccupant(int id) async {
+    final db = await SQLHelper._db();
+    var releaseDate = DateTime.now();
+    final data = {
+      "release_date": releaseDate.toIso8601String(),
+    };
+
+    final result =
+        db.update(_occupants, data, where: "id = ?", whereArgs: [id]);
+    return result;
+  }
+
   static Future<int> insertPayment(
       int ownerId,
       double amount,
@@ -221,7 +249,7 @@ class SQLHelper {
 
   static Future<List<Map<String, dynamic>>> getLivingQuarters() async {
     final db = await SQLHelper._db();
-    return db.query(_livingQuarter, orderBy: "id");
+    return db.query(_livingQuarters, orderBy: "id");
   }
 
   static Future<int> insertLivingQuarter(
@@ -230,7 +258,7 @@ class SQLHelper {
 
     final data = {'name': quarterName, 'color': color};
 
-    final id = await db.insert(_livingQuarter, data,
+    final id = await db.insert(_livingQuarters, data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
     if (kDebugMode) {
       print(" Quarter with $id inserted");
@@ -248,7 +276,7 @@ class SQLHelper {
       'quarter_id': quarterId
     };
 
-    final id = await db.insert(_building, data,
+    final id = await db.insert(_buildings, data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
     if (kDebugMode) {
       print(" Building with $id inserted");
@@ -258,7 +286,29 @@ class SQLHelper {
 
   static Future<List<Map<String, dynamic>>> getBuildings(int quarterId) async {
     final db = await SQLHelper._db();
-    return db.query(_building,
+    return db.query(_buildings,
         where: "quarter_id = ?", whereArgs: [quarterId], orderBy: "id");
+  }
+
+  static Future<int> insertRent(DateTime from, double rent) async {
+    final db = await SQLHelper._db();
+
+    final data = {
+      'from': from.toIso8601String(),
+      'rent': rent,
+    };
+
+    final id = await db.insert(_rents, data,
+        conflictAlgorithm: sql.ConflictAlgorithm.replace);
+    if (kDebugMode) {
+      print(" Rent with $id inserted");
+    }
+    return id;
+  }
+
+  static Future<List<Map<String, dynamic>>> getRents(int lodgingId) async {
+    final db = await SQLHelper._db();
+    return db.query(_rents,
+        where: "lodging_id = ?", whereArgs: [lodgingId], orderBy: "id");
   }
 }
