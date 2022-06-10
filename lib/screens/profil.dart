@@ -27,6 +27,15 @@ class _SettingsPagesState extends State<SettingsPages> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                Padding(padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: const [
+                      Text("Nouveau mot de pass", style: TextStyle(
+                        fontSize: 30.0,
+                      ),),
+                    ],
+                  ),
+                ),
 
                 Padding(
                   padding: const EdgeInsets.all(8.0),

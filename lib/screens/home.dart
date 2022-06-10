@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:otis/screens/living_quarter_list.dart';
-import 'package:otis/screens/settings.dart';
+import 'package:otis/screens/profil.dart';
 
 import '../helper.dart';
 
@@ -37,7 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(
+      child: Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xFFEFFFFD),
           elevation: 0.0,
@@ -47,10 +48,29 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         drawer: Drawer(
           child: ListView(
+            padding: const EdgeInsets.all(0.0),
             children: [
-              const DrawerHeader(child: Text("Hello")),
+              const DrawerHeader(
+                decoration: BoxDecoration(color: Colors.red
+                    /*image: DecorationImage(
+                      image: AssetImage("assets/icons/icon.png"),
+                      fit: BoxFit.fill
+                    ),*/
+                    ),
+                child: Text(""),
+              ),
               ListTile(
-                title: const Text("Parametres"),
+                leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const SettingsPages(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.person),
+                ),
+                title: const Text("Profile"),
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -93,6 +113,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

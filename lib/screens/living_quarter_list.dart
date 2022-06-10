@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:otis/helper.dart';
 import 'package:otis/models/living_quarter.dart';
@@ -58,33 +57,41 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
                 var livingQuarter = LivingQuarter.fromMap(livingQuarterMap);
 
                 var name = livingQuarter.name;
+                var description = livingQuarter.description;
                 var colorName = livingQuarter.colorName;
                 var color = colorMap[colorName];
-
-                return GestureDetector(
-                  onDoubleTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            BuildingsList(livingQuarter: livingQuarter),
+                return SizedBox(
+                  //height: 200,
+                  child: Card(
+                    elevation: 5,
+                    margin: const EdgeInsets.only(top: 20, right: 20, left: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    color: color,
+                    child: ListTile(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                BuildingsList(livingQuarter: livingQuarter),
+                          ),
+                        );
+                      },
+                      title: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Center(
+                          child: Text(
+                            name,
+                            style: const TextStyle(fontSize: 30),
+                          ),
+                        ),
                       ),
-                    );
-                  },
-                  child: SizedBox(
-                    height: 200,
-                    child: Card(
-                      elevation: 5,
-                      margin: const EdgeInsets.all(20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      color: color,
-                      child: ListTile(
-                        title: Center(
-                            child: Text(
-                          name,
-                          style: const TextStyle(fontSize: 30),
-                        )),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Center(
+                          child: Text(description),
+                        ),
                       ),
                     ),
                   ),

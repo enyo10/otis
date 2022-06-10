@@ -11,7 +11,6 @@ class AddQuarter extends StatefulWidget {
 }
 
 class _AddQuarterState extends State<AddQuarter> {
-
   var _selectedColorData = colorMap.entries.first;
   final quarterNameController = TextEditingController();
   final quarterDescriptionController = TextEditingController();
@@ -27,11 +26,11 @@ class _AddQuarterState extends State<AddQuarter> {
         onPressed: () {
           var name = quarterNameController.text;
           var desc = quarterDescriptionController.text;
-          if (name.isNotEmpty && name.length > 2) {
+          if (name.isNotEmpty && name.length > 1) {
             setState(() {
               isSaving = true;
             });
-            SQLHelper.insertLivingQuarter(name, _selectedColorData.key)
+            SQLHelper.insertLivingQuarter(name, desc, _selectedColorData.key)
                 .whenComplete(() => Navigator.pop(context, true));
           }
         },
@@ -50,8 +49,8 @@ class _AddQuarterState extends State<AddQuarter> {
               controller: quarterNameController,
               decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'Quarter name',
-                  hintText: 'Enter description'),
+                  labelText: 'Le nom du quartier',
+                  hintText: 'Enter le nom'),
             ),
           ),
           Padding(
@@ -76,8 +75,7 @@ class _AddQuarterState extends State<AddQuarter> {
                 Icons.lens,
                 color: _selectedColorData.value,
               ),
-              title: Text(
-                  _selectedColorData.key),
+              title: Text(_selectedColorData.key),
               onTap: () {
                 showDialog<Widget>(
                   context: context,
@@ -85,9 +83,7 @@ class _AddQuarterState extends State<AddQuarter> {
                   builder: (BuildContext context) {
                     return _pickColor();
                   },
-                ).then((dynamic value) => setState(() {
-
-                    }));
+                ).then((dynamic value) => setState(() {}));
               },
             ),
           ),
@@ -103,7 +99,6 @@ class _AddQuarterState extends State<AddQuarter> {
           child: ListView.builder(
             padding: const EdgeInsets.all(0),
             itemCount: colorMap.length - 1,
-
             itemBuilder: (BuildContext context, int index) {
               var colorData = colorMap.entries.elementAt(index);
 

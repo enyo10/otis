@@ -12,10 +12,10 @@ class SQLHelper {
   static const String _rents = "rents";
 
   static Future<void> _onCreateTables(sql.Database database) async {
-
     await database.execute("""CREATE TABLE $_livingQuarters(
      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
      name TEXT,
+     desc TEXT,
      color TEXT  )
     """);
 
@@ -56,8 +56,6 @@ class SQLHelper {
     ON UPDATE CASCADE
     ON DELETE CASCADE)
     """);
-
-
 
     await database.execute("""CREATE TABLE $_occupants( 
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
@@ -102,6 +100,25 @@ class SQLHelper {
         await _onCreateTables(database);
       },
     );
+  }
+
+  static Future<List<Map<String, dynamic>>> getLivingQuarters() async {
+    final db = await SQLHelper._db();
+    return db.query(_livingQuarters, orderBy: "id");
+  }
+
+  static Future<int> insertLivingQuarter(
+      String quarterName, String desc, String color) async {
+    final db = await SQLHelper._db();
+
+    final data = {'name': quarterName, 'desc': desc, 'color': color};
+
+    final id = await db.insert(_livingQuarters, data,
+        conflictAlgorithm: sql.ConflictAlgorithm.replace);
+    if (kDebugMode) {
+      print(" Quarter with $id inserted");
+    }
+    return id;
   }
 
   // Create new apartment(journal)
@@ -247,24 +264,7 @@ class SQLHelper {
         where: "lodging_id = ?", whereArgs: [lodgingId], limit: 1);
   }
 
-  static Future<List<Map<String, dynamic>>> getLivingQuarters() async {
-    final db = await SQLHelper._db();
-    return db.query(_livingQuarters, orderBy: "id");
-  }
 
-  static Future<int> insertLivingQuarter(
-      String quarterName, String color) async {
-    final db = await SQLHelper._db();
-
-    final data = {'name': quarterName, 'color': color};
-
-    final id = await db.insert(_livingQuarters, data,
-        conflictAlgorithm: sql.ConflictAlgorithm.replace);
-    if (kDebugMode) {
-      print(" Quarter with $id inserted");
-    }
-    return id;
-  }
 
   static Future<int> insertBuilding(
       String buildingName, String color, int quarterId) async {

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:otis/screens/home.dart';
-import 'package:otis/screens/settings.dart';
+import 'package:otis/screens/profil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'helper.dart';
