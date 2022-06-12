@@ -8,7 +8,7 @@ import 'package:otis/widgets/add_payment.dart';
 
 import '../models/lodging.dart';
 import '../models/sql_helper.dart';
-import '../widgets/occupant_form.dart';
+import '../widgets/add_occupant_form.dart';
 
 class LodgingDetails extends StatefulWidget {
   final Lodging lodging;
@@ -291,13 +291,13 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     });
   }
 
-  showOccupantForm() {
+  _showOccupantForm() {
     var id = widget.lodging.id;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => AddOccupantForm(
+      builder: (BuildContext context) => AddOccupantForm(
         lodgingId: id,
       ),
     ).then((value) => _loadData());
@@ -420,7 +420,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           )
         : IconButton(
             onPressed: () {
-              showOccupantForm();
+              _showOccupantForm();
             },
             icon: const Icon(Icons.add));
   }
@@ -428,13 +428,13 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   Widget _changedOwner() {
     return IconButton(
       onPressed: () {
-        _showMyDialog();
+        _showChangeOwnerDialog();
       },
       icon: const Icon(Icons.remove_circle_rounded),
     );
   }
 
-  Future<void> _showMyDialog() async {
+  Future<void> _showChangeOwnerDialog() async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!

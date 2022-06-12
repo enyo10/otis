@@ -1,6 +1,7 @@
 class Lodging {
   final int id;
   String description;
+  String address;
   double rent;
   int level;
   int? occupantId;
@@ -9,6 +10,7 @@ class Lodging {
       {this.occupantId,
       required this.id,
       required this.description,
+      required this.address,
       required this.rent,
       required this.level});
 

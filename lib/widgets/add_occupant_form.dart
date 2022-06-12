@@ -41,9 +41,6 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
         bottomNavigationBar: FloatingActionButton.extended(
           onPressed: () {
             _addOccupant();
-            if (kDebugMode) {
-              print(" Occupant added");
-            }
             // Close the bottom sheet
             Navigator.of(context).pop();
           },
@@ -59,14 +56,9 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
               const Center(
                 child: Text(' Ajouter un locataire',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 30.0, color: Colors.red)
-                    // style: TextStyle(fontSize: 20.0, color: Colors.blue),
-                    ),
+                    style: TextStyle(fontSize: 30.0, color: Colors.red)),
               ),
-              const SizedBox(
-                height: 80,
-              ),
-               Padding(
+              Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
                   controller: _firstnameTextController,
@@ -77,7 +69,7 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
                   ),
                 ),
               ),
-               Padding(
+              Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
                   controller: _lastnameTextEditController,
@@ -88,7 +80,6 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
                   ),
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -104,7 +95,8 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
                       width: 40.0,
                     ),
                     Text(
-                        "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}")
+                      "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
+                    )
                   ],
                 ),
               )
@@ -120,8 +112,7 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
     String lastname = _lastnameTextEditController.text;
     int lodgingId = widget.lodgingId;
     var id = await SQLHelper.insertOccupant(
-        firstname, lastname, selectedDate.toIso8601String(),lodgingId) ;
-
+        firstname, lastname, selectedDate.toIso8601String(), lodgingId);
   }
 
   _selectDate(BuildContext context) async {
