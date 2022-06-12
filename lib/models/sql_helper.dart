@@ -22,6 +22,7 @@ class SQLHelper {
     await database.execute("""CREATE TABLE $_buildings(
      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
      name TEXT,
+     desc TEXT,
      color TEXT,
      quarter_id INTEGER,
       FOREIGN KEY (quarter_id)
@@ -32,7 +33,7 @@ class SQLHelper {
 
     await database.execute("""CREATE TABLE $_apartments(
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-        type INTEGER,
+        floor INTEGER,
         occupant_id INTEGER,
         address Text,
         description TEXT,
@@ -102,6 +103,9 @@ class SQLHelper {
     );
   }
 
+  /*
+   LiVing Quarter
+    */
   static Future<List<Map<String, dynamic>>> getLivingQuarters() async {
     final db = await SQLHelper._db();
     return db.query(_livingQuarters, orderBy: "id");
@@ -121,13 +125,41 @@ class SQLHelper {
     return id;
   }
 
+  /*
+                          BUILDING
+   */
+  static Future<int> insertBuilding(
+      String buildingName, String desc, String color, int quarterId) async {
+    final db = await SQLHelper._db();
+
+    final data = {
+      'name': buildingName,
+      'desc': desc,
+      'color': color,
+      'quarter_id': quarterId
+    };
+
+    final id = await db.insert(_buildings, data,
+        conflictAlgorithm: sql.ConflictAlgorithm.replace);
+    if (kDebugMode) {
+      print(" Building with $id inserted");
+    }
+    return id;
+  }
+
+  static Future<List<Map<String, dynamic>>> getBuildings(int quarterId) async {
+    final db = await SQLHelper._db();
+    return db.query(_buildings,
+        where: "quarter_id = ?", whereArgs: [quarterId], orderBy: "id");
+  }
+
   // Create new apartment(journal)
-  static Future<int> insertApartment(int type, int buildingId, String address,
+  static Future<int> insertApartment(int floor, int buildingId, String address,
       String? description, double rent) async {
     final db = await SQLHelper._db();
 
     final data = {
-      'type': type,
+      'floor': floor,
       'building_id': buildingId,
       'address': address,
       'description': description,
@@ -154,11 +186,11 @@ class SQLHelper {
 
   // Update an apartment by id
   static Future<int> updateApartment(
-      int id, int type, double rent, String title, String? description) async {
+      int id, int floor, double rent, String title, String? description) async {
     final db = await SQLHelper._db();
 
     final data = {
-      'type': type,
+      'floor': floor,
       'address': title,
       'rent': rent,
       'description': description,
@@ -264,37 +296,13 @@ class SQLHelper {
         where: "lodging_id = ?", whereArgs: [lodgingId], limit: 1);
   }
 
-
-
-  static Future<int> insertBuilding(
-      String buildingName, String color, int quarterId) async {
+  static Future<int> insertRent(
+      int lodgingId, DateTime from, double rent) async {
     final db = await SQLHelper._db();
 
     final data = {
-      'name': buildingName,
-      'color': color,
-      'quarter_id': quarterId
-    };
-
-    final id = await db.insert(_buildings, data,
-        conflictAlgorithm: sql.ConflictAlgorithm.replace);
-    if (kDebugMode) {
-      print(" Building with $id inserted");
-    }
-    return id;
-  }
-
-  static Future<List<Map<String, dynamic>>> getBuildings(int quarterId) async {
-    final db = await SQLHelper._db();
-    return db.query(_buildings,
-        where: "quarter_id = ?", whereArgs: [quarterId], orderBy: "id");
-  }
-
-  static Future<int> insertRent(DateTime from, double rent) async {
-    final db = await SQLHelper._db();
-
-    final data = {
-      'from': from.toIso8601String(),
+      'lodging_id': lodgingId,
+      'start_date': from.toIso8601String(),
       'rent': rent,
     };
 

@@ -5,15 +5,14 @@ import '../helper.dart';
 import '../models/sql_helper.dart';
 
 class AddBuilding extends StatefulWidget {
-   final LivingQuarter livingQuarter;
-   const AddBuilding({Key? key, required this.livingQuarter}) : super(key: key);
+  final LivingQuarter livingQuarter;
+  const AddBuilding({Key? key, required this.livingQuarter}) : super(key: key);
 
   @override
   _AddBuildingState createState() => _AddBuildingState();
 }
 
 class _AddBuildingState extends State<AddBuilding> {
-
   var _selectedColorData = colorMap.entries.first;
   final buildingNameController = TextEditingController();
   final buildingDescriptionController = TextEditingController();
@@ -33,7 +32,8 @@ class _AddBuildingState extends State<AddBuilding> {
             setState(() {
               isSaving = true;
             });
-            SQLHelper.insertBuilding(name, _selectedColorData.key, widget.livingQuarter.id)
+            SQLHelper.insertBuilding(
+                    name, desc, _selectedColorData.key, widget.livingQuarter.id)
                 .whenComplete(() => Navigator.pop(context, true));
           }
         },
@@ -78,8 +78,7 @@ class _AddBuildingState extends State<AddBuilding> {
                 Icons.lens,
                 color: _selectedColorData.value,
               ),
-              title: Text(
-                  _selectedColorData.key),
+              title: Text(_selectedColorData.key),
               onTap: () {
                 showDialog<Widget>(
                   context: context,
@@ -87,9 +86,7 @@ class _AddBuildingState extends State<AddBuilding> {
                   builder: (BuildContext context) {
                     return _pickColor();
                   },
-                ).then((dynamic value) => setState(() {
-
-                }));
+                ).then((dynamic value) => setState(() {}));
               },
             ),
           ),
@@ -105,7 +102,6 @@ class _AddBuildingState extends State<AddBuilding> {
           child: ListView.builder(
             padding: const EdgeInsets.all(0),
             itemCount: colorMap.length - 1,
-
             itemBuilder: (BuildContext context, int index) {
               var colorData = colorMap.entries.elementAt(index);
 
@@ -120,7 +116,7 @@ class _AddBuildingState extends State<AddBuilding> {
                   color: colorData.value,
                 ),
                 title: //Text(_colorNames[index]),
-                Text(colorData.key),
+                    Text(colorData.key),
                 onTap: () {
                   setState(() {
                     // _selectedColorIndex = index;

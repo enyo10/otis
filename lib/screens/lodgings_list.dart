@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:grouped_list/grouped_list.dart';
 import 'package:otis/helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -42,6 +43,7 @@ class _LodgingListState extends State<LodgingList> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _rentController = TextEditingController();
+  final TextEditingController _floorController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -52,65 +54,89 @@ class _LodgingListState extends State<LodgingList> {
           style: TextStyle(fontSize: 25.0),
         ),
       ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : ListView.builder(
-              itemCount: _apartments.length,
-              itemBuilder: (context, index) => GestureDetector(
-                onDoubleTap: () {
-                  Map<String, dynamic> data = _apartments[index];
-                  Lodging lodging = Lodging(
-                      id: data['id'],
-                      description: data['description'],
-                      rent: data['rent'],
-                      level: data['type']);
+      body: SafeArea(
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : GroupedListView<dynamic, String>(
+                elements: _apartments,
+                groupBy: (element) => element['floor'].toString(),
+                groupComparator: (value1, value2) => value2.compareTo(value1),
+                itemComparator: (item1, item2) =>
+                    item1['address'].compareTo(item2['address']),
+                order: GroupedListOrder.DESC,
+                useStickyGroupSeparators: true,
+                groupSeparatorBuilder: (String value) => Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    value,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                itemBuilder: (c, element) {
+                  return Card(
+                    elevation: 8.0,
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 10.0, vertical: 6.0),
+                    child: SizedBox(
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 10.0),
+                        title: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            element['address'],
+                            style: const TextStyle(fontSize: 20.0),
+                          ),
+                        ),
+                        subtitle: Text(element['description']),
+                        trailing: Container(
+                          padding: const EdgeInsets.all(0),
+                          width: 100.0,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () => _showForm(element['id']),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () => _deleteItem(element['id']),
+                              ),
+                            ],
+                          ),
+                        ),
+                        onTap: () {
+                          if (kDebugMode) {
+                            print("on tap");
+                          }
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LodgingDetails(lodging: lodging),
+                          Lodging lodging = Lodging(
+                              id: element['id'],
+                              description: element['description'],
+                              rent: element['rent'],
+                              level: element['floor']);
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  LodgingDetails(lodging: lodging),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   );
                 },
-                child: Card(
-                  color: Colors.orange[100],
-                  margin: const EdgeInsets.all(15),
-                  child: ListTile(
-                      title: Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Text(
-                          _apartments[index]['address'],
-                          style: const TextStyle(fontSize: 20.0),
-                        ),
-                      ),
-                      subtitle: Text(
-                        _apartments[index]['description'],
-                        style: const TextStyle(fontSize: 15.0),
-                      ),
-                      trailing: Container(
-                        padding: const EdgeInsets.all(0),
-                        width: 100.0,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () =>
-                                  _showForm(_apartments[index]['id']),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () =>
-                                  _deleteItem(_apartments[index]['id']),
-                            ),
-                          ],
-                        ),
-                      )),
-                ),
               ),
-            ),
+      ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () => _showForm(null),
@@ -128,46 +154,185 @@ class _LodgingListState extends State<LodgingList> {
           _apartments.firstWhere((element) => element['id'] == id);
       _addressController.text = existingJournal['address'];
       _descriptionController.text = existingJournal['description'];
+      _floorController.text = existingJournal['floor'].toString();
       _rentController.text = existingJournal['rent'].toString();
     }
 
+    //await _showModalBottomSheet(id);
+    _moreModalBottomSheet(context, id);
+  }
+
+  /* _showModalBottomSheet(int? id) async {
     showModalBottomSheet(
-        context: context,
-        elevation: 5,
-        isScrollControlled: true,
-        builder: (_) => Container(
-              padding: EdgeInsets.only(
-                top: 15,
-                left: 15,
-                right: 15,
-                // this will prevent the soft keyboard from covering the text fields
-                bottom: MediaQuery.of(context).viewInsets.bottom + 120,
-              ),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(25.0),
-                  topRight: Radius.circular(25.0),
+      context: context,
+      elevation: 5,
+      isScrollControlled: true,
+      builder: (_) => Container(
+        // color: Colors.transparent,
+        padding: EdgeInsets.only(
+          top: 0,
+          left: 0,
+          right: 0,
+          // this will prevent the soft keyboard from covering the text fields
+          bottom: MediaQuery.of(context).viewInsets.bottom + 120,
+        ),
+
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25.0),
+              topRight: Radius.circular(25.0),
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _floorController,
+                    decoration:
+                        const InputDecoration(hintText: 'Numéro d\'étage'),
+                  ),
                 ),
+                TextField(
+                  controller: _addressController,
+                  decoration: const InputDecoration(hintText: 'Address'),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                TextField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(hintText: 'Description'),
+                ),
+                TextField(
+                  controller: _rentController,
+                  // keyboardType: TextInputType.number,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'(^\d*\.?\d*)')),
+                  ],
+                  // Only numbers can be entered
+                  decoration: const InputDecoration(hintText: 'rent'),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    // Save new journal
+                    if (id == null) {
+                      await _addApartment();
+                    }
+
+                    if (id != null) {
+                      await _updateItem(id);
+                    }
+                    // Clear the text fields
+                    _addressController.text = '';
+                    _descriptionController.text = '';
+
+                    // Close the bottom sheet
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(id == null ? 'Create New' : 'Update'),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }*/
+
+  _moreModalBottomSheet(context, id) {
+    Size size = MediaQuery.of(context).size;
+    showModalBottomSheet(
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(40.0),
+        ),
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+            height: size.height * 0.5,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(40.0),
+                topLeft: Radius.circular(40.0),
               ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    TextField(
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: ListView(
+                physics: const ClampingScrollPhysics(),
+                children: [
+                  //content of modal bottom
+                  // sheet
+                  const Padding(
+                    padding: EdgeInsets.only(top: 20, bottom: 8.0),
+                    child: Center(
+                      child: Text(
+                        'Appartement',
+                        style: TextStyle(fontSize: 20.0),
+                      ),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 60),
+                    child: Divider(
+                      thickness: 5, // thickness of the line
+                      indent: 20, // empty space to the leading edge of divider.
+                      endIndent:
+                          20, // empty space to the trailing edge of the divider.
+                      color: Colors
+                          .red, // The color to use when painting the line.
+                      height: 20, // The divider's height extent.
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: _floorController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: const InputDecoration(
+                        hintText: 'Numéro d\'étage',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
                       controller: _addressController,
-                      decoration: const InputDecoration(hintText: 'Address'),
+                      decoration: const InputDecoration(
+                        hintText: 'Address',
+                        labelText: 'Address',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    TextField(
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
                       controller: _descriptionController,
-                      decoration:
-                          const InputDecoration(hintText: 'Description'),
+                      decoration: const InputDecoration(
+                        hintText: 'Description',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                    TextField(
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
                       controller: _rentController,
                       // keyboardType: TextInputType.number,
                       keyboardType:
@@ -177,66 +342,52 @@ class _LodgingListState extends State<LodgingList> {
                             RegExp(r'(^\d*\.?\d*)')),
                       ],
                       // Only numbers can be entered
-                      decoration: const InputDecoration(hintText: 'rent'),
+                      decoration: const InputDecoration(
+                        hintText: 'rent',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        // Save new journal
-                        if (id == null) {
-                          await _addApartment();
-                        }
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      // Save new journal
+                      if (id == null) {
+                        await _addApartment();
+                      }
 
-                        if (id != null) {
-                          await _updateItem(id);
-                        }
-                        // Clear the text fields
-                        _addressController.text = '';
-                        _descriptionController.text = '';
+                      if (id != null) {
+                        await _updateItem(id);
+                      }
+                      // Clear the text fields
+                      _addressController.text = '';
+                      _descriptionController.text = '';
 
-                        // Close the bottom sheet
-                        Navigator.of(context).pop();
-                      },
-                      child: Text(id == null ? 'Create New' : 'Update'),
-                    )
-                  ],
-                ),
+                      // Close the bottom sheet
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(id == null ? 'Create New' : 'Update'),
+                  ),
+                ],
               ),
-            ));
-  }
-
-// Insert a new journal to the database
-  Future<void> _addApartment() async {
-    await SQLHelper.insertApartment(
-        1,
-        widget.building.id,
-        _addressController.text,
-        _descriptionController.text,
-        double.parse(_rentController.text));
-
-    _refreshJournals();
-  }
-
-  // Update an existing journal
-  Future<void> _updateItem(int id) async {
-    double rent = double.parse(_rentController.text);
-    await SQLHelper.updateApartment(
-        id, 1, rent, _addressController.text, _descriptionController.text);
-    _refreshJournals();
+            ),
+          );
+        });
   }
 
   _checkPasswordAndDeleteItem(int id) async {
+    if (kDebugMode) {
+      print("check password ");
+    }
     _checkPassword().then((value) async {
-      if (kDebugMode) {
-        print(value);
-      }
       if (value) {
         await SQLHelper.deleteApartment(id);
         if (kDebugMode) {
-          print("Delete");
+          print("in delete $value");
         }
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Successfully deleted a journal!'),
@@ -244,15 +395,22 @@ class _LodgingListState extends State<LodgingList> {
         );
         passwordController.clear();
         _refreshJournals();
+      } else {
+        if (kDebugMode) {
+          print("value $value");
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Echec, Vérifier les données'),
+          ),
+        );
       }
     });
   }
 
   // Delete an item
-  void _deleteItem(int id) async {
-    // _askedToDelete(id);
-   //showAlertDialog(context);
-    _showPasswordDialog();
+  Future<void> _deleteItem(int id) async {
+    _askedToDelete(id);
   }
 
   Future<bool> _checkPassword() async {
@@ -267,7 +425,7 @@ class _LodgingListState extends State<LodgingList> {
     return false;
   }
 
-   Future<void> _showPasswordDialog() async {
+  /* Future<void> _showPasswordDialog() async {
     await showDialog<void>(
         context: context,
         builder: (BuildContext context) {
@@ -286,28 +444,30 @@ class _LodgingListState extends State<LodgingList> {
                         hintText: 'Mot de pass'),
                   ),
                   Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text("annuler"),
-                        ), // button 1
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text(" Supprimer"),
-                        ), // button 2
-                      ])
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("annuler"),
+                      ), // button 1
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text(" Supprimer"),
+                      ), // button 2
+                    ],
+                  )
                 ],
               ),
             ),
           );
         });
-  }
-  showAlertDialog(BuildContext context) {
+  }*/
+
+  _showAlertDialog(BuildContext context) {
     // set up the button
     Widget okButton = TextButton(
       child: const Text("Confirmer"),
@@ -339,6 +499,45 @@ class _LodgingListState extends State<LodgingList> {
         return alert;
       },
     );
+  }
+
+  bool _apartmentHasData() {
+    if (_floorController.text.isNotEmpty &&
+        _addressController.text.isNotEmpty &&
+        _descriptionController.text.isNotEmpty &&
+        _rentController.text.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // Insert a new journal to the database
+  Future<void> _addApartment() async {
+    if (_apartmentHasData()) {
+      await SQLHelper.insertApartment(
+              int.parse(_floorController.text),
+              widget.building.id,
+              _addressController.text,
+              _descriptionController.text,
+              double.parse(_rentController.text))
+          .then((value) async {
+        await SQLHelper.insertRent(
+            value, DateTime.now(), double.parse(_rentController.text));
+      });
+      _refreshJournals();
+    }
+
+    //  _refreshJournals();
+  }
+
+  // Update an existing journal
+  Future<void> _updateItem(int id) async {
+    double rent = double.parse(_rentController.text);
+    int floor = int.parse(_floorController.text);
+    await SQLHelper.updateApartment(
+        id, floor, rent, _addressController.text, _descriptionController.text);
+    _refreshJournals();
   }
 
   Future<void> _askedToDelete(int id) async {
@@ -419,38 +618,4 @@ class _LodgingListState extends State<LodgingList> {
         break;
     }
   }
-
-  /*Future<void> _askedToLead() async {
-    switch (await showDialog<CheckedValue>(
-        context: context,
-        builder: (BuildContext context) {
-          return SimpleDialog(
-            title: const Text('Select assignment'),
-            children: <Widget>[
-              SimpleDialogOption(
-                onPressed: () {
-                  Navigator.pop(context, "Treasury");
-                },
-                child: const Text('Treasury department'),
-              ),
-              SimpleDialogOption(
-                onPressed: () {
-                  Navigator.pop(context, "State");
-                },
-                child: const Text('State department'),
-              ),
-            ],
-          );
-        })) {
-      case CheckedValue.yes:
-        print("Treasure");
-        break;
-      case CheckedValue.no:
-        // TODO: Handle this case.
-        break;
-      case null:
-        // dialog dismissed
-        break;
-    }
-  }*/
 }

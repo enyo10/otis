@@ -63,32 +63,38 @@ class _BuildingsListState extends State<BuildingsList> {
               itemBuilder: (context, index) {
                 var building = Building.fromMap(_buildings[index]);
                 var name = building.name;
+                var desc = building.desc;
                 var colorName = building.colorName;
                 var color = colorMap[colorName];
 
-                return GestureDetector(
-                  onDoubleTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => LodgingList(building: building),
-                      ),
-                    );
-                  },
-                  child: SizedBox(
-                    height: 200,
-                    child: Card(
-                      elevation: 5,
-                      margin: const EdgeInsets.all(20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      color: color,
-                      child: ListTile(
-                        title: Center(
-                            child: Text(
+                return Card(
+                  elevation: 5,
+                  margin: const EdgeInsets.all(10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  color: color,
+                  child: ListTile(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => LodgingList(building: building),
+                        ),
+                      );
+                    },
+                    title: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                        child: Text(
                           name,
                           style: const TextStyle(fontSize: 30.0),
-                        )),
+                        ),
+                      ),
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                        child: Text(desc),
                       ),
                     ),
                   ),
