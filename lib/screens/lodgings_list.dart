@@ -170,15 +170,10 @@ class _LodgingListState extends State<LodgingList> {
   }
 
   _checkPasswordAndDeleteItem(int id) async {
-    if (kDebugMode) {
-      print("check password ");
-    }
+
     _checkPassword().then((value) async {
       if (value) {
         await SQLHelper.deleteApartment(id);
-        if (kDebugMode) {
-          print("in delete $value");
-        }
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

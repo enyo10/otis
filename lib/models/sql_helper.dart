@@ -50,8 +50,7 @@ class SQLHelper {
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     rent REAL,
     start_date TEXT NOT NULL,
-    end_date TEXT,
-    lodging_id INTEGER,
+    lodging_id INTEGER NOT NULL,
     FOREIGN KEY (lodging_id)
     REFERENCES $_apartments (id)
     ON UPDATE CASCADE

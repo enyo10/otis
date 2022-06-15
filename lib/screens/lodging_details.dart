@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:otis/helper.dart';
 import 'package:otis/models/occupant.dart';
@@ -5,8 +6,10 @@ import 'package:otis/models/payment.dart';
 import 'package:otis/screens/payment_details.dart';
 import 'package:otis/screens/payments_list.dart';
 import 'package:otis/widgets/add_payment.dart';
+import 'package:otis/widgets/icon_widget.dart';
 
 import '../models/lodging.dart';
+import '../models/rent_period.dart';
 import '../models/sql_helper.dart';
 import '../widgets/add_occupant_form.dart';
 
@@ -238,6 +241,19 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     );
   }
 
+  Future<Rent?> _loadRentMap(int lodgingId, DateTime dateTime) async {
+    Rent? rent;
+    await SQLHelper.getRents(lodgingId).then((value) {
+      for (dynamic rentMap in value) {
+        if (Rent.formMap(rentMap).startDate.microsecondsSinceEpoch <
+            dateTime.microsecondsSinceEpoch) {
+          rent = Rent.formMap(rentMap);
+        }
+      }
+    });
+    return rent;
+  }
+
   _loadData() async {
     await SQLHelper.getOccupantsWithLodgingId(widget.lodging.id).then((value) {
       if (value.isNotEmpty) {
@@ -261,8 +277,9 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       _initMonthList();
 
       await SQLHelper.getCurrentYearPayment(ownerId).then((value) {
-        for (var element in value) {
-          paymentList.add(Payment.fromMap(element));
+        print("Payment map size ${value.length}");
+        for (var paymentMap in value) {
+          paymentList.add(Payment.fromMap(paymentMap));
         }
 
         for (var i = 0; i < monthDataList.length; i++) {
@@ -277,6 +294,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       setState(() {
         //_payments = paymentList;
         //monthDataList = monthDataList;
+        print("Monate list : ${monthDataList.elementAt(0).payments.length}");
       });
     }
   }
@@ -305,48 +323,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
   bool isOccupied() => _occupantMap != null;
 
-  Widget _widgetStatus(List<Payment> payments) {
-    if (payments.isNotEmpty) {
-      if (getSum(payments) == widget.lodging.rent) {
-        return const Icon(
-          Icons.check,
-          color: Colors.green,
-        );
-      } else {
-        return const Icon(
-          Icons.check_box_outlined,
-          color: Colors.orange,
-        );
-      }
-    }
-    return const Icon(
-      Icons.close,
-      color: Colors.red,
-    );
-  }
-
-  /* Icon _statusIcon(List<Payment> payments) {
-    var icon = const Icon(
-      Icons.close,
-      color: Colors.red,
-    );
-
-    if (payments.isNotEmpty) {
-      if (getSum(payments) == widget.lodging.rent) {
-        icon = const Icon(
-          Icons.check,
-          color: Colors.green,
-        );
-      } else {
-        icon = const Icon(
-          Icons.check_box_outlined,
-          color: Colors.orange,
-        );
-      }
-    }
-    return icon;
-  }*/
-
   double getSum(List<Payment> payments) {
     var sum = 0.0;
 
@@ -370,10 +346,14 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     var data = monthDataList.elementAt(index);
     var month = monthMap[data.month];
 
-    // Payment? payment = data.payment;
     List<Payment> payments = data.payments;
+
     // var icon = _statusIcon(payments);
-    var icon = _widgetStatus(payments);
+    // var icon = _widgetStatus(payments);
+    var icon = IconWidget(
+      payments: payments,
+      id: widget.lodging.id,
+    );
 
     return GestureDetector(
       onDoubleTap: () {

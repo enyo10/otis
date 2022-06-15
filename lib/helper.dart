@@ -127,3 +127,6 @@ class Palette {
 } //
 
 enum CheckedValue { yes, no }
+
+
+

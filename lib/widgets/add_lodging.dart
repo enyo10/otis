@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:otis/models/building.dart';
@@ -27,15 +26,6 @@ class _AddLodgingState extends State<AddLodging> {
   void initState() {
     super.initState();
     _setValue();
-  }
-
-  void _setValue() {
-    if (widget.lodging != null) {
-      _descriptionController.text = widget.lodging!.description;
-      _addressController.text = widget.lodging!.address;
-      _rentController.text = widget.lodging!.rent.toString();
-      _floorController.text = widget.lodging!.level.toString();
-    }
   }
 
   @override
@@ -77,38 +67,44 @@ class _AddLodgingState extends State<AddLodging> {
                 height: 20, // The divider's height extent.
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _floorController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(
-                  hintText: 'Numéro d\'étage',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _addressController,
-                decoration: const InputDecoration(
-                  hintText: 'Address',
-                  labelText: 'Address',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(
-                  hintText: 'Description',
-                  border: OutlineInputBorder(),
-                ),
+            Visibility(
+              visible: widget.lodging == null,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: _floorController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: const InputDecoration(
+                        hintText: 'Numéro d\'étage',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: _addressController,
+                      decoration: const InputDecoration(
+                        hintText: 'Address',
+                        labelText: 'Address',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: _descriptionController,
+                      decoration: const InputDecoration(
+                        hintText: 'Description',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(
@@ -137,7 +133,9 @@ class _AddLodgingState extends State<AddLodging> {
                     onPressed: () {
                       _selectDate(context);
                     },
-                    child: const Text("Mise en service"),
+                    child: Text(widget.lodging == null
+                        ? 'Mise en service'
+                        : 'Date modification'),
                   ),
                   const SizedBox(
                     width: 40.0,
@@ -179,6 +177,15 @@ class _AddLodgingState extends State<AddLodging> {
     );
   }
 
+  void _setValue() {
+    if (widget.lodging != null) {
+      _descriptionController.text = widget.lodging!.description;
+      _addressController.text = widget.lodging!.address;
+      _rentController.text = widget.lodging!.rent.toString();
+      _floorController.text = widget.lodging!.level.toString();
+    }
+  }
+
   void _clearController() {
     _rentController.clear();
     _descriptionController.clear();
@@ -194,7 +201,7 @@ class _AddLodgingState extends State<AddLodging> {
       await SQLHelper.updateApartment(id, floor, rent, _addressController.text,
               _descriptionController.text)
           .then((value) async {
-        await SQLHelper.insertRent(id, DateTime.now(), rent);
+        // await SQLHelper.insertRent(id, DateTime.now(), rent);
       });
       _clearController();
       //  _refreshJournals();
@@ -211,7 +218,7 @@ class _AddLodgingState extends State<AddLodging> {
     if (selected != null && selected != selectedDate) {
       setState(() {
         selectedDate = selected;
-        if (kDebugMode) {
+        /* if (kDebugMode) {
           print(selected.toString());
         }
         DateTime? dt = DateTime.now();
@@ -237,7 +244,7 @@ class _AddLodgingState extends State<AddLodging> {
         dt = DateTime.fromMillisecondsSinceEpoch(dtInt!);
         if (kDebugMode) {
           print(" dt after reconvert from $dt");
-        }
+        }*/
       });
     }
   }
@@ -262,12 +269,25 @@ class _AddLodgingState extends State<AddLodging> {
               _addressController.text,
               _descriptionController.text,
               double.parse(_rentController.text))
-          .then((value) async {
+          .then((lodgingId) async {
+        print(" apartement with id $lodgingId inserted");
         await SQLHelper.insertRent(
-            value, DateTime.now(), double.parse(_rentController.text));
+                lodgingId, selectedDate, double.parse(_rentController.text))
+            .then((id) {
+          print(" Rent Object with id $id inserted");
+        });
       });
       _clearController();
       //_refreshJournals();
     }
+  }
+
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason> _showMessage(
+      String message) {
+    return ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 }

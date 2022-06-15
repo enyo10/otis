@@ -7,6 +7,7 @@ import 'package:otis/models/sql_helper.dart';
 
 import '../helper.dart';
 import '../models/period.dart';
+import '../models/rent_period.dart';
 
 class AddPayments extends StatefulWidget {
   final Occupant occupant;
@@ -257,6 +258,20 @@ class _AddPaymentsState extends State<AddPayments> {
     }
   }
 
+  Future<Rent?> _loadRentMap(DateTime dateTime) async {
+    print("lodging id ${widget.occupant.lodgingId}");
+    Rent? rentValue;
+    await SQLHelper.getRents(widget.occupant.lodgingId).then((value) {
+      for (dynamic rent in value) {
+        if (Rent.formMap(rent).startDate.microsecondsSinceEpoch <
+            dateTime.microsecondsSinceEpoch) {
+          rentValue = Rent.formMap(rent);
+        }
+      }
+    });
+    return rentValue;
+  }
+
   Future<int> _addPayment() async {
     int id = 0;
     if (!_checkValues()) {
@@ -277,18 +292,23 @@ class _AddPaymentsState extends State<AddPayments> {
       for (Payment payment in payments) {
         totalAmount += payment.amount / payment.rate;
       }
-      if (totalAmount < widget.rent) {
-        var paymentDate = _selectedPaymentDate;
-        var periodOfPayment = Period(month: month, year: year);
-        double rate = double.parse(_taxController.text);
 
-        id = await SQLHelper.insertPayment(
-            ownerId, amount, paymentDate, periodOfPayment, _currency, rate);
+      Rent? rentData = await _loadRentMap(DateTime(year, month));
+      if (rentData != null) {
+        if (totalAmount < rentData.rent) {
+          var paymentDate = _selectedPaymentDate;
+          var periodOfPayment = Period(month: month, year: year);
+          double rate = double.parse(_taxController.text);
 
-        _showMessage(' Le payement est enrégistré');
-        return id;
-      } else {
-        _showMessage('Erreur: Vérifier les montants');
+          id = await SQLHelper.insertPayment(
+              ownerId, amount, paymentDate, periodOfPayment, _currency, rate);
+
+          _showMessage(' Le payement est enrégistré');
+
+          return id;
+        } else {
+          _showMessage('Erreur: Vérifier les montants');
+        }
       }
     }
     return id;
