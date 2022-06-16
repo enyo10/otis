@@ -6,8 +6,6 @@ import 'package:otis/models/payment.dart';
 import 'package:otis/screens/payment_details.dart';
 import 'package:otis/screens/payments_list.dart';
 import 'package:otis/widgets/add_payment.dart';
-import 'package:otis/widgets/icon_widget.dart';
-
 import '../models/lodging.dart';
 import '../models/rent_period.dart';
 import '../models/sql_helper.dart';
@@ -32,9 +30,12 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   late DateTime entryDate;
   bool _isLoading = true;
 
+  late List<Rent> _rents;
+
   @override
   initState() {
     super.initState();
+    _loadRents(widget.lodging.id);
     _initMonthList();
     _loadData();
   }
@@ -241,17 +242,14 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     );
   }
 
-  Future<Rent?> _loadRentMap(int lodgingId, DateTime dateTime) async {
-    Rent? rent;
+  _loadRents(int lodgingId) async {
+    List<Rent> list = [];
     await SQLHelper.getRents(lodgingId).then((value) {
-      for (dynamic rentMap in value) {
-        if (Rent.formMap(rentMap).startDate.microsecondsSinceEpoch <
-            dateTime.microsecondsSinceEpoch) {
-          rent = Rent.formMap(rentMap);
-        }
-      }
+      list = value.map((e) => Rent.formMap(e)).toList();
     });
-    return rent;
+    setState(() {
+      _rents = list;
+    });
   }
 
   _loadData() async {
@@ -277,7 +275,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       _initMonthList();
 
       await SQLHelper.getCurrentYearPayment(ownerId).then((value) {
-        print("Payment map size ${value.length}");
         for (var paymentMap in value) {
           paymentList.add(Payment.fromMap(paymentMap));
         }
@@ -342,18 +339,70 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     }
   }
 
+  Widget _paymentsStatus(List<Payment> paymentList) {
+    var payments = paymentList;
+    var icon = const Icon(
+      Icons.close,
+      color: Colors.red,
+    );
+    if (payments.isNotEmpty) {
+      var period = payments.elementAt(0).paymentPeriod;
+      var date = DateTime(period.year, period.month);
+      var rent = _getRent(date);
+      var sum = _getSum(payments);
+
+      if (sum == rent?.rent) {
+        icon = const Icon(
+          Icons.check,
+          color: Colors.green,
+        );
+      } else {
+        print("Not Equal");
+
+        icon = const Icon(
+          Icons.check_box_outlined,
+          color: Colors.orange,
+        );
+      }
+    }
+
+    return icon;
+  }
+
+  Rent? _getRent(DateTime dateTime) {
+    Rent? rent;
+    for (Rent value in _rents) {
+      if (value.startDate.microsecondsSinceEpoch <
+          dateTime.microsecondsSinceEpoch) {
+        rent = value;
+      }
+    }
+    return rent;
+  }
+
+  double _getSum(List<Payment> payments) {
+    var sum = 0.0;
+
+    for (Payment payment in payments) {
+      sum += payment.amount / payment.rate;
+    }
+    return sum;
+  }
+
   Widget _newListItem(int index) {
     var data = monthDataList.elementAt(index);
     var month = monthMap[data.month];
 
     List<Payment> payments = data.payments;
+    var icon = _paymentsStatus(payments);
 
     // var icon = _statusIcon(payments);
     // var icon = _widgetStatus(payments);
-    var icon = IconWidget(
+    /*var icon = IconWidget(
       payments: payments,
-      id: widget.lodging.id,
-    );
+      lodgingId: widget.lodging.id,
+      rents: _rents,
+    );*/
 
     return GestureDetector(
       onDoubleTap: () {

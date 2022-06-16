@@ -11,22 +11,14 @@ class PaymentDetails extends StatefulWidget {
   State<PaymentDetails> createState() => _PaymentDetailsState();
 }
 
-class _PaymentDetailsState extends State<PaymentDetails>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+class _PaymentDetailsState extends State<PaymentDetails> {
   late List<Payment> payments;
+
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this);
     payments = widget.payments;
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
