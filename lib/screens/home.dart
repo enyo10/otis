@@ -48,16 +48,16 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         drawer: Drawer(
           child: ListView(
-            padding: const EdgeInsets.all(0.0),
+            padding: const EdgeInsets.all(4.0),
             children: [
               const DrawerHeader(
-                decoration: BoxDecoration(color: Colors.red
-                    /*image: DecorationImage(
-                      image: AssetImage("assets/icons/icon.png"),
-                      fit: BoxFit.fill
-                    ),*/
+                decoration: BoxDecoration(color: Colors.red,
+                    image: DecorationImage(
+                      image: AssetImage("assets/icons/ic_launcher.png"),
+                      fit: BoxFit.cover
                     ),
-                child: Text(""),
+                    ),
+                child: Text("", style: TextStyle(color: Colors.white),),
               ),
               ListTile(
                 leading: IconButton(
@@ -95,13 +95,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   width: 250.0,
                   child: TextLiquidFill(
-                    text: 'Otis',
+                    text: 'F.K.Otis',
                     waveColor: Colors.blueAccent,
                     boxBackgroundColor: Colors.red,
                     textStyle: const TextStyle(
-                        fontSize: 80.0,
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic),
+                      fontSize: 50.0,
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic,
+                    ),
                     boxHeight: 300.0,
                   ),
                 ),

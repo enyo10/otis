@@ -47,7 +47,7 @@ class _AddPaymentsState extends State<AddPayments> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(" add Payment"),
+        title: const Text(" Ajouter payement"),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -203,10 +203,11 @@ class _AddPaymentsState extends State<AddPayments> {
   }
 
   void _showPaymentMontPicker(BuildContext context) {
+
     showMonthPicker(
             context: context,
             initialDate: _selectedPeriodDate,
-            firstDate: widget.initialPaymentPeriodDate)
+            firstDate: widget.occupant.entryDate)
         .then((date) => {
               if (date != null)
                 {
@@ -259,7 +260,6 @@ class _AddPaymentsState extends State<AddPayments> {
   }
 
   Future<Rent?> _loadRentMap(DateTime dateTime) async {
-    print("lodging id ${widget.occupant.lodgingId}");
     Rent? rentValue;
     await SQLHelper.getRents(widget.occupant.lodgingId).then((value) {
       for (dynamic rent in value) {
@@ -306,11 +306,10 @@ class _AddPaymentsState extends State<AddPayments> {
           _showMessage(' Le payement est enrégistré');
 
           return id;
-        } else {
-          _showMessage('Erreur: Vérifier les montants');
         }
       }
     }
+    _showMessage('Erreur: Verifiez les données');
     return id;
   }
 }

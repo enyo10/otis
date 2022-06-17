@@ -92,6 +92,10 @@ class SQLHelper {
   }
 
   static Future<sql.Database> _db() async {
+    sql.getDatabasesPath().then((value) {
+      print(" db path : ${value.toString()}");
+    });
+
     return sql.openDatabase(
       join(await sql.getDatabasesPath(), 'otis.db'),
       version: 1,

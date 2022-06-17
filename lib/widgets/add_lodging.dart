@@ -167,9 +167,11 @@ class _AddLodgingState extends State<AddLodging> {
                 _descriptionController.text = '';
 
                 // Close the bottom sheet
+                if (!mounted) return;
                 Navigator.of(context).pop();
               },
-              child: Text(widget.lodging == null ? 'Create New' : 'Update'),
+              child:
+                  Text(widget.lodging == null ? 'Enrégistrer' : 'Actualiser'),
             ),
           ],
         ),
@@ -201,7 +203,7 @@ class _AddLodgingState extends State<AddLodging> {
       await SQLHelper.updateApartment(id, floor, rent, _addressController.text,
               _descriptionController.text)
           .then((value) async {
-        // await SQLHelper.insertRent(id, DateTime.now(), rent);
+        await SQLHelper.insertRent(id, selectedDate, rent);
       });
       _clearController();
       //  _refreshJournals();
@@ -274,7 +276,7 @@ class _AddLodgingState extends State<AddLodging> {
         await SQLHelper.insertRent(
                 lodgingId, selectedDate, double.parse(_rentController.text))
             .then((id) {
-          print(" Rent Object with id $id inserted");
+          _showMessage("Création réussie");
         });
       });
       _clearController();

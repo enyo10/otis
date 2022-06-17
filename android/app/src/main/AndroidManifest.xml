@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ch.enyo.otis">
    <application
-        android:label="otis"
+        android:label="F.K.Otis"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

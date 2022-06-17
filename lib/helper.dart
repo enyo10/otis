@@ -76,6 +76,15 @@ class Data {
   }
 
   get payments => _payments;
+
+  double getSum() {
+    var sum = 0.0;
+
+    for (Payment payment in payments) {
+      sum += payment.amount / payment.rate;
+    }
+    return sum;
+  }
 }
 
 String stringValue(DateTime dateTime) {
@@ -127,6 +136,3 @@ class Palette {
 } //
 
 enum CheckedValue { yes, no }
-
-
-

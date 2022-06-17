@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../models/rent_period.dart';
 import '../models/sql_helper.dart';
 
 class AddOccupantForm extends StatefulWidget {
@@ -22,6 +23,13 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
       TextEditingController();
   String date = "";
   DateTime selectedDate = DateTime.now();
+  late DateTime lodgingCreation;
+
+  @override
+  void initState() {
+    _loadRent(widget.lodgingId);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,8 +127,8 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
     final DateTime? selected = await showDatePicker(
       context: context,
       initialDate: selectedDate,
-      firstDate: DateTime(2010),
-      lastDate: DateTime(2030),
+      firstDate: lodgingCreation,
+      lastDate: DateTime(2040),
     );
     if (selected != null && selected != selectedDate) {
       setState(() {
@@ -155,5 +163,16 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
         }
       });
     }
+  }
+
+  _loadRent(int lodgingId) async {
+    List<Rent> list = [];
+
+    await SQLHelper.getRents(lodgingId).then((value) {
+      list = value.map((e) => Rent.formMap(e)).toList();
+    });
+    setState(() {
+      lodgingCreation = list.elementAt(0).startDate;
+    });
   }
 }
