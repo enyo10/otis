@@ -9,7 +9,7 @@ import 'package:otis/widgets/add_payment.dart';
 import '../models/lodging.dart';
 import '../models/rent_period.dart';
 import '../models/sql_helper.dart';
-import '../widgets/add_occupant_form.dart';
+import '../widgets/add_occupant.dart';
 
 class LodgingDetails extends StatefulWidget {
   final Lodging lodging;
@@ -21,25 +21,28 @@ class LodgingDetails extends StatefulWidget {
 }
 
 class _LodgingDetailsState extends State<LodgingDetails> {
-  Map<String, dynamic>? _occupantMap;
-  List<Map<String, dynamic>> _occupants = [];
-  late Occupant occupant;
-
-
+  /* Map<String, dynamic>? _occupantMap;
+  List<Map<String, dynamic>> _occupants = [];*/
+  Occupant? _occupant;
 
   late List<Data> monthDataList;
-  late int ownerId;
+  //late int ownerId;
   late DateTime entryDate;
   bool _isLoading = true;
 
   late List<Rent> _rents;
+  late Lodging _lodging;
 
   @override
   initState() {
-    super.initState();
-    _loadRents(widget.lodging.id);
+    /*_loadLodging();
+    _loadRents();
     _initMonthList();
-    _loadData();
+    //_loadData();
+    _loadOccupantWithPayment();*/
+    _lodging = widget.lodging;
+    _initData();
+    super.initState();
   }
 
   @override
@@ -99,8 +102,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         ],
       ),
     );*/
-     return Scaffold(
-
+    return Scaffold(
       appBar: AppBar(
         title: const Text('Logement'),
         actions: [
@@ -118,14 +120,14 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                   .push(
                     MaterialPageRoute(
                       builder: (context) => AddPayments(
-                        occupant: occupant,
+                        occupant: _occupant!,
                         rent: widget.lodging.rent,
-                        initialPaymentPeriodDate: occupant.entryDate,
+                        initialPaymentPeriodDate: _occupant!.entryDate,
                       ),
                       fullscreenDialog: true,
                     ),
                   )
-                  .then((value) => value ? _loadData() : null)
+                  .then((value) => value ? _loadOccupantWithPayment() : null)
                   .onError((error, stackTrace) => null);
             },
             style: ElevatedButton.styleFrom(
@@ -134,8 +136,8 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                 padding: const EdgeInsets.all(10),
                 textStyle:
                     const TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
-            child: const Text(" Ajouter payement "),
             autofocus: true,
+            child: const Text(" Ajouter payement "),
           ),
         ),
       ),
@@ -157,11 +159,15 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                   var entryDate = '   -';
                   var firstname = '   -';
                   var lastname = '    -';
-                  if (_occupantMap != null) {
-                    DateTime date = DateTime.parse(_occupantMap!['entry_date']);
+                  if (_occupant != null) {
+                    DateTime date = _occupant!.entryDate;
+                    entryDate = '${date.day}/${date.month}/${date.year}';
+                    firstname = _occupant!.firstname;
+                    lastname = _occupant!.lastname;
+                    /*DateTime date = DateTime.parse(_occupantMap!['entry_date']);
                     entryDate = '${date.day}/${date.month}/${date.year}';
                     firstname = ' ${_occupantMap!['firstname']}';
-                    lastname = ' ${_occupantMap!['lastname']}';
+                    lastname = ' ${_occupantMap!['lastname']}';*/
                   }
 
                   return Column(
@@ -254,12 +260,12 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                           child: Row(
                             children: [
                               Container(
+                                padding: const EdgeInsets.only(left: 10),
+                                width: 150.0,
                                 child: const Text(
                                   "Mois",
                                   style: TextStyle(fontSize: 20.0),
                                 ),
-                                padding: const EdgeInsets.only(left: 10),
-                                width: 150.0,
                               ),
                               //const SizedBox(width: 40,),
                               const Text(
@@ -283,15 +289,14 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                               ),
                             )
                           : Expanded(
-                        flex: 1,
-                            child: ListView.builder(
-
-                                itemCount: monthDataList.length,
-                                itemBuilder:
-                                    (BuildContext context, int index) {
-                                  return _newListItem(index);
-                                }),
-                          )
+                              flex: 1,
+                              child: ListView.builder(
+                                  itemCount: monthDataList.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return _newListItem(index);
+                                  }),
+                            )
                     ],
                   );
                 },
@@ -300,7 +305,15 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     );
   }
 
-  _loadRents(int lodgingId) async {
+  _initData() async {
+    await _loadRents();
+    await _initMonthList();
+    //_loadData();
+    await _loadOccupantWithPayment();
+  }
+
+  _loadRents() async {
+    int lodgingId = widget.lodging.id;
     List<Rent> list = [];
     await SQLHelper.getRents(lodgingId).then((value) {
       list = value.map((e) => Rent.formMap(e)).toList();
@@ -310,13 +323,43 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     });
   }
 
-  _loadData() async {
-    await SQLHelper.getOccupantsWithLodgingId(widget.lodging.id).then((value) {
+  _loadLodging() async {
+    Lodging lodging = widget.lodging;
+    await SQLHelper.getApartment(lodging.id).then((value) async {
+      _lodging = value.map((e) => Lodging.fromMap(e)).toList().first;
+      if (lodging.occupantId != null) {
+        if (kDebugMode) {
+          print("lodging with occupant id ${_lodging.occupantId}");
+        }
+      }
+    });
+    await _loadOccupantWithPayment();
+  }
+
+  _loadOccupantWithPayment() async {
+    print("lodging with occupant id ${_lodging.occupantId}");
+    if (_lodging.occupantId != null) {
+      print(" Occupant id not null");
+      var id = _lodging.occupantId;
+      await SQLHelper.getOccupantById(id!, _lodging.id).then((value) {
+        _occupant = value.map((e) => Occupant.fromMap(e)).toList().first;
+        //ownerId = _occupant.id;
+        _loadPayments();
+      });
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  /* _loadData() async {
+    await SQLHelper.getOccupantsWithLodgingId(_lodging.id).then((value) {
       if (value.isNotEmpty) {
         _occupants = value;
         _occupantMap = _occupants.first;
         ownerId = _occupantMap!['id'];
-        occupant = Occupant.fromMap(_occupantMap!);
+        _occupant = Occupant.fromMap(_occupantMap!);
 
         _loadPayments();
       }
@@ -325,14 +368,14 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     setState(() {
       _isLoading = false;
     });
-  }
+  }*/
 
   _loadPayments() async {
-    if (_occupants.isNotEmpty) {
-      List<Payment> paymentList = [];
-      _initMonthList();
-
-      await SQLHelper.getCurrentYearPayment(ownerId).then((value) {
+    List<Payment> paymentList = [];
+    _initMonthList();
+    if (_occupant != null) {
+      print("in load payment");
+      await SQLHelper.getCurrentYearPayment(_occupant!.id).then((value) {
         for (var paymentMap in value) {
           paymentList.add(Payment.fromMap(paymentMap));
         }
@@ -346,8 +389,9 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           }
         }
       });
-      setState(() {});
     }
+
+    setState(() {});
   }
 
   _initMonthList() {
@@ -361,18 +405,17 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   }
 
   _showOccupantForm() {
-    var id = widget.lodging.id;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) => AddOccupantForm(
-        lodgingId: id,
+        lodging: _lodging,
       ),
-    ).then((value) => _loadData());
+    ).then((value) => _loadLodging());
   }
 
-  bool _isOccupied() => _occupantMap != null;
+  bool _isOccupied() => _lodging.occupantId != null;
 
   double _getSum(List<Payment> payments) {
     var sum = 0.0;
@@ -453,7 +496,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       child: SizedBox(
         child: Card(
           elevation: 5,
-         // margin: const EdgeInsets.only(top: 20, right: 20, left: 20),
+          // margin: const EdgeInsets.only(top: 20, right: 20, left: 20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
@@ -487,7 +530,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (_) => PaymentsList(occupant: occupant),
+                  builder: (_) => PaymentsList(occupant: _occupant!),
                 ),
               );
             },

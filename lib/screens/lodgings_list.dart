@@ -26,7 +26,7 @@ class _LodgingListState extends State<LodgingList> {
 
   bool _isLoading = true;
   // This function is used to fetch all data from the database
-  void _refreshJournals() async {
+  void _refreshData() async {
     final data = await SQLHelper.getApartments(widget.building.id);
 
     setState(() {
@@ -38,7 +38,7 @@ class _LodgingListState extends State<LodgingList> {
   @override
   void initState() {
     super.initState();
-    _refreshJournals(); // Loading the diary when the app starts
+    _refreshData(); // Loading the diary when the app starts
   }
 
   @override
@@ -104,7 +104,7 @@ class _LodgingListState extends State<LodgingList> {
                                         id: element['id'],
                                         description: element['description'],
                                         rent: element['rent'],
-                                        level: element['floor'],
+                                        floor: element['floor'],
                                         address: element['address']);
 
                                     _showForm(lodging);
@@ -125,7 +125,7 @@ class _LodgingListState extends State<LodgingList> {
                               id: element['id'],
                               description: element['description'],
                               rent: element['rent'],
-                              level: element['floor'],
+                              floor: element['floor'],
                               address: element['address']);
 
                           Navigator.push(
@@ -166,22 +166,21 @@ class _LodgingListState extends State<LodgingList> {
         context: context,
         builder: (BuildContext bc) {
           return AddLodging(building: widget.building, lodging: lodging);
-        }).then((value) => _refreshJournals());
+        }).then((value) => _refreshData());
   }
 
   _checkPasswordAndDeleteItem(int id) async {
-
     _checkPassword().then((value) async {
       if (value) {
         await SQLHelper.deleteApartment(id);
-
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Successfully deleted a journal!'),
           ),
         );
         passwordController.clear();
-        _refreshJournals();
+        _refreshData();
       } else {
         if (kDebugMode) {
           print("value $value");

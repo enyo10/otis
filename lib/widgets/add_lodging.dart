@@ -184,7 +184,7 @@ class _AddLodgingState extends State<AddLodging> {
       _descriptionController.text = widget.lodging!.description;
       _addressController.text = widget.lodging!.address;
       _rentController.text = widget.lodging!.rent.toString();
-      _floorController.text = widget.lodging!.level.toString();
+      _floorController.text = widget.lodging!.floor.toString();
     }
   }
 
@@ -197,11 +197,12 @@ class _AddLodgingState extends State<AddLodging> {
 
   Future<void> _updateItem(Lodging lodging) async {
     final int id = lodging.id;
+    int? occupantId = lodging.occupantId;
     if (_apartmentHasData()) {
       double rent = double.parse(_rentController.text);
       int floor = int.parse(_floorController.text);
       await SQLHelper.updateApartment(id, floor, rent, _addressController.text,
-              _descriptionController.text)
+              _descriptionController.text, occupantId)
           .then((value) async {
         await SQLHelper.insertRent(id, selectedDate, rent);
       });

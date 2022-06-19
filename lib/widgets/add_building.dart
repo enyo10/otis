@@ -9,7 +9,7 @@ class AddBuilding extends StatefulWidget {
   const AddBuilding({Key? key, required this.livingQuarter}) : super(key: key);
 
   @override
-  _AddBuildingState createState() => _AddBuildingState();
+  State<AddBuilding> createState() => _AddBuildingState();
 }
 
 class _AddBuildingState extends State<AddBuilding> {

@@ -92,9 +92,9 @@ class SQLHelper {
   }
 
   static Future<sql.Database> _db() async {
-    sql.getDatabasesPath().then((value) {
+   /* sql.getDatabasesPath().then((value) {
       print(" db path : ${value.toString()}");
-    });
+    });*/
 
     return sql.openDatabase(
       join(await sql.getDatabasesPath(), 'otis.db'),
@@ -188,8 +188,8 @@ class SQLHelper {
   }
 
   // Update an apartment by id
-  static Future<int> updateApartment(
-      int id, int floor, double rent, String title, String? description) async {
+  static Future<int> updateApartment(int id, int floor, double rent,
+      String title, String? description, int? occupantId) async {
     final db = await SQLHelper._db();
 
     final data = {
@@ -197,6 +197,7 @@ class SQLHelper {
       'address': title,
       'rent': rent,
       'description': description,
+      'occupant_id': occupantId,
       'createdAt': DateTime.now().toString()
     };
 
@@ -233,6 +234,14 @@ class SQLHelper {
   static Future<List<Map<String, dynamic>>> getOccupants() async {
     final db = await SQLHelper._db();
     return db.query(_occupants, orderBy: "id");
+  }
+
+  static Future<List<Map<String, dynamic>>> getOccupantById(
+      int occupantId, int lodgingId) async {
+    final db = await SQLHelper._db();
+    return db.query(_occupants,
+        where: "id =? AND lodging_id= ?",
+        whereArgs: [occupantId, lodgingId]);
   }
 
   static Future<int> updateOccupant(int id) async {

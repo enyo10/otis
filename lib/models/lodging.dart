@@ -3,7 +3,7 @@ class Lodging {
   String description;
   String address;
   double rent;
-  int level;
+  int floor;
   int? occupantId;
 
   Lodging(
@@ -12,10 +12,18 @@ class Lodging {
       required this.description,
       required this.address,
       required this.rent,
-      required this.level});
+      required this.floor});
+
+  Lodging.fromMap(Map<String, dynamic> map)
+      : id = map['id'],
+        description = map['description'],
+        address = map['address'],
+        rent = map['rent'],
+        floor = map['floor'],
+        occupantId = map['occupant_id'];
 
   @override
   String toString() {
-    return 'Lodging{id: $id, description: $description, rent: $rent, type: $level, occupantId: $occupantId}';
+    return 'Lodging{id: $id, description: $description, rent: $rent, type: $floor, occupantId: $occupantId}';
   }
 }

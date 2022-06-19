@@ -1,14 +1,14 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:otis/models/lodging.dart';
 
 import '../models/rent_period.dart';
 import '../models/sql_helper.dart';
 
 class AddOccupantForm extends StatefulWidget {
-  final int lodgingId;
+  final Lodging lodging;
   const AddOccupantForm({
     Key? key,
-    required this.lodgingId,
+    required this.lodging,
   }) : super(key: key);
 
   @override
@@ -24,10 +24,12 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
   String date = "";
   DateTime selectedDate = DateTime.now();
   late DateTime lodgingCreation;
+  late Lodging lodging;
 
   @override
   void initState() {
-    _loadRent(widget.lodgingId);
+    lodging = widget.lodging;
+    _loadRent(lodging.id);
     super.initState();
   }
 
@@ -116,11 +118,25 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
   }
 
   _addOccupant() async {
+    print("in add accupant");
     String firstname = _firstnameTextController.text;
     String lastname = _lastnameTextEditController.text;
-    int lodgingId = widget.lodgingId;
-    var id = await SQLHelper.insertOccupant(
-        firstname, lastname, selectedDate.toIso8601String(), lodgingId);
+    int lodgingId = widget.lodging.id;
+    if (widget.lodging.occupantId != null) {
+      _showMessage('Il y a déjà un occupant');
+    } else {
+      await SQLHelper.insertOccupant(
+              firstname, lastname, selectedDate.toIso8601String(), lodgingId)
+          .then((occupantId) async {
+        await SQLHelper.updateApartment(lodging.id, lodging.floor, lodging.rent,
+                lodging.address, lodging.description, occupantId)
+            .then((value) {
+          _showMessage(" Occupant ajouté avec succès");
+        });
+      });
+    }
+    /* var id = await SQLHelper.insertOccupant(
+        firstname, lastname, selectedDate.toIso8601String(), lodgingId);*/
   }
 
   _selectDate(BuildContext context) async {
@@ -133,34 +149,6 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
     if (selected != null && selected != selectedDate) {
       setState(() {
         selectedDate = selected;
-        if (kDebugMode) {
-          print(selected.toString());
-        }
-
-        DateTime? dt = DateTime.now();
-        if (kDebugMode) {
-          print(" dt: $dt");
-        }
-
-// String
-        var dtStr = dt.toIso8601String();
-        if (kDebugMode) {
-          print(" dtStr: $dtStr");
-        }
-        dt = DateTime.tryParse(dtStr);
-        if (kDebugMode) {
-          print(" dt after reconversion : $dt");
-        }
-
-// Int
-        var dtInt = dt?.millisecondsSinceEpoch;
-        if (kDebugMode) {
-          print("dtInt : $dtInt");
-        }
-        dt = DateTime.fromMillisecondsSinceEpoch(dtInt!);
-        if (kDebugMode) {
-          print(" dt after reconvert from $dt");
-        }
       });
     }
   }
@@ -174,5 +162,14 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
     setState(() {
       lodgingCreation = list.elementAt(0).startDate;
     });
+  }
+
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason> _showMessage(
+      String message) {
+    return ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 }
