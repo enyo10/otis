@@ -49,8 +49,8 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
         backgroundColor: Colors.transparent,
         /* resizeToAvoidBottomInset: false,*/
         bottomNavigationBar: FloatingActionButton.extended(
-          onPressed: () {
-            _addOccupant();
+          onPressed: () async {
+            await _addOccupant();
             // Close the bottom sheet
             Navigator.of(context).pop();
           },
@@ -135,8 +135,6 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
         });
       });
     }
-    /* var id = await SQLHelper.insertOccupant(
-        firstname, lastname, selectedDate.toIso8601String(), lodgingId);*/
   }
 
   _selectDate(BuildContext context) async {

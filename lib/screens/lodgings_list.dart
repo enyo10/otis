@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:otis/helper.dart';
 import 'package:otis/widgets/add_lodging.dart';
+import 'package:otis/widgets/password_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/building.dart';
@@ -15,7 +16,7 @@ class LodgingList extends StatefulWidget {
   const LodgingList({Key? key, required this.building}) : super(key: key);
 
   @override
-  _LodgingListState createState() => _LodgingListState();
+  State<LodgingList> createState() => _LodgingListState();
 }
 
 class _LodgingListState extends State<LodgingList> {
@@ -99,15 +100,22 @@ class _LodgingListState extends State<LodgingList> {
                             children: [
                               IconButton(
                                   icon: const Icon(Icons.edit),
-                                  onPressed: () {
-                                    Lodging lodging = Lodging(
-                                        id: element['id'],
-                                        description: element['description'],
-                                        rent: element['rent'],
-                                        floor: element['floor'],
-                                        address: element['address']);
+                                  onPressed: () async {
+                                    Lodging lodging = Lodging.fromMap(element);
+                                    var passChecker = const PasswordChecker(
+                                        title: "kdkkd",
+                                        label: "lable",
+                                        hint: "dkkdkd");
+                                  await  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return passChecker;
+                                      },
+                                    ).then((value){
+                                      print(" check value : $value");
+                                    });
 
-                                    _showForm(lodging);
+                                    // _showForm(lodging);
                                   }),
                               IconButton(
                                 icon: const Icon(Icons.delete),
@@ -117,16 +125,7 @@ class _LodgingListState extends State<LodgingList> {
                           ),
                         ),
                         onTap: () {
-                          if (kDebugMode) {
-                            print("on tap");
-                          }
-
-                          Lodging lodging = Lodging(
-                              id: element['id'],
-                              description: element['description'],
-                              rent: element['rent'],
-                              floor: element['floor'],
-                              address: element['address']);
+                          Lodging lodging = Lodging.fromMap(element);
 
                           Navigator.push(
                             context,
@@ -144,19 +143,20 @@ class _LodgingListState extends State<LodgingList> {
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () => _showForm(null),
+        onPressed: () {
+          // _showForm(null)
+        },
       ),
     );
   }
 
   // This function will be triggered when the floating button is pressed
   // It will also be triggered when you want to update an item
-  void _showForm(Lodging? lodging) async {
-    //await _showModalBottomSheet(id);
+  /* void _showForm(Lodging? lodging) async {
     _moreModalBottomSheet(context, lodging);
-  }
+  }*/
 
-  _moreModalBottomSheet(context, lodging) {
+  /* _moreModalBottomSheet(context, lodging) {
     Size size = MediaQuery.of(context).size;
     showModalBottomSheet(
         isScrollControlled: true,
@@ -167,7 +167,7 @@ class _LodgingListState extends State<LodgingList> {
         builder: (BuildContext bc) {
           return AddLodging(building: widget.building, lodging: lodging);
         }).then((value) => _refreshData());
-  }
+  }*/
 
   _checkPasswordAndDeleteItem(int id) async {
     _checkPassword().then((value) async {

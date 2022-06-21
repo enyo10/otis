@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:otis/models/payment.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 List<Color> colorCollection = <Color>[
   const Color(0xFFADE2CF),
@@ -136,3 +137,15 @@ class Palette {
 } //
 
 enum CheckedValue { yes, no }
+
+Future<bool> _checkPassword(String password) async {
+  print("in check password");
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  SharedPreferences prefs = await _prefs;
+  final storedPass = prefs.get(kPassword);
+//  final password = passwordController.text;
+  if (storedPass == password) {
+    return true;
+  }
+  return false;
+}

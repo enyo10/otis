@@ -35,13 +35,10 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
   @override
   initState() {
-    /*_loadLodging();
+    _lodging = widget.lodging;
     _loadRents();
     _initMonthList();
-    //_loadData();
-    _loadOccupantWithPayment();*/
-    _lodging = widget.lodging;
-    _initData();
+    _loadOccupantWithPayment();
     super.initState();
   }
 
@@ -305,15 +302,8 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     );
   }
 
-  _initData() async {
-    await _loadRents();
-    await _initMonthList();
-    //_loadData();
-    await _loadOccupantWithPayment();
-  }
-
   _loadRents() async {
-    int lodgingId = widget.lodging.id;
+    int lodgingId = _lodging.id;
     List<Rent> list = [];
     await SQLHelper.getRents(lodgingId).then((value) {
       list = value.map((e) => Rent.formMap(e)).toList();
@@ -324,27 +314,48 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   }
 
   _loadLodging() async {
-    Lodging lodging = widget.lodging;
+    Lodging lodging = _lodging;
+    Occupant? occupant;
     await SQLHelper.getApartment(lodging.id).then((value) async {
-      _lodging = value.map((e) => Lodging.fromMap(e)).toList().first;
+      lodging = value.map((e) => Lodging.fromMap(e)).toList().first;
+      print(" in load Loading : lodging id --> ${lodging.id}");
+      print(" Occupant id : ${lodging.occupantId}");
       if (lodging.occupantId != null) {
-        if (kDebugMode) {
-          print("lodging with occupant id ${_lodging.occupantId}");
-        }
+        await SQLHelper.getOccupantById(lodging.occupantId!, lodging.id)
+            .then((value) {
+          occupant = value.map((e) => Occupant.fromMap(e)).toList().first;
+          if (kDebugMode) {
+            print(" Occupant id:  ${occupant?.id}");
+          }
+        });
       }
     });
-    await _loadOccupantWithPayment();
+    setState(() {
+      _lodging = lodging;
+      _occupant = occupant;
+    });
   }
 
   _loadOccupantWithPayment() async {
-    print("lodging with occupant id ${_lodging.occupantId}");
+    print("in load Occupant lodging with occupant id ${_lodging.occupantId}");
+    Occupant? occupant;
     if (_lodging.occupantId != null) {
-      print(" Occupant id not null");
+      if (kDebugMode) {
+        print(" Occupant id : ${_lodging.occupantId}");
+      }
       var id = _lodging.occupantId;
-      await SQLHelper.getOccupantById(id!, _lodging.id).then((value) {
-        _occupant = value.map((e) => Occupant.fromMap(e)).toList().first;
-        //ownerId = _occupant.id;
-        _loadPayments();
+
+      await SQLHelper.getOccupantById(id!, _lodging.id).then((value) async {
+        if (value.isNotEmpty) {
+          if (kDebugMode) {
+            print("Value ist not empty");
+          }
+          occupant = value.map((e) => Occupant.fromMap(e)).toList().first;
+          await _loadPayments();
+        }
+      });
+      setState(() {
+        _occupant = occupant;
       });
     }
 
@@ -412,7 +423,10 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       builder: (BuildContext context) => AddOccupantForm(
         lodging: _lodging,
       ),
-    ).then((value) => _loadLodging());
+    ).then((value) {
+      _loadLodging();
+      print(" Value -----$value");
+    });
   }
 
   bool _isOccupied() => _lodging.occupantId != null;

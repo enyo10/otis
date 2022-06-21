@@ -154,18 +154,8 @@ class _AddLodgingState extends State<AddLodging> {
                 widget.lodging != null
                     ? await _updateItem(widget.lodging!)
                     : await _addApartment();
-                // Save new journal
-                /* if (widget.lodging == null) {
-                  await _addApartment();
-                }
-
-                if (widget.lodging != null) {
-                  await _updateItem(widget.lodging!);
-                }*/
-                // Clear the text fields
                 _addressController.text = '';
                 _descriptionController.text = '';
-
                 // Close the bottom sheet
                 if (!mounted) return;
                 Navigator.of(context).pop();
@@ -207,7 +197,6 @@ class _AddLodgingState extends State<AddLodging> {
         await SQLHelper.insertRent(id, selectedDate, rent);
       });
       _clearController();
-      //  _refreshJournals();
     }
   }
 
@@ -221,33 +210,6 @@ class _AddLodgingState extends State<AddLodging> {
     if (selected != null && selected != selectedDate) {
       setState(() {
         selectedDate = selected;
-        /* if (kDebugMode) {
-          print(selected.toString());
-        }
-        DateTime? dt = DateTime.now();
-        if (kDebugMode) {
-          print(" dt: $dt");
-        }
-
-// String
-        var dtStr = dt.toIso8601String();
-        if (kDebugMode) {
-          print(" dtStr: $dtStr");
-        }
-        dt = DateTime.tryParse(dtStr);
-        if (kDebugMode) {
-          print(" dt after reconversion : $dt");
-        }
-
-// Int
-        var dtInt = dt?.millisecondsSinceEpoch;
-        if (kDebugMode) {
-          print("dtInt : $dtInt");
-        }
-        dt = DateTime.fromMillisecondsSinceEpoch(dtInt!);
-        if (kDebugMode) {
-          print(" dt after reconvert from $dt");
-        }*/
       });
     }
   }
