@@ -4,21 +4,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helper.dart';
 
-class PasswordChecker extends StatefulWidget {
+class PasswordController extends StatefulWidget {
   final String title;
-  final String label;
-  final String hint;
-  const PasswordChecker(
-      {Key? key, required this.title, required this.label, required this.hint})
-      : super(key: key);
+
+  const PasswordController({Key? key, required this.title}) : super(key: key);
 
   @override
-  State<PasswordChecker> createState() => _PasswordCheckerState();
+  State<PasswordController> createState() => _PasswordControllerState();
 }
 
-class _PasswordCheckerState extends State<PasswordChecker> {
+class _PasswordControllerState extends State<PasswordController> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   final TextEditingController passwordController = TextEditingController();
+  final String label = "Entrer le mot de pass";
+  final String hint = "Mot de pass";
+  final String breakButtonLabel = "Annuler";
+  final String okButtonLabel = "Continuer";
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +33,8 @@ class _PasswordCheckerState extends State<PasswordChecker> {
               keyboardType: TextInputType.visiblePassword,
               decoration: InputDecoration(
                   border: const OutlineInputBorder(),
-                  labelText: widget.label,
-                  hintText: widget.hint),
+                  labelText: label,
+                  hintText: hint),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -42,7 +43,7 @@ class _PasswordCheckerState extends State<PasswordChecker> {
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
-                  child: const Text("Annuler"),
+                  child: Text(breakButtonLabel),
                 ), // button 1
                 SimpleDialogOption(
                   onPressed: () async {
@@ -51,7 +52,7 @@ class _PasswordCheckerState extends State<PasswordChecker> {
                     if (!mounted) return;
                     Navigator.of(context).pop(value);
                   },
-                  child: const Text(" Check"),
+                  child: Text(okButtonLabel),
                 ), // button 2
               ],
             ),

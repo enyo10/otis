@@ -184,16 +184,17 @@ class _AddPaymentsState extends State<AddPayments> {
               Padding(
                 padding: const EdgeInsets.only(right: 30),
                 child: IconButton(
-                    onPressed: () async {
-                      await _addPayment();
-                      Navigator.of(context).pop(true);
-                      // Navigator.pop(context, true);
-                    },
-                    icon: const Icon(
-                      Icons.save,
-                      size: 35,
-                      color: Colors.red,
-                    )),
+                  onPressed: () async {
+                    await _addPayment();
+                    if (!mounted) return;
+                    Navigator.of(context).pop(true);
+                  },
+                  icon: const Icon(
+                    Icons.save,
+                    size: 35,
+                    color: Colors.red,
+                  ),
+                ),
               )
             ],
           ),
@@ -203,7 +204,6 @@ class _AddPaymentsState extends State<AddPayments> {
   }
 
   void _showPaymentMontPicker(BuildContext context) {
-
     showMonthPicker(
             context: context,
             initialDate: _selectedPeriodDate,

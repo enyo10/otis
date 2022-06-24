@@ -42,128 +42,132 @@ class _AddLodgingState extends State<AddLodging> {
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-        child: ListView(
+        child: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
-          children: [
-            //content of modal bottom
-            // sheet
-            const Padding(
-              padding: EdgeInsets.only(top: 20, bottom: 8.0),
-              child: Center(
-                child: Text(
-                  'Appartement',
-                  style: TextStyle(fontSize: 20.0),
+          child: Column(
+            children: [
+              //content of modal bottom
+              // sheet
+              const Padding(
+                padding: EdgeInsets.only(top: 20, bottom: 8.0),
+                child: Center(
+                  child: Text(
+                    'Appartement',
+                    style: TextStyle(fontSize: 20.0),
+                  ),
                 ),
               ),
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 60),
-              child: Divider(
-                thickness: 5, // thickness of the line
-                indent: 20, // empty space to the leading edge of divider.
-                endIndent:
-                    20, // empty space to the trailing edge of the divider.
-                color: Colors.red, // The color to use when painting the line.
-                height: 20, // The divider's height extent.
-              ),
-            ),
-            Visibility(
-              visible: widget.lodging == null,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      controller: _floorController,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      decoration: const InputDecoration(
-                        hintText: 'Numéro d\'étage',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      controller: _addressController,
-                      decoration: const InputDecoration(
-                        hintText: 'Address',
-                        labelText: 'Address',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      controller: _descriptionController,
-                      decoration: const InputDecoration(
-                        hintText: 'Description',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _rentController,
-                // keyboardType: TextInputType.number,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'(^\d*\.?\d*)')),
-                ],
-                // Only numbers can be entered
-                decoration: const InputDecoration(
-                  hintText: 'rent',
-                  border: OutlineInputBorder(),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 60),
+                child: Divider(
+                  thickness: 5, // thickness of the line
+                  indent: 20, // empty space to the leading edge of divider.
+                  endIndent:
+                      20, // empty space to the trailing edge of the divider.
+                  color: Colors.red, // The color to use when painting the line.
+                  height: 20, // The divider's height extent.
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      _selectDate(context);
-                    },
-                    child: Text(widget.lodging == null
-                        ? 'Mise en service'
-                        : 'Date modification'),
-                  ),
-                  const SizedBox(
-                    width: 40.0,
-                  ),
-                  Text(
-                    "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
-                  )
-                ],
+              Visibility(
+                visible: widget.lodging == null,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: _floorController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        decoration: const InputDecoration(
+                          hintText: 'Numéro d\'étage',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: _addressController,
+                        decoration: const InputDecoration(
+                          hintText: 'Address',
+                          labelText: 'Address',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: _descriptionController,
+                        decoration: const InputDecoration(
+                          hintText: 'Description',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                widget.lodging != null
-                    ? await _updateItem(widget.lodging!)
-                    : await _addApartment();
-                _addressController.text = '';
-                _descriptionController.text = '';
-                // Close the bottom sheet
-                if (!mounted) return;
-                Navigator.of(context).pop();
-              },
-              child:
-                  Text(widget.lodging == null ? 'Enrégistrer' : 'Actualiser'),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _rentController,
+                  // keyboardType: TextInputType.number,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'(^\d*\.?\d*)')),
+                  ],
+                  // Only numbers can be entered
+                  decoration: const InputDecoration(
+                    hintText: 'rent',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        _selectDate(context);
+                      },
+                      child: Text(widget.lodging == null
+                          ? 'Mise en service'
+                          : 'Date modification'),
+                    ),
+                    const SizedBox(
+                      width: 40.0,
+                    ),
+                    Text(
+                      "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  widget.lodging != null
+                      ? await _updateItem(widget.lodging!)
+                      : await _addApartment();
+                  _addressController.text = '';
+                  _descriptionController.text = '';
+                  // Close the bottom sheet
+                  if (!mounted) return;
+                  Navigator.of(context).pop();
+                },
+                child:
+                    Text(widget.lodging == null ? 'Enrégistrer' : 'Actualiser'),
+              ),
+            ],
+          ),
         ),
       ),
     );

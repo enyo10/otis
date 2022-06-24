@@ -102,17 +102,17 @@ class _LodgingListState extends State<LodgingList> {
                                   icon: const Icon(Icons.edit),
                                   onPressed: () async {
                                     Lodging lodging = Lodging.fromMap(element);
-                                    var passChecker = const PasswordChecker(
-                                        title: "kdkkd",
-                                        label: "lable",
-                                        hint: "dkkdkd");
-                                  await  showDialog(
+                                    var passChecker = const PasswordController(
+                                        title: "Actualisation de donnée");
+                                    await showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
                                         return passChecker;
                                       },
-                                    ).then((value){
-                                      print(" check value : $value");
+                                    ).then((value) {
+                                      if (value) {
+                                        _showForm(lodging);
+                                      }
                                     });
 
                                     // _showForm(lodging);
@@ -130,10 +130,9 @@ class _LodgingListState extends State<LodgingList> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  LodgingDetails(lodging: lodging),
-                            ),
-                          );
+                                builder: (context) =>
+                                    LodgingDetails(lodging: lodging)),
+                          ).then((value) => _refreshData());
                         },
                       ),
                     ),
@@ -144,7 +143,7 @@ class _LodgingListState extends State<LodgingList> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          // _showForm(null)
+          _showForm(null);
         },
       ),
     );
@@ -152,12 +151,11 @@ class _LodgingListState extends State<LodgingList> {
 
   // This function will be triggered when the floating button is pressed
   // It will also be triggered when you want to update an item
-  /* void _showForm(Lodging? lodging) async {
-    _moreModalBottomSheet(context, lodging);
-  }*/
+  void _showForm(Lodging? lodging) async {
+    _updateModalBottomSheet(context, lodging);
+  }
 
-  /* _moreModalBottomSheet(context, lodging) {
-    Size size = MediaQuery.of(context).size;
+  _updateModalBottomSheet(context, lodging) {
     showModalBottomSheet(
         isScrollControlled: true,
         shape: RoundedRectangleBorder(
@@ -167,7 +165,7 @@ class _LodgingListState extends State<LodgingList> {
         builder: (BuildContext bc) {
           return AddLodging(building: widget.building, lodging: lodging);
         }).then((value) => _refreshData());
-  }*/
+  }
 
   _checkPasswordAndDeleteItem(int id) async {
     _checkPassword().then((value) async {
@@ -216,11 +214,10 @@ class _LodgingListState extends State<LodgingList> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text(" Suppression de donnée"),
+            title: const Text(" Suppression de données"),
             content: SingleChildScrollView(
               child: Column(
                 children: [
-                  const Text("data"),
                   TextField(
                     controller: passwordController,
                     keyboardType: TextInputType.visiblePassword,
@@ -236,13 +233,19 @@ class _LodgingListState extends State<LodgingList> {
                         onPressed: () {
                           Navigator.of(context).pop(CheckedValue.no);
                         },
-                        child: const Text("annuler"),
+                        child: const Text(
+                          "Annuler",
+                          style: TextStyle(color: Colors.blue),
+                        ),
                       ), // button 1
                       SimpleDialogOption(
                         onPressed: () {
                           Navigator.of(context).pop(CheckedValue.yes);
                         },
-                        child: const Text(" Supprimer"),
+                        child: const Text(
+                          " Supprimer",
+                          style: TextStyle(color: Colors.red),
+                        ),
                       ), // button 2
                     ],
                   ),

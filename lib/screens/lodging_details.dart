@@ -6,6 +6,7 @@ import 'package:otis/models/payment.dart';
 import 'package:otis/screens/payment_details.dart';
 import 'package:otis/screens/payments_list.dart';
 import 'package:otis/widgets/add_payment.dart';
+import 'package:otis/widgets/password_controller.dart';
 import '../models/lodging.dart';
 import '../models/rent_period.dart';
 import '../models/sql_helper.dart';
@@ -21,8 +22,6 @@ class LodgingDetails extends StatefulWidget {
 }
 
 class _LodgingDetailsState extends State<LodgingDetails> {
-  /* Map<String, dynamic>? _occupantMap;
-  List<Map<String, dynamic>> _occupants = [];*/
   Occupant? _occupant;
 
   late List<Data> monthDataList;
@@ -161,10 +160,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                     entryDate = '${date.day}/${date.month}/${date.year}';
                     firstname = _occupant!.firstname;
                     lastname = _occupant!.lastname;
-                    /*DateTime date = DateTime.parse(_occupantMap!['entry_date']);
-                    entryDate = '${date.day}/${date.month}/${date.year}';
-                    firstname = ' ${_occupantMap!['firstname']}';
-                    lastname = ' ${_occupantMap!['lastname']}';*/
                   }
 
                   return Column(
@@ -364,23 +359,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     });
   }
 
-  /* _loadData() async {
-    await SQLHelper.getOccupantsWithLodgingId(_lodging.id).then((value) {
-      if (value.isNotEmpty) {
-        _occupants = value;
-        _occupantMap = _occupants.first;
-        ownerId = _occupantMap!['id'];
-        _occupant = Occupant.fromMap(_occupantMap!);
-
-        _loadPayments();
-      }
-    });
-
-    setState(() {
-      _isLoading = false;
-    });
-  }*/
-
   _loadPayments() async {
     List<Payment> paymentList = [];
     _initMonthList();
@@ -562,14 +540,24 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
   Widget _changedOwner() {
     return IconButton(
-      onPressed: () {
-        _showChangeOwnerDialog();
+      onPressed: () async {
+        var passwordController = const PasswordController(title: "Résiliation");
+
+        await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return passwordController;
+            }).then((value) {
+          if (value) {
+            _showRemoveOwnerDialog();
+          }
+        });
       },
       icon: const Icon(Icons.remove_circle_rounded),
     );
   }
 
-  Future<void> _showChangeOwnerDialog() async {
+  Future<void> _showRemoveOwnerDialog() async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -577,7 +565,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         return AlertDialog(
           title: const Text(
             'ATTENTION',
-            //style: TextStyle(color: Colors.red),
+            style: TextStyle(color: Colors.red),
           ),
           content: SingleChildScrollView(
             child: ListBody(
@@ -596,7 +584,10 @@ class _LodgingDetailsState extends State<LodgingDetails> {
             ),
             TextButton(
               child: const Text('Continuer'),
-              onPressed: () {
+              onPressed: () async {
+                await _removeOccupant();
+
+                if (!mounted) return;
                 Navigator.of(context).pop();
               },
             ),
@@ -604,5 +595,14 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         );
       },
     );
+  }
+
+  Future<void> _removeOccupant() async {
+    var lodging = widget.lodging;
+    await SQLHelper.updateApartment(lodging.id, lodging.floor, lodging.rent,
+            lodging.address, lodging.description, null)
+        .then((value) {
+      _loadLodging();
+    });
   }
 }
