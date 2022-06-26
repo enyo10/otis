@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:otis/models/living_quarter.dart';
 
-import '../helper.dart';
+import '../helper/helper.dart';
 import '../models/sql_helper.dart';
 
 class AddBuilding extends StatefulWidget {

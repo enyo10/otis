@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:otis/bottomSheet.dart';
 import 'package:otis/screens/home.dart';
-import 'package:otis/screens/profil.dart';
+import 'package:otis/screens/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'helper.dart';
+import 'helper/helper.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

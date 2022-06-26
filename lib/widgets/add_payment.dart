@@ -5,7 +5,7 @@ import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
 import 'package:otis/models/sql_helper.dart';
 
-import '../helper.dart';
+import '../helper/helper.dart';
 import '../models/period.dart';
 import '../models/rent_period.dart';
 

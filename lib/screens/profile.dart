@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:otis/helper.dart';
+import 'package:otis/helper/helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPages extends StatefulWidget {

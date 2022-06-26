@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:otis/helper.dart';
+import 'package:otis/helper/helper.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
 import 'package:otis/screens/payment_details.dart';

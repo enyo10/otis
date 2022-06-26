@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
-import 'package:otis/helper.dart';
+import 'package:otis/helper/helper.dart';
 import 'package:otis/widgets/add_lodging.dart';
 import 'package:otis/widgets/password_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';

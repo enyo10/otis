@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:otis/screens/living_quarter_list.dart';
-import 'package:otis/screens/profil.dart';
+import 'package:otis/screens/profile.dart';
+import 'package:otis/screens/share_data.dart';
 
-import '../helper.dart';
+import '../helper/helper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -75,6 +76,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => const SettingsPages(),
+                    ),
+                  );
+                },
+              ),
+
+              ListTile(
+                leading: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const SettingsPages(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.share),
+                ),
+                title: const Text("Partager données"),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const ShareData(),
                     ),
                   );
                 },

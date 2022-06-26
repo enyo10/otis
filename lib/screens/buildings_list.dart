@@ -4,7 +4,7 @@ import 'package:otis/models/living_quarter.dart';
 import 'package:otis/screens/lodgings_list.dart';
 import 'package:otis/widgets/add_building.dart';
 
-import '../helper.dart';
+import '../helper/helper.dart';
 import '../models/sql_helper.dart';
 
 class BuildingsList extends StatefulWidget {

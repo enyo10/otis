@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'helper.dart';
+import 'helper/helper.dart';
 
 
 class ResourcePicker extends StatefulWidget {
