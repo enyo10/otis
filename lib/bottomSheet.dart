@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ModalBottomSheet {
-  static void _moreModalBottomSheet(context) {
-    Size size = MediaQuery.of(context).size;
+  static void _moreModalBottomSheet(context, size) {
+
     showModalBottomSheet(
         isScrollControlled: true,
         shape: RoundedRectangleBorder(
@@ -42,12 +42,13 @@ class Test extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: ElevatedButton(
             onPressed: () =>
-                ModalBottomSheet._moreModalBottomSheet(context),
+                ModalBottomSheet._moreModalBottomSheet(context, size),
             child: const Text('open modal'),
           ),
         ),

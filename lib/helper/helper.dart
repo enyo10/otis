@@ -138,7 +138,7 @@ class Palette {
 
 enum CheckedValue { yes, no }
 
-Future<bool> _checkPassword(String password) async {
+/*Future<bool> _checkPassword(String password) async {
   print("in check password");
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   SharedPreferences prefs = await _prefs;
@@ -148,4 +148,13 @@ Future<bool> _checkPassword(String password) async {
     return true;
   }
   return false;
+}*/
+
+ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showMessage(
+    BuildContext context, String message) {
+  return ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+    ),
+  );
 }

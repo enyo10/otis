@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:otis/screens/living_quarter_list.dart';
 import 'package:otis/screens/profile.dart';
 import 'package:otis/screens/share_data.dart';
+import 'package:otis/widgets/password_controller.dart';
 
 import '../helper/helper.dart';
 
@@ -52,13 +53,16 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.all(4.0),
             children: [
               const DrawerHeader(
-                decoration: BoxDecoration(color: Colors.red,
-                    image: DecorationImage(
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  image: DecorationImage(
                       image: AssetImage("assets/icons/ic_launcher.png"),
-                      fit: BoxFit.cover
-                    ),
-                    ),
-                child: Text("", style: TextStyle(color: Colors.white),),
+                      fit: BoxFit.cover),
+                ),
+                child: Text(
+                  "",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
               ListTile(
                 leading: IconButton(
@@ -72,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: const Icon(Icons.person),
                 ),
                 title: const Text("Profile"),
-                onTap: () {
+                onTap: () async {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => const SettingsPages(),
@@ -80,25 +84,40 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
-
               ListTile(
                 leading: IconButton(
                   onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const SettingsPages(),
-                      ),
-                    );
+                    var passwordController =
+                        const PasswordController(title: "Partage de données");
                   },
                   icon: const Icon(Icons.share),
                 ),
                 title: const Text("Partager données"),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const ShareData(),
-                    ),
-                  );
+                onTap: () async {
+                  var passwordController =
+                      const PasswordController(title: "Partage de données");
+
+                  await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return passwordController;
+                      }).then((value) {
+                    if (value) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ShareData(),
+                        ),
+                      );
+                      /*Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsPages(),
+                        ),
+                      );*/
+                    } else {
+                      showMessage(context, "Saisir mot de passe correcte");
+                    }
+                  });
+
                 },
               ),
             ],

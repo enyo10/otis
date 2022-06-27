@@ -6,6 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite/sqflite.dart' as sql;
+import 'package:path/path.dart';
+
+import '../helper/helper.dart';
 
 class ShareData extends StatefulWidget {
   const ShareData({Key? key}) : super(key: key);
@@ -15,36 +18,101 @@ class ShareData extends StatefulWidget {
 }
 
 class _ShareDataState extends State<ShareData> {
+  List<String> _exPath = [];
+  late String _dbPath;
+  late String _download;
+  String? selectedFilePath;
+  File? selectedFile;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Stockage de base de donnée"),
+      ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Center(
-                child: ElevatedButton(
-                    onPressed: () async {
-                      await copyDBToStorage();
-                    },
-                    child: const Text("Partager DB")),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 50.0),
+              child: ElevatedButton(
+                onPressed: () async {
+                  String message;
+                  await _copyDBToStorage().then((value) {
+                    if (value.existsSync()) {
+                      message = " DB copiée dans fichier téléchargement réussi";
+                    } else {
+                      message = " Erreur lors de la copie";
+                    }
+                    showMessage(context, message);
+                  });
+                },
+                child: const Text(
+                  "Partager DB",
+                  style: TextStyle(fontSize: 30.0),
+                ),
               ),
-              ElevatedButton(
+            ),
+            _fileSelected()
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                    child: ListTile(
+                      title: Text(
+                        basename(selectedFile!.path),
+                        style: const TextStyle(fontSize: 30),
+                      ),
+                      trailing: IconButton(
+                        onPressed: _deleteSelectedFile,
+                        icon: const Icon(Icons.delete, size: 30.0,),
+                      ),
+                      tileColor: Colors.red,
+                      textColor: Colors.white,
+                      iconColor: Colors.white,
+                    ),
+                  )
+                : const Center(
+                    child: Text(
+                      "Pas de selection",
+                      style: TextStyle(fontSize: 30.0),
+                    ),
+                  ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 50.0),
+              child: ElevatedButton(
                   onPressed: () {
                     _pickFile();
                   },
-                  child: const Text("Pick File")),
-            ],
-          ),
+                  child: const Text(
+                    "Pick File",
+                    style: TextStyle(fontSize: 30.0),
+                  )),
+            ),
+            Visibility(
+              visible: _fileSelected(),
+              child: ElevatedButton(
+                onPressed: () async {
+                  String message;
+                  await _copyToDB().then((value) {
+                    if (value != null) {
+                      message = " Restauration avec réussite. Bravo";
+                    } else {
+                      message = " Erreur lors de la restauration";
+                    }
+                    showMessage(context, message);
+                  });
+                },
+                child: const Text(
+                  "Tranférer  donnée",
+                  style: TextStyle(fontSize: 30.0),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
-
-  List<String> _exPath = [];
-  late String _dbPath;
-  late String _download;
-  File? _selectedFile;
 
   @override
   void initState() {
@@ -86,6 +154,7 @@ class _ShareDataState extends State<ShareData> {
     await sql.getDatabasesPath().then((value) {
       path = value;
     });
+
     setState(() {
       _dbPath = path;
       if (kDebugMode) {
@@ -94,7 +163,7 @@ class _ShareDataState extends State<ShareData> {
     });
   }
 
-  Future<void> copyDBToStorage() async {
+  Future<File> _copyDBToStorage() async {
     File source1 = File("$_dbPath/otis.db");
 
     Directory copyTo = Directory(_download);
@@ -116,9 +185,14 @@ class _ShareDataState extends State<ShareData> {
 
     String newPath = "${copyTo.path}/otis.db";
 
-    await source1.copy(newPath).then((value) {
-      value.length().then((value) => {print("$value")});
-    });
+    return await source1.copy(newPath);
+  }
+
+  Future<File?> _copyToDB() async {
+    if (_fileSelected()) {
+      return await selectedFile?.copy("$_dbPath/otis.db");
+    }
+    return null;
   }
 
   void _pickFile() async {
@@ -131,9 +205,17 @@ class _ShareDataState extends State<ShareData> {
     if (result == null) return;
 
     setState(() {
-      _selectedFile = File(result.files.first.path!);
-
-      print("Selected File path: ${_selectedFile?.path}");
+      selectedFilePath = result.files.first.path;
+      selectedFile = File(selectedFilePath!);
     });
   }
+
+  void _deleteSelectedFile() {
+    setState(() {
+      selectedFilePath = null;
+      selectedFile = null;
+    });
+  }
+
+  bool _fileSelected() => selectedFilePath != null && selectedFile != null;
 }
