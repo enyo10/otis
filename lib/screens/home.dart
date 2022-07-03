@@ -108,11 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           builder: (_) => const ShareData(),
                         ),
                       );
-                      /*Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const SettingsPages(),
-                        ),
-                      );*/
+
                     } else {
                       showMessage(context, "Saisir mot de passe correcte");
                     }

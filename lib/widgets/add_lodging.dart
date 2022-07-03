@@ -30,9 +30,9 @@ class _AddLodgingState extends State<AddLodging> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    // Size size = MediaQuery.of(context).size;
     return Container(
-      height: size.height * 0.6,
+      // height: size.height * 0.6,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
@@ -152,19 +152,24 @@ class _AddLodgingState extends State<AddLodging> {
               const SizedBox(
                 height: 20,
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  widget.lodging != null
-                      ? await _updateItem(widget.lodging!)
-                      : await _addApartment();
-                  _addressController.text = '';
-                  _descriptionController.text = '';
-                  // Close the bottom sheet
-                  if (!mounted) return;
-                  Navigator.of(context).pop();
-                },
-                child:
-                    Text(widget.lodging == null ? 'Enrégistrer' : 'Actualiser'),
+              Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    widget.lodging != null
+                        ? await _updateItem(widget.lodging!)
+                        : await _addApartment();
+                    _addressController.text = '';
+                    _descriptionController.text = '';
+                    // Close the bottom sheet
+                    if (!mounted) return;
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                      widget.lodging == null ? 'Enrégistrer' : 'Actualiser'),
+                ),
               ),
             ],
           ),

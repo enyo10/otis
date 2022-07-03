@@ -4,8 +4,10 @@ import 'package:external_path/external_path.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:otis/models/sql_helper.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sqflite/sqflite.dart' as sql;
+import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 import '../helper/helper.dart';
@@ -18,8 +20,9 @@ class ShareData extends StatefulWidget {
 }
 
 class _ShareDataState extends State<ShareData> {
-  List<String> _exPath = [];
-  late String _dbPath;
+  List<String> _exPaths = [];
+  late Directory directory;
+  late String _dataBasePath;
   late String _download;
   String? selectedFilePath;
   File? selectedFile;
@@ -40,7 +43,7 @@ class _ShareDataState extends State<ShareData> {
                 onPressed: () async {
                   String message;
                   await _copyDBToStorage().then((value) {
-                    if (value.existsSync()) {
+                    if (value != null && value.existsSync()) {
                       message = " DB copiée dans fichier téléchargement réussi";
                     } else {
                       message = " Erreur lors de la copie";
@@ -64,7 +67,10 @@ class _ShareDataState extends State<ShareData> {
                       ),
                       trailing: IconButton(
                         onPressed: _deleteSelectedFile,
-                        icon: const Icon(Icons.delete, size: 30.0,),
+                        icon: const Icon(
+                          Icons.delete,
+                          size: 30.0,
+                        ),
                       ),
                       tileColor: Colors.red,
                       textColor: Colors.white,
@@ -93,9 +99,12 @@ class _ShareDataState extends State<ShareData> {
               child: ElevatedButton(
                 onPressed: () async {
                   String message;
-                  await _copyToDB().then((value) {
-                    if (value != null) {
+                  await _copyToDataBase().then((value) {
+                    if (value != null && value.existsSync()) {
                       message = " Restauration avec réussite. Bravo";
+                      if (kDebugMode) {
+                        print(" Value path ${value.path}");
+                      }
                     } else {
                       message = " Erreur lors de la restauration";
                     }
@@ -117,23 +126,35 @@ class _ShareDataState extends State<ShareData> {
   @override
   void initState() {
     super.initState();
-    getPath();
-    getDBPath();
+    _getStoragePaths();
+    _getDataBasePath();
     getPublicDirectoryPath();
+
+    // getStorage().then((value) => print(value?.path));
   }
 
   // Get storage directory paths
   // Like internal and external (SD card) storage path
-  Future<void> getPath() async {
+  Future<void> _getStoragePaths() async {
     List<String> paths;
     // getExternalStorageDirectories() will return list containing internal storage directory path
     // And external storage (SD card) directory path (if exists)
     paths = await ExternalPath.getExternalStorageDirectories();
 
     setState(() {
-      _exPath = paths; // [/storage/emulated/0, /storage/B3AE-4D28]
-      print("Print ext path $_exPath");
+      _exPaths = paths; // [/storage/emulated/0, /storage/B3AE-4D28]
     });
+    for (String path in _exPaths) {
+      if (kDebugMode) {
+        print(" Directory: $path");
+      }
+    }
+  }
+
+  Future<Directory?> _getStorageDirectory() async {
+    return Platform.isAndroid
+        ? await getExternalStorageDirectory()
+        : await getApplicationSupportDirectory();
   }
 
   // To get public storage directory path like Downloads, Picture, Movie etc.
@@ -147,24 +168,25 @@ class _ShareDataState extends State<ShareData> {
     setState(() {
       _download = path; // /storage/emulated/0/Download
     });
+    if (kDebugMode) {
+      print("Download path : $_download");
+    }
   }
 
-  Future<void> getDBPath() async {
-    String path = "";
-    await sql.getDatabasesPath().then((value) {
-      path = value;
-    });
+  Future<void> _getDataBasePath() async {
+    String path;
+    path = await getDatabasesPath();
 
     setState(() {
-      _dbPath = path;
-      if (kDebugMode) {
-        print(" db...$_dbPath");
-      }
+      _dataBasePath = path;
     });
+    if (kDebugMode) {
+      print("DataBase path $_dataBasePath");
+    }
   }
 
-  Future<File> _copyDBToStorage() async {
-    File source1 = File("$_dbPath/otis.db");
+  Future<File?> _copyDBToStorage() async {
+    //File dataFile = File("$_dataBasePath/otis.db");
 
     Directory copyTo = Directory(_download);
     if ((await copyTo.exists())) {
@@ -183,16 +205,41 @@ class _ShareDataState extends State<ShareData> {
       }
     }
 
-    String newPath = "${copyTo.path}/otis.db";
+    // String newPath = "${copyTo.path}/otis.db";
+    String newPath = join(copyTo.path, 'otis.db');
+    var dbPath = join(await getDatabasesPath(), 'otis.db');
 
-    return await source1.copy(newPath);
+    File dataFile = File(dbPath);
+
+    return await dataFile.copy(newPath);
   }
 
-  Future<File?> _copyToDB() async {
+  Future<File?> _copyToDataBase() async {
+    File? file;
     if (_fileSelected()) {
-      return await selectedFile?.copy("$_dbPath/otis.db");
+      var restoredPath = join(await getDatabasesPath(), 'otis.db');
+     // File newSelectedFile = File(selectedFile!.path);
+
+      file = selectedFile!.copySync(restoredPath);
+      if (file.existsSync()) {
+        String bName = basename(selectedFile!.path);
+        file = File(join(_download, bName)).copySync(restoredPath);
+        if (kDebugMode) {
+          print(" File path ${file.path}");
+        }
+      }
     }
-    return null;
+
+    /*String newDatabasePath = join(_download, "otis.db");
+    file = File(newDatabasePath);
+    if (file.existsSync()) {
+      print(" File exist at ${file.path}");
+      String dbPath = join(await getDatabasesPath(), "otis.db");
+
+      file.copySync(dbPath);
+    }*/
+
+    return file;
   }
 
   void _pickFile() async {
@@ -200,12 +247,14 @@ class _ShareDataState extends State<ShareData> {
     // are assigned into result and if no file is chosen result is null.
     // you can also toggle "allowMultiple" true or false depending on your need
     final result = await FilePicker.platform.pickFiles(allowMultiple: false);
+    print(" result path ${result!.paths.first}");
 
     // if no file is picked
     if (result == null) return;
 
     setState(() {
       selectedFilePath = result.files.first.path;
+
       selectedFile = File(selectedFilePath!);
     });
   }
@@ -213,9 +262,31 @@ class _ShareDataState extends State<ShareData> {
   void _deleteSelectedFile() {
     setState(() {
       selectedFilePath = null;
+
       selectedFile = null;
     });
   }
 
   bool _fileSelected() => selectedFilePath != null && selectedFile != null;
+
+  /* Future<void> initDB() async {
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String newPath = join(documentsDirectory.path, '/backup.db');
+    final exists = await databaseExists(newPath);
+    if (!exists) {
+      try {
+        final dbPath = await getExternalStorageDirectories().first.
+        final path = join(dbPath, '/backup.db');
+        File(path).copySync(newPath);
+      } catch (_) {}
+    }
+  }
+
+  Future<Database> openDB() async {
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentsDirectory.path, '/backup.db');
+    await initDB();
+    Database db = await openDatabase(path);
+    return db;
+  }*/
 }

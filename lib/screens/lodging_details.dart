@@ -25,6 +25,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   Occupant? _occupant;
 
   late List<Data> monthDataList;
+  List<Payment> payments = [];
   //late int ownerId;
   late DateTime entryDate;
   bool _isLoading = true;
@@ -346,12 +347,13 @@ class _LodgingDetailsState extends State<LodgingDetails> {
             print("Value ist not empty");
           }
           occupant = value.map((e) => Occupant.fromMap(e)).toList().first;
-          await _loadPayments();
+         // await _loadPayments();
         }
       });
       setState(() {
         _occupant = occupant;
       });
+      await _loadPayments();
     }
 
     setState(() {
@@ -403,7 +405,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       ),
     ).then((value) {
       _loadLodging();
-      print(" Value -----$value");
     });
   }
 

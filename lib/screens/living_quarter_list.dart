@@ -40,7 +40,7 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
                   fullscreenDialog: true,
                 ),
               )
-              .then((value) => value ? _loadData() : null);
+              .then((value) => _loadData());
         },
       ),
       body: !_hasData()
