@@ -218,7 +218,7 @@ class _ShareDataState extends State<ShareData> {
     File? file;
     if (_fileSelected()) {
       var restoredPath = join(await getDatabasesPath(), 'otis.db');
-     // File newSelectedFile = File(selectedFile!.path);
+      // File newSelectedFile = File(selectedFile!.path);
 
       file = selectedFile!.copySync(restoredPath);
       if (file.existsSync()) {
@@ -246,7 +246,8 @@ class _ShareDataState extends State<ShareData> {
     // opens storage to pick files and the picked file or files
     // are assigned into result and if no file is chosen result is null.
     // you can also toggle "allowMultiple" true or false depending on your need
-    final result = await FilePicker.platform.pickFiles(allowMultiple: false);
+    final FilePickerResult? result =
+        await FilePicker.platform.pickFiles(allowMultiple: false);
     print(" result path ${result!.paths.first}");
 
     // if no file is picked
