@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helper/helper.dart';
 
-
 class PasswordController extends StatefulWidget {
   final String title;
 
@@ -37,25 +36,30 @@ class _PasswordControllerState extends State<PasswordController> {
                   labelText: label,
                   hintText: hint),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                SimpleDialogOption(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: Text(breakButtonLabel),
-                ), // button 1
-                SimpleDialogOption(
-                  onPressed: () async {
-                    var value = await _checkPassword();
+            Padding(
+              padding: const EdgeInsets.only(top: 20.0, left: 0.0, right: 0.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  SimpleDialogOption(
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: Text(breakButtonLabel),
+                  ), // button 1
+                  SimpleDialogOption(
+                    padding:  EdgeInsets.zero,
+                    onPressed: () async {
+                      var value = await _checkPassword();
 
-                    if (!mounted) return;
-                    Navigator.of(context).pop(value);
-                  },
-                  child: Text(okButtonLabel),
-                ), // button 2
-              ],
+                      if (!mounted) return;
+                      Navigator.of(context).pop(value);
+                    },
+                    child: Text(okButtonLabel),
+                  ), // button 2
+                ],
+              ),
             ),
           ],
         ),
@@ -77,4 +81,3 @@ class _PasswordControllerState extends State<PasswordController> {
     return false;
   }
 }
-

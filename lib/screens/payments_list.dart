@@ -26,6 +26,14 @@ class _PaymentsListState extends State<PaymentsList> {
     super.initState();
   }
 
+  double getTotalAmount() {
+    var amount = 0.0;
+    for (Payment payment in _items) {
+      amount += payment.amount;
+    }
+    return amount;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +53,6 @@ class _PaymentsListState extends State<PaymentsList> {
         children: [
           const PaymentTileHeader(),
           Expanded(
-
             child: ListView.builder(
                 itemCount: _items.length,
                 itemBuilder: (_, index) {
@@ -54,6 +61,9 @@ class _PaymentsListState extends State<PaymentsList> {
                 }),
           ),
         ],
+      ),
+      bottomSheet: TotalAmountWidget(
+        amount: getTotalAmount(),
       ),
     );
   }

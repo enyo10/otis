@@ -1,6 +1,7 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:otis/screens/import-export.dart';
 
 import 'package:otis/screens/living_quarter_list.dart';
 import 'package:otis/screens/profile.dart';
@@ -105,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (value) {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) => const ShareData(),
+                          builder: (_) => const ImportExportDB(),
                         ),
                       );
 

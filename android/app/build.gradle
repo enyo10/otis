@@ -47,7 +47,7 @@ android {
         applicationId "ch.enyo.otis"
         //minSdkVersion flutter.minSdkVersion
         minSdkVersion 21
-        targetSdkVersion 32
+        targetSdkVersion 33
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

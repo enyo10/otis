@@ -13,12 +13,21 @@ class PaymentDetails extends StatefulWidget {
 
 class _PaymentDetailsState extends State<PaymentDetails> {
   late List<Payment> payments;
-
+  double totalAmount = 0;
 
   @override
   void initState() {
     super.initState();
     payments = widget.payments;
+    totalAmount = getTotalAmount();
+  }
+
+  double getTotalAmount() {
+    var amount = 0.0;
+    for (Payment payment in payments) {
+      amount += payment.amount;
+    }
+    return amount;
   }
 
   @override
@@ -39,6 +48,9 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                 }),
           ),
         ],
+      ),
+      bottomSheet: TotalAmountWidget(
+        amount: totalAmount
       ),
     );
   }

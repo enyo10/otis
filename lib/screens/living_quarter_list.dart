@@ -14,6 +14,7 @@ class LivingQuarterList extends StatefulWidget {
 
 class _LivingQuarterListState extends State<LivingQuarterList> {
   List<Map<String, dynamic>> _livingQuarters = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -43,12 +44,9 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
               .then((value) => _loadData());
         },
       ),
-      body: !_hasData()
+      body: _isLoading
           ? const Center(
-              child: Text(
-                " La liste est vide",
-                style: TextStyle(fontSize: 25.0),
-              ),
+              child: CircularProgressIndicator(),
             )
           : ListView.builder(
               itemCount: _livingQuarters.length,
@@ -105,6 +103,7 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
 
     setState(() {
       _livingQuarters = data;
+      _isLoading = false;
     });
   }
 
