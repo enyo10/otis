@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:otis/models/lodging.dart';
+import 'package:otis/models/occupant.dart';
 import 'package:otis/widgets/payment_list_tile.dart';
 
 import '../models/payment.dart';
+import '../widgets/add_payment.dart';
 
 class PaymentDetails extends StatefulWidget {
   final List<Payment> payments;
-  const PaymentDetails({Key? key, required this.payments}) : super(key: key);
+  final Occupant occupant;
+  final Lodging lodging;
+  const PaymentDetails(
+      {Key? key,
+      required this.payments,
+      required this.occupant,
+      required this.lodging})
+      : super(key: key);
 
   @override
   State<PaymentDetails> createState() => _PaymentDetailsState();
@@ -33,6 +43,20 @@ class _PaymentDetailsState extends State<PaymentDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => AddPayments(
+                  occupant: widget.occupant,
+                  rent: widget.lodging.rent,
+                  initialPaymentPeriodDate: widget.occupant!.entryDate,
+                ),
+                fullscreenDialog: true,
+              ),
+            );
+          }),
       appBar: AppBar(
         title: const Text("Details du payment"),
       ),
@@ -49,9 +73,7 @@ class _PaymentDetailsState extends State<PaymentDetails> {
           ),
         ],
       ),
-      bottomSheet: TotalAmountWidget(
-        amount: totalAmount
-      ),
+      bottomSheet: TotalAmountWidget(amount: totalAmount),
     );
   }
 }

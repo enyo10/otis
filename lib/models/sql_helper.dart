@@ -85,6 +85,11 @@ class SQLHelper {
          ON UPDATE CASCADE
          ON DELETE CASCADE ) 
     """);
+
+   /* ALTER TABLE table_name
+    ADD column_name datatype;*/
+    //await database.execute("""ALTER TABLE $_payments ADD desc TEXT""");
+    await database.execute("""ALTER TABLE $_payments ADD desc TEXT""");
   }
 
   static Future _onConfigure(Database db) async {
@@ -95,7 +100,7 @@ class SQLHelper {
 
     return openDatabase(
       join(await getDatabasesPath(), 'otis.db'),
-      version: 1,
+      version: 2,
       onConfigure: _onConfigure,
       onCreate: (Database database, int version) async {
         await _onCreateTables(database);
@@ -258,7 +263,8 @@ class SQLHelper {
       DateTime paymentDate,
       Period periodOfPayment,
       String currency,
-      double rate) async {
+      double rate,
+      String desc) async {
     final db = await SQLHelper.db();
 
     final data = {
@@ -268,8 +274,11 @@ class SQLHelper {
       'year': periodOfPayment.year,
       'month': periodOfPayment.month,
       'currency': currency,
-      'rate': rate
+      'rate': rate,
+      'desc':desc
     };
+   // await db.execute("""ALTER TABLE $_payments ADD desc TEXT""");
+
     final id = await db.insert(_payments, data,
         conflictAlgorithm: ConflictAlgorithm.replace);
 

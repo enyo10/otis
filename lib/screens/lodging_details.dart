@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:otis/helper/helper.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
-import 'package:otis/screens/payment_details.dart';
+import 'package:otis/screens/period_payments.dart';
 import 'package:otis/screens/payments_list.dart';
 import 'package:otis/widgets/add_payment.dart';
 import 'package:otis/widgets/password_controller.dart';
@@ -347,7 +347,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
             print("Value ist not empty");
           }
           occupant = value.map((e) => Occupant.fromMap(e)).toList().first;
-         // await _loadPayments();
+          // await _loadPayments();
         }
       });
       setState(() {
@@ -481,7 +481,11 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       onDoubleTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => PaymentDetails(payments: payments),
+            builder: (context) => PaymentDetails(
+              payments: payments,
+              lodging: widget.lodging,
+              occupant: _occupant!,
+            ),
             fullscreenDialog: true,
           ),
         );

@@ -29,6 +29,7 @@ class _AddPaymentsState extends State<AddPayments> {
   final TextEditingController _amountController = TextEditingController();
 
   final TextEditingController _taxController = TextEditingController();
+  final TextEditingController _descController = TextEditingController();
 
   double amountInDollar = 0.0;
   late DateTime _selectedPaymentDate;
@@ -145,7 +146,39 @@ class _AddPaymentsState extends State<AddPayments> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left: 8.0, top: 30),
+                child: Row(
+                  children: <Widget>[
+                    Flexible(
+                      flex: 2,
+                      child: TextField(
+                        controller: _descController,
+                        decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Ajouter commentaire',
+                            hintText: 'Commentaire'),
+                        style: Theme.of(context).textTheme.labelLarge,
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        /*inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'(^\d*\.?\d*)')),
+                        ],*/
+                      ),
+                    ),
+                    const Flexible(
+                      flex: 1,
+                      child: Text(
+                        " ",
+                        style: TextStyle(fontSize: 30.0),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              //  SizedBox()
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, top: 30),
                 child: Row(
                   children: [
                     ElevatedButton(
@@ -162,7 +195,7 @@ class _AddPaymentsState extends State<AddPayments> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left: 8.0, top: 30),
                 child: Row(
                   children: [
                     ElevatedButton(
@@ -299,9 +332,10 @@ class _AddPaymentsState extends State<AddPayments> {
           var paymentDate = _selectedPaymentDate;
           var periodOfPayment = Period(month: month, year: year);
           double rate = double.parse(_taxController.text);
+          var desc = _descController.text;
 
-          id = await SQLHelper.insertPayment(
-              ownerId, amount, paymentDate, periodOfPayment, _currency, rate);
+          id = await SQLHelper.insertPayment(ownerId, amount, paymentDate,
+              periodOfPayment, _currency, rate, desc);
 
           _showMessage(' Le payement est enrégistré');
 

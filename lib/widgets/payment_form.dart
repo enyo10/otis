@@ -18,6 +18,7 @@ class AddPayment extends StatefulWidget {
 class _AddPaymentState extends State<AddPayment> {
   final TextEditingController _dollarPaymentController =
       TextEditingController();
+  final TextEditingController _descTextController = TextEditingController();
 
   late DateTime selectedDate;
 
@@ -116,8 +117,12 @@ class _AddPaymentState extends State<AddPayment> {
     var year = selectedDate.year;
     var amount = double.parse(_dollarPaymentController.text);
     var periodOfPayment = Period(month: month, year: year);
-    var id = await SQLHelper.insertPayment(
-        widget.ownerId, amount, paymentDate, periodOfPayment, "\$", 450);
+    var desc = _dollarPaymentController.text;
+    int id = 0;
+
+   /* var id = await SQLHelper.insertPayment(
+        widget.ownerId, amount, paymentDate, periodOfPayment, "\$", 450,desc);*/
+
     if (kDebugMode) {
       print(" Payment with id : $id inserted");
     }
