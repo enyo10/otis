@@ -87,6 +87,16 @@ class Data {
   }
 }
 
+double getTotalAmount(List<Payment> payments) {
+  var amount = 0.0;
+  for (Payment payment in payments) {
+    double subAmount = payment.amount / payment.rate;
+    double num2 = double.parse((subAmount).toStringAsFixed(2));
+    amount += num2;
+  }
+  return amount;
+}
+
 String stringValue(DateTime dateTime) {
   var yearShortCut = dateTime.year.toString().substring(2);
   return dateTime.day < 10
@@ -136,7 +146,6 @@ class Palette {
 } //
 
 enum CheckedValue { yes, no }
-
 
 ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showMessage(
     BuildContext context, String message) {

@@ -86,7 +86,7 @@ class SQLHelper {
          ON DELETE CASCADE ) 
     """);
 
-   /* ALTER TABLE table_name
+    /* ALTER TABLE table_name
     ADD column_name datatype;*/
     //await database.execute("""ALTER TABLE $_payments ADD desc TEXT""");
     await database.execute("""ALTER TABLE $_payments ADD desc TEXT""");
@@ -96,16 +96,18 @@ class SQLHelper {
     await db.execute('PRAGMA foreign_keys = ON');
   }
 
-  static Future<Database> db() async {
+  static Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < newVersion) {
+      await db.execute("""ALTER TABLE $_payments ADD desc TEXT""");
+    }
+  }
 
-    return openDatabase(
-      join(await getDatabasesPath(), 'otis.db'),
-      version: 2,
-      onConfigure: _onConfigure,
-      onCreate: (Database database, int version) async {
-        await _onCreateTables(database);
-      },
-    );
+  static Future<Database> db() async {
+    return openDatabase(join(await getDatabasesPath(), 'otis.db'),
+        version: 2, onConfigure: _onConfigure,
+        onCreate: (Database database, int version) async {
+      await _onCreateTables(database);
+    }, onUpgrade: _onUpgrade);
   }
 
   /*
@@ -275,9 +277,9 @@ class SQLHelper {
       'month': periodOfPayment.month,
       'currency': currency,
       'rate': rate,
-      'desc':desc
+      'desc': desc
     };
-   // await db.execute("""ALTER TABLE $_payments ADD desc TEXT""");
+    // await db.execute("""ALTER TABLE $_payments ADD desc TEXT""");
 
     final id = await db.insert(_payments, data,
         conflictAlgorithm: ConflictAlgorithm.replace);

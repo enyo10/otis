@@ -8,7 +8,7 @@ class Payment {
   final Period paymentPeriod;
   final String currency;
   final double rate;
-  final String? desc;
+   final String desc;
 
   Payment(
       {required this.paymentId,
@@ -18,7 +18,7 @@ class Payment {
       required this.paymentDate,
       required this.currency,
       required this.paymentPeriod,
-      this.desc});
+      required this.desc});
 
   Payment.fromMap(Map<String, dynamic> map)
       : paymentId = map['id'],
@@ -28,7 +28,7 @@ class Payment {
         amount = map['amount'],
         rate = map['rate'],
         currency = map['currency'],
-        desc = map['desc'];
+        desc = map['desc']?? '';
 
   String stringValue() {
     return '${paymentPeriod.toString()}, $amount, $currency,';

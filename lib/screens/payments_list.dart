@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:otis/helper/helper.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/sql_helper.dart';
 import '../models/payment.dart';
@@ -26,13 +27,13 @@ class _PaymentsListState extends State<PaymentsList> {
     super.initState();
   }
 
-  double getTotalAmount() {
+  /*double getTotalAmount() {
     var amount = 0.0;
     for (Payment payment in _items) {
       amount += payment.amount;
     }
     return amount;
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +64,7 @@ class _PaymentsListState extends State<PaymentsList> {
         ],
       ),
       bottomSheet: TotalAmountWidget(
-        amount: getTotalAmount(),
+        amount: getTotalAmount(_items),
       ),
     );
   }

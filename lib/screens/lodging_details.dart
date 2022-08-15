@@ -314,15 +314,11 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     Occupant? occupant;
     await SQLHelper.getApartment(lodging.id).then((value) async {
       lodging = value.map((e) => Lodging.fromMap(e)).toList().first;
-      print(" in load Loading : lodging id --> ${lodging.id}");
-      print(" Occupant id : ${lodging.occupantId}");
+
       if (lodging.occupantId != null) {
         await SQLHelper.getOccupantById(lodging.occupantId!, lodging.id)
             .then((value) {
           occupant = value.map((e) => Occupant.fromMap(e)).toList().first;
-          if (kDebugMode) {
-            print(" Occupant id:  ${occupant?.id}");
-          }
         });
       }
     });
@@ -333,21 +329,13 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   }
 
   _loadOccupantWithPayment() async {
-    print("in load Occupant lodging with occupant id ${_lodging.occupantId}");
     Occupant? occupant;
     if (_lodging.occupantId != null) {
-      if (kDebugMode) {
-        print(" Occupant id : ${_lodging.occupantId}");
-      }
       var id = _lodging.occupantId;
 
       await SQLHelper.getOccupantById(id!, _lodging.id).then((value) async {
         if (value.isNotEmpty) {
-          if (kDebugMode) {
-            print("Value ist not empty");
-          }
           occupant = value.map((e) => Occupant.fromMap(e)).toList().first;
-          // await _loadPayments();
         }
       });
       setState(() {
@@ -365,7 +353,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     List<Payment> paymentList = [];
     _initMonthList();
     if (_occupant != null) {
-      print("in load payment");
       await SQLHelper.getCurrentYearPayment(_occupant!.id).then((value) {
         for (var paymentMap in value) {
           paymentList.add(Payment.fromMap(paymentMap));
@@ -447,8 +434,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           color: Colors.green,
         );
       } else {
-        print("Not Equal");
-
         icon = const Icon(
           Icons.check_box_outlined,
           color: Colors.orange,
@@ -481,10 +466,11 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       onDoubleTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => PaymentDetails(
+            builder: (context) => PeriodPayments(
               payments: payments,
               lodging: widget.lodging,
               occupant: _occupant!,
+              data: data,
             ),
             fullscreenDialog: true,
           ),
@@ -510,8 +496,8 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                 ),
                 //const SizedBox(width: 40,),
                 Visibility(
-                  child: icon,
                   visible: _isVisible(index, payments),
+                  child: icon,
                 )
               ],
             ),

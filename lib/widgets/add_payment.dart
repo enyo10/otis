@@ -13,12 +13,14 @@ class AddPayments extends StatefulWidget {
   final Occupant occupant;
   final DateTime initialPaymentPeriodDate;
   final double rent;
+  final DateTime? paymentPeriod;
 
   const AddPayments(
       {Key? key,
       required this.occupant,
       required this.rent,
-      required this.initialPaymentPeriodDate})
+      required this.initialPaymentPeriodDate,
+      this.paymentPeriod})
       : super(key: key);
 
   @override
@@ -35,13 +37,24 @@ class _AddPaymentsState extends State<AddPayments> {
   late DateTime _selectedPaymentDate;
   String _currency = currencies.elementAt(0);
   late DateTime _selectedPeriodDate;
+  bool _hasPeriod = false;
+  bool _currencyIsUSD = true;
 
   @override
   void initState() {
     super.initState();
-    _selectedPeriodDate = DateTime.now();
-    _selectedPaymentDate = _selectedPeriodDate;
+    _initPaymentPeriod();
+    _selectedPaymentDate = DateTime.now();
     _updateTaxValue();
+  }
+
+  _initPaymentPeriod() {
+    if (widget.paymentPeriod != null) {
+      _selectedPeriodDate = widget.paymentPeriod!;
+      _hasPeriod = true;
+    } else {
+      _selectedPeriodDate = DateTime.now();
+    }
   }
 
   @override
@@ -114,35 +127,38 @@ class _AddPaymentsState extends State<AddPayments> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0, top: 30),
-                child: Row(
-                  children: <Widget>[
-                    Flexible(
-                      flex: 2,
-                      child: TextField(
-                        controller: _taxController,
-                        decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Entrer le taux',
-                            hintText: 'Taux de conversion'),
-                        style: Theme.of(context).textTheme.labelLarge,
-                        keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'(^\d*\.?\d*)')),
-                        ],
+              Visibility(
+                visible: !_currencyIsUSD,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 30),
+                  child: Row(
+                    children: <Widget>[
+                      Flexible(
+                        flex: 2,
+                        child: TextField(
+                          controller: _taxController,
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Entrer le taux',
+                              hintText: 'Taux de conversion'),
+                          style: Theme.of(context).textTheme.labelLarge,
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'(^\d*\.?\d*)')),
+                          ],
+                        ),
                       ),
-                    ),
-                    const Flexible(
-                      flex: 1,
-                      child: Text(
-                        " ",
-                        style: TextStyle(fontSize: 30.0),
+                      const Flexible(
+                        flex: 1,
+                        child: Text(
+                          " ",
+                          style: TextStyle(fontSize: 30.0),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               Padding(
@@ -158,12 +174,8 @@ class _AddPaymentsState extends State<AddPayments> {
                             labelText: 'Ajouter commentaire',
                             hintText: 'Commentaire'),
                         style: Theme.of(context).textTheme.labelLarge,
-                        keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true),
-                        /*inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'(^\d*\.?\d*)')),
-                        ],*/
+                        keyboardType: TextInputType.multiline,
+                        maxLines: null,
                       ),
                     ),
                     const Flexible(
@@ -177,23 +189,25 @@ class _AddPaymentsState extends State<AddPayments> {
                 ),
               ),
               //  SizedBox()
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0, top: 30),
-                child: Row(
-                  children: [
-                    ElevatedButton(
-                        onPressed: () {
-                          _showPaymentMontPicker(context);
-                        },
-                        child: const Text("Periode de payement")),
-                    const SizedBox(
-                      width: 15.0,
+              Visibility(
+                  visible: !_hasPeriod,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, top: 30),
+                    child: Row(
+                      children: [
+                        ElevatedButton(
+                            onPressed: () {
+                              _showPaymentMontPicker(context);
+                            },
+                            child: const Text("Periode de payement")),
+                        const SizedBox(
+                          width: 15.0,
+                        ),
+                        Text("${_selectedPeriodDate.month}/"
+                            "${_selectedPeriodDate.year}")
+                      ],
                     ),
-                    Text(
-                        "${_selectedPeriodDate.month}/${_selectedPeriodDate.year}")
-                  ],
-                ),
-              ),
+                  )),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0, top: 30),
                 child: Row(
@@ -206,8 +220,9 @@ class _AddPaymentsState extends State<AddPayments> {
                     const SizedBox(
                       width: 15.0,
                     ),
-                    Text(
-                        "${_selectedPaymentDate.day}/${_selectedPaymentDate.month}/${_selectedPaymentDate.year}")
+                    Text("${_selectedPaymentDate.day}/"
+                        "${_selectedPaymentDate.month}/"
+                        "${_selectedPaymentDate.year}")
                   ],
                 ),
               ),
@@ -270,8 +285,10 @@ class _AddPaymentsState extends State<AddPayments> {
   void _updateTaxValue() {
     if (_currency == currencies.elementAt(0)) {
       _taxController.text = 1.toString();
+      _currencyIsUSD = true;
     } else {
       _taxController.clear();
+      _currencyIsUSD = false;
     }
     setState(() {});
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:otis/screens/payment_details.dart';
 
 import '../helper/helper.dart';
 import '../models/payment.dart';
@@ -13,27 +14,22 @@ class PaymentListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      //semanticContainer: false,
-      shadowColor: Colors.green,
-      elevation: 4.0,
-      /*shape: OutlineInputBorder(*/
-      /*    borderRadius: BorderRadius.circular(10),*/
-      /*    borderSide: const BorderSide(color: Colors.white))*/
-      /*child: ListTile(
-        textColor: Colors.black,
-        leading: Padding(
-          padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
-          child: Text(
-            payment.paymentPeriod.toString(),
+    return GestureDetector(
+      onDoubleTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PaymentDetails(payment: payment),
           ),
-        ),
-        title: Text(" ${payment.amount} ${payment.currency}"),
-        trailing: Text(
-          "${payment.rate}      ${stringValue(payment.paymentDate)} ",
-        ),
-      ),*/
-      child: _paymentWidget(payment),
+        );
+      },
+      child: Card(
+        //semanticContainer: false,
+        shadowColor: Colors.green,
+        elevation: 4.0,
+
+        child: _paymentWidget(payment),
+      ),
     );
   }
 
