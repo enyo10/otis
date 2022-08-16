@@ -107,35 +107,11 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           Visibility(visible: _isOccupied(), child: _changedOwner())
         ],
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Visibility(
-          visible: _isOccupied(),
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.of(context)
-                  .push(
-                    MaterialPageRoute(
-                      builder: (context) => AddPayments(
-                        occupant: _occupant!,
-                        rent: widget.lodging.rent,
-                        initialPaymentPeriodDate: _occupant!.entryDate,
-                      ),
-                      fullscreenDialog: true,
-                    ),
-                  )
-                  .then((value) => value ? _loadOccupantWithPayment() : null)
-                  .onError((error, stackTrace) => null);
-            },
-            style: ElevatedButton.styleFrom(
-                //  primary: Colors.purple,
-                // padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                padding: const EdgeInsets.all(10),
-                textStyle:
-                    const TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
-            autofocus: true,
-            child: const Text(" Ajouter payement "),
-          ),
+      floatingActionButton: Visibility(
+        visible: _isOccupied(),
+        child: FloatingActionButton(
+          onPressed: _navigateToAddPayment,
+          child: const Icon(Icons.add),
         ),
       ),
       body: _isLoading
@@ -595,5 +571,21 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         .then((value) {
       _loadLodging();
     });
+  }
+
+  _navigateToAddPayment() {
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            builder: (context) => AddPayments(
+              occupant: _occupant!,
+              rent: widget.lodging.rent,
+              initialPaymentPeriodDate: _occupant!.entryDate,
+            ),
+            fullscreenDialog: true,
+          ),
+        )
+        .then((value) => value ? _loadOccupantWithPayment() : null)
+        .onError((error, stackTrace) => null);
   }
 }
