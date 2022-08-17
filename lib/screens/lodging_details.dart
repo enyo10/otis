@@ -44,61 +44,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
   @override
   Widget build(BuildContext context) {
-    /*return Scaffold(
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Visibility(
-          visible: _isOccupied(),
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.of(context)
-                  .push(
-                    MaterialPageRoute(
-                      builder: (context) => AddPayments(
-                        occupant: occupant,
-                        rent: widget.lodging.rent,
-                        initialPaymentPeriodDate: occupant.entryDate,
-                      ),
-                      fullscreenDialog: true,
-                    ),
-                  )
-                  .then((value) => value ? _loadData() : null)
-                  .onError((error, stackTrace) => null);
-            },
-            style: ElevatedButton.styleFrom(
-                //  primary: Colors.purple,
-                // padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                padding: const EdgeInsets.all(10),
-                textStyle:
-                    const TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
-            child: const Text(" Ajouter payement "),
-            autofocus: true,
-          ),
-        ),
-      ),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            title: const Text('Logement'),
-            actions: [
-              _actionIcon(),
-              Visibility(visible: _isOccupied(), child: _changedOwner())
-            ],
-            floating: true,
-            flexibleSpace: Placeholder(),
-            expandedHeight: 200,
-          ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, index) {
-                return _newListItem(index);
-              },
-              childCount: monthDataList.length,
-            ),
-          ),
-        ],
-      ),
-    );*/
     return Scaffold(
       appBar: AppBar(
         title: const Text('Logement'),
@@ -110,6 +55,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       floatingActionButton: Visibility(
         visible: _isOccupied(),
         child: FloatingActionButton(
+          elevation: 10,
           onPressed: _navigateToAddPayment,
           child: const Icon(Icons.add),
         ),

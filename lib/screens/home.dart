@@ -7,6 +7,7 @@ import 'package:otis/screens/living_quarter_list.dart';
 import 'package:otis/screens/profile.dart';
 import 'package:otis/screens/share_data.dart';
 import 'package:otis/widgets/password_controller.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../helper/helper.dart';
 
@@ -18,17 +19,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static const colorizeColors = [
-    Colors.purple,
-    Colors.blue,
-    Colors.yellow,
-    Colors.red,
-  ];
 
-  static const colorizeTextStyle = TextStyle(
-    fontSize: 50.0,
-    fontFamily: 'Horizon',
-  );
 
   @override
   void initState() {

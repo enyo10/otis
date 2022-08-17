@@ -10,7 +10,9 @@ class PaymentDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var desc = (payment.desc == '') ? 'Description null' : payment.desc;
+    var desc = (payment.desc == '')
+        ? "Aucun commentaire n'a été laissé"
+        : payment.desc;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -20,32 +22,70 @@ class PaymentDetails extends StatelessWidget {
             color: Colors.red,
           ),
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              NewWidget(
-                data: payment.paymentPeriod.toString(),
-                text: 'Mois',
-              ),
-              NewWidget(data: payment.amount.toString(), text: "Montant"),
-              NewWidget(data: payment.currency, text: "Devise"),
-              NewWidget(
-                  data: stringValue(payment.paymentDate), text: "Date payement"),
-              const NewWidget(data: "", text: "Commentaire"),
-              Card(
-                elevation: 5,
-                margin: const EdgeInsets.all(8.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    desc,
-                    style: const TextStyle(
-                        fontSize: 20, fontStyle: FontStyle.italic),
+        body: FractionallySizedBox(
+          heightFactor: 0.8,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Card(
+                  elevation: 10,
+                  margin: const EdgeInsets.all(8.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        NewWidget(
+                          data: payment.paymentPeriod.toString(),
+                          text: 'Mois',
+                        ),
+                        NewWidget(
+                            data: payment.amount.toString(), text: "Montant"),
+                        NewWidget(data: payment.currency, text: "Devise"),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            NewWidget(
+                                data: stringValue(payment.paymentDate),
+                                text: "Date payement"),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              )
-            ],
+                const SizedBox(
+                  height: 30,
+                ),
+                Card(
+                  elevation: 5,
+                  margin: const EdgeInsets.all(8.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: const [
+                            Text(
+                              "Commentaire: ",
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          desc,
+                          style: const TextStyle(
+                              fontSize: 20, fontStyle: FontStyle.italic),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
