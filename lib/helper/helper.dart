@@ -125,7 +125,6 @@ const kBodyTextStyle = TextStyle(
   fontSize: 22.0,
 );
 
-const kPassword = "password";
 
 class Palette {
   static const MaterialColor kToDark = MaterialColor(

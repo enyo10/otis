@@ -14,6 +14,12 @@ class PaymentListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var amount = "${payment.amount} ${payment.currency}";
+    var period = payment.paymentPeriod.toString();
+    var tax = payment.rate.toString();
+    var date = stringValue(payment.paymentDate);
+    var info = (payment.desc == '') ? " " : "i";
+
     return GestureDetector(
       onDoubleTap: () {
         Navigator.push(
@@ -23,26 +29,33 @@ class PaymentListTile extends StatelessWidget {
           ),
         );
       },
-      child: Card(
+      /* child: Card(
         //semanticContainer: false,
         shadowColor: Colors.green,
         elevation: 4.0,
 
         child: _paymentWidget(payment),
-      ),
+      ),*/
+      child: PaymentCard(
+          period: period, amount: amount, tax: tax, date: date, info: info),
     );
   }
 
   Widget _paymentWidget(Payment payment) {
+    var info = (payment.desc == '') ? " " : "i";
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(child: Text(payment.paymentPeriod.toString())),
-          Expanded(child: Text(" ${payment.amount} ${payment.currency}")),
-          Expanded(child: Text(payment.rate.toString())),
-          Expanded(flex: 1, child: Text(stringValue(payment.paymentDate))),
+          MyTextWidget(
+            text: payment.paymentPeriod.toString(),
+          ),
+          MyTextWidget(text: "${payment.amount} ${payment.currency}"),
+          MyTextWidget(text: payment.rate.toString()),
+          MyTextWidget(text: stringValue(payment.paymentDate)),
+          MyTextWidget(text: info),
         ],
       ),
     );
@@ -54,25 +67,32 @@ class PaymentTileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var period = 'Periode';
+    var amount = "Montant";
+    var rate = "Taux";
+    var date = "Date paie";
+    var info = "";
+
     return Card(
       color: Colors.white70,
       //semanticContainer: false,
       shadowColor: Colors.green,
       elevation: 8.0,
-      /*shape: OutlineInputBorder(*/
-      /*    borderRadius: BorderRadius.circular(10),*/
-      /*    borderSide: const BorderSide(color: Colors.white))*/
-      child: ListTile(
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-        textColor: Colors.black,
-        leading: const Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Text('Periode'),
+
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            MyTextWidget(text: period),
+            MyTextWidget(text: amount),
+            MyTextWidget(text: rate),
+            MyTextWidget(text: date),
+            const Text("")
+            // MyTextWidget(text: info)
+          ],
         ),
-        title: const Text("Montant"),
-        trailing: Text("${currencies.elementAt(0)}/${currencies.elementAt(1)}"
-            "       Date de paie"),
       ),
     );
   }
@@ -98,6 +118,74 @@ class TotalAmountWidget extends StatelessWidget {
             const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
         textColor: Colors.black,
         title: Text("  Montant total :   $amount"),
+      ),
+    );
+  }
+}
+
+class MyTextWidget extends StatelessWidget {
+  final String text;
+
+  const MyTextWidget({Key? key, required this.text}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+}
+
+class MyRow extends StatelessWidget {
+  const MyRow({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    );
+  }
+}
+
+class PaymentCard extends StatelessWidget {
+  const PaymentCard(
+      {Key? key,
+      this.color,
+      required this.period,
+      required this.amount,
+      required this.tax,
+      required this.date,
+      required this.info})
+      : super(key: key);
+  final Color? color;
+  final String period;
+  final String amount;
+  final String tax;
+  final String date;
+  final String info;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shadowColor: Colors.green,
+      elevation: 4.0,
+      child: ListTile(
+        trailing: SizedBox(
+            width: 10,
+            child: Text(
+              info,
+              style: const TextStyle(
+                  color: Colors.amber,
+                  fontStyle: FontStyle.italic,
+                  fontSize: 25),
+            ),),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [Text(period), Text(amount), Text(tax), Text(date)],
+        ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:otis/models/lodging.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/sql_helper.dart';
@@ -37,16 +38,6 @@ class _PeriodPaymentsState extends State<PeriodPayments> {
     totalAmount = getTotalAmount(payments);
   }
 
-/*  double getTotalAmount() {
-    var amount = 0.0;
-    for (Payment payment in payments) {
-      double subAmount = payment.amount / payment.rate;
-      double num2 = double.parse((subAmount).toStringAsFixed(2));
-      amount += num2;
-    }
-    return amount;
-  }*/
-
   @override
   Widget build(BuildContext context) {
     int year = DateTime.now().year;
@@ -66,12 +57,18 @@ class _PeriodPaymentsState extends State<PeriodPayments> {
                     fullscreenDialog: true,
                   ),
                 )
-                .then((value) => value ? _reloadData() : null)
+                .then((value) => _reloadData())
                 .onError((error, stackTrace) => null);
           }),
-
       appBar: AppBar(
-        title: const Text("Les payements de la période"),
+        title: Text(
+          "Payements de la période",
+          style: GoogleFonts.charmonman(
+              textStyle: const TextStyle(
+            fontSize: 20,
+                fontWeight: FontWeight.bold
+          )),
+        ),
       ),
       body: Column(
         children: [

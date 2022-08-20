@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:otis/models/payment.dart';
 
 import '../helper/helper.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PaymentDetails extends StatelessWidget {
   final Payment payment;
@@ -65,10 +66,13 @@ class PaymentDetails extends StatelessWidget {
                     child: Column(
                       children: [
                         Row(
-                          children: const [
+                          children: [
                             Text(
                               "Commentaire: ",
-                              style: TextStyle(fontSize: 20),
+                              // style: TextStyle(fontSize: 20),
+                              style: GoogleFonts.courgette(
+                                textStyle: const TextStyle(fontSize: 25),
+                              ),
                             ),
                           ],
                         ),
@@ -77,8 +81,15 @@ class PaymentDetails extends StatelessWidget {
                         ),
                         Text(
                           desc,
-                          style: const TextStyle(
-                              fontSize: 20, fontStyle: FontStyle.italic),
+                          /*style: const TextStyle(
+                              fontSize: 20, fontStyle: FontStyle.italic),*/
+                          style: GoogleFonts.courgette(
+                            textStyle: const TextStyle(
+                              fontSize: 20,
+
+
+                            )
+                          ),
                         ),
                       ],
                     ),

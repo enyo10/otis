@@ -5,9 +5,8 @@ import 'package:otis/screens/import-export.dart';
 
 import 'package:otis/screens/living_quarter_list.dart';
 import 'package:otis/screens/profile.dart';
-import 'package:otis/screens/share_data.dart';
 import 'package:otis/widgets/password_controller.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 
 import '../helper/helper.dart';
 

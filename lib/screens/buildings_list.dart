@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:otis/models/building.dart';
 import 'package:otis/models/living_quarter.dart';
 import 'package:otis/screens/lodgings_list.dart';
@@ -30,9 +31,14 @@ class _BuildingsListState extends State<BuildingsList> {
     return Scaffold(
       // backgroundColor: Colors.black26,
       appBar: AppBar(
-        title: const Text(
+        title:  Text(
           " Les immeubles",
-          style: TextStyle(fontSize: 25.0),
+          style: GoogleFonts.charmonman(
+            textStyle: const TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.w600
+            )
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(

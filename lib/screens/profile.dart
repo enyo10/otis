@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:otis/helper/helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../helper/password_helper.dart';
 
 class SettingsPages extends StatefulWidget {
   const SettingsPages({Key? key}) : super(key: key);

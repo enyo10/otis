@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:otis/helper/helper.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
@@ -46,7 +47,12 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Logement'),
+        title: Text(
+          'Le logement',
+          style: GoogleFonts.charmonman(
+              textStyle:
+                  const TextStyle(fontSize: 25, fontWeight: FontWeight.w600)),
+        ),
         actions: [
           _actionIcon(),
           Visibility(visible: _isOccupied(), child: _changedOwner())

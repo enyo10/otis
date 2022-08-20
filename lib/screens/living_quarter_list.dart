@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:otis/helper/helper.dart';
+import 'package:otis/helper/password_helper.dart';
 import 'package:otis/models/living_quarter.dart';
 import 'package:otis/models/sql_helper.dart';
 import 'package:otis/screens/buildings_list.dart';
@@ -15,6 +17,7 @@ class LivingQuarterList extends StatefulWidget {
 class _LivingQuarterListState extends State<LivingQuarterList> {
   List<Map<String, dynamic>> _livingQuarters = [];
   bool _isLoading = true;
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void initState() {
@@ -26,9 +29,12 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          " Liste des quartiers",
-          style: TextStyle(fontSize: 25.0),
+        title:  Text(
+          " Les quartiers",
+         // style: TextStyle(fontSize: 25.0),
+          style: GoogleFonts.charmonman(
+            textStyle: const TextStyle(fontSize: 25, fontWeight: FontWeight.w600)
+          )
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -68,30 +74,64 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
                     ),
                     color: color,
                     child: ListTile(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                BuildingsList(livingQuarter: livingQuarter),
-                          ),
-                        );
-                      },
-                      title: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Center(
-                          child: Text(
-                            name,
-                            style: const TextStyle(fontSize: 30),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  BuildingsList(livingQuarter: livingQuarter),
+                            ),
+                          );
+                        },
+                        title: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Center(
+                            child: Text(
+                              name,
+                              style: const TextStyle(fontSize: 30),
+                            ),
                           ),
                         ),
-                      ),
-                      subtitle: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Center(
-                          child: Text(description),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: Text(description),
+                          ),
                         ),
-                      ),
-                    ),
+                        trailing: Container(
+                          padding: const EdgeInsets.all(0),
+                          width: 100.0,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              /* IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  onPressed: () async {
+                                    Lodging lodging = Lodging.fromMap(element);
+                                    var passChecker = const PasswordController(
+                                        title: "Actualisation de donnée");
+                                    await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return passChecker;
+                                      },
+                                    ).then((value) {
+                                      if (value) {
+                                        _showForm(lodging);
+                                      }
+                                    });
+
+                                    // _showForm(lodging);
+                                  }),*/
+                              IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.black),
+                                  onPressed: () async {
+                                    await _deleteLivingQuarter(
+                                        livingQuarter.id);
+                                    setState(() {});
+                                  })
+                            ],
+                          ),
+                        )),
                   ),
                 );
               }),
@@ -105,6 +145,15 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
       _livingQuarters = data;
       _isLoading = false;
     });
+  }
+
+  Future<void> _deleteLivingQuarter(int id) async {
+    await askedToDelete(
+        context, _passwordController, id, SQLHelper.deleteLivingQuarter);
+    await _loadData();
+    if (!mounted) return;
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (BuildContext context) => super.widget));
   }
 
   _hasData() => _livingQuarters.isNotEmpty;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:otis/helper/helper.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/sql_helper.dart';
@@ -16,7 +17,9 @@ class PaymentsList extends StatefulWidget {
 class _PaymentsListState extends State<PaymentsList> {
   final TextEditingController _editingController = TextEditingController();
   Icon _searchIcon = const Icon(Icons.search);
-  Widget _appBarTitle = const Text('Les payements');
+  Widget _appBarTitle =  Text('Les payements', style: GoogleFonts.sacramento(
+    textStyle: const TextStyle(fontSize: 40)
+  ));
 
   List<Payment> _payments = [];
   final List<Payment> _items = [];
@@ -27,13 +30,6 @@ class _PaymentsListState extends State<PaymentsList> {
     super.initState();
   }
 
-  /*double getTotalAmount() {
-    var amount = 0.0;
-    for (Payment payment in _items) {
-      amount += payment.amount;
-    }
-    return amount;
-  }*/
 
   @override
   Widget build(BuildContext context) {

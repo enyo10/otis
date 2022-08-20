@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:otis/helper/helper.dart';
 import 'package:otis/widgets/add_lodging.dart';
 import 'package:otis/widgets/password_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../helper/password_helper.dart';
 import '../models/building.dart';
 import '../models/lodging.dart';
 import '../models/sql_helper.dart';
@@ -46,9 +48,11 @@ class _LodgingListState extends State<LodgingList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Les appartements',
-          style: TextStyle(fontSize: 25.0),
+          style: GoogleFonts.charmonman(
+              textStyle:
+                  const TextStyle(fontSize: 25, fontWeight: FontWeight.w600)),
         ),
       ),
       body: SafeArea(
@@ -198,9 +202,8 @@ class _LodgingListState extends State<LodgingList> {
   }
 
   Future<bool> _checkPassword() async {
-    print("in check password");
-    final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-    SharedPreferences prefs = await _prefs;
+    final Future<SharedPreferences> p = SharedPreferences.getInstance();
+    SharedPreferences prefs = await p;
     final storedPass = prefs.get(kPassword);
     final password = passwordController.text;
     if (storedPass == password) {

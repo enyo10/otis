@@ -40,6 +40,7 @@ dependencies:
   external_path: ^1.0.1
   path_provider: ^2.0.11
   google_fonts: ^3.0.1
+#  google_fonts: ^3.0.1
 
 
 
@@ -92,6 +93,11 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  fonts:
+    - family: Charmonman
+      fonts:
+        - asset: fonts/Charmonman-Bold.ttf
+        - asset: fonts/Charmonman-Regular.ttf
   # fonts:
   #   - family: Schyler
   #     fonts:

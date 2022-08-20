@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../helper/helper.dart';
+import '../helper/password_helper.dart';
 
 class PasswordController extends StatefulWidget {
   final String title;
@@ -49,7 +49,7 @@ class _PasswordControllerState extends State<PasswordController> {
                     child: Text(breakButtonLabel),
                   ), // button 1
                   SimpleDialogOption(
-                    padding:  EdgeInsets.zero,
+                    padding: EdgeInsets.zero,
                     onPressed: () async {
                       var value = await _checkPassword();
 
