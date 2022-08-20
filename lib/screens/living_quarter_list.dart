@@ -29,27 +29,13 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:  Text(
-          " Les quartiers",
-         // style: TextStyle(fontSize: 25.0),
-          style: GoogleFonts.charmonman(
-            textStyle: const TextStyle(fontSize: 25, fontWeight: FontWeight.w600)
-          )
-        ),
+        title: Text(" Les quartiers",
+            // style: TextStyle(fontSize: 25.0),
+            style: GoogleFonts.charmonman(
+                textStyle: const TextStyle(
+                    fontSize: 25, fontWeight: FontWeight.w600))),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.of(context)
-              .push(
-                MaterialPageRoute(
-                  builder: (context) => const AddQuarter(),
-                  fullscreenDialog: true,
-                ),
-              )
-              .then((value) => _loadData());
-        },
-      ),
+      floatingActionButton: OtisFloatingButton(callback: _navigateToAddQuarter),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(),
@@ -60,10 +46,11 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
                 var livingQuarterMap = _livingQuarters[index];
                 var livingQuarter = LivingQuarter.fromMap(livingQuarterMap);
 
-                var name = livingQuarter.name;
+                var title = livingQuarter.name;
                 var description = livingQuarter.description;
                 var colorName = livingQuarter.colorName;
                 var color = colorMap[colorName];
+
                 return SizedBox(
                   //height: 200,
                   child: Card(
@@ -73,65 +60,11 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     color: color,
-                    child: ListTile(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  BuildingsList(livingQuarter: livingQuarter),
-                            ),
-                          );
-                        },
-                        title: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Center(
-                            child: Text(
-                              name,
-                              style: const TextStyle(fontSize: 30),
-                            ),
-                          ),
-                        ),
-                        subtitle: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Center(
-                            child: Text(description),
-                          ),
-                        ),
-                        trailing: Container(
-                          padding: const EdgeInsets.all(0),
-                          width: 100.0,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              /* IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () async {
-                                    Lodging lodging = Lodging.fromMap(element);
-                                    var passChecker = const PasswordController(
-                                        title: "Actualisation de donnée");
-                                    await showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return passChecker;
-                                      },
-                                    ).then((value) {
-                                      if (value) {
-                                        _showForm(lodging);
-                                      }
-                                    });
-
-                                    // _showForm(lodging);
-                                  }),*/
-                              IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.black),
-                                  onPressed: () async {
-                                    await _deleteLivingQuarter(
-                                        livingQuarter.id);
-                                    setState(() {});
-                                  })
-                            ],
-                          ),
-                        )),
+                    child: OtisListTile(
+                        callback: () => _navigateToBuildingList(livingQuarter),
+                        delete: () => _deleteLivingQuarter(livingQuarter.id),
+                        title: title,
+                        description: description),
                   ),
                 );
               }),
@@ -147,14 +80,118 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
     });
   }
 
+  _navigateToBuildingList(LivingQuarter livingQuarter) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => BuildingsList(livingQuarter: livingQuarter),
+      ),
+    );
+  }
+
+  _navigateToAddQuarter() {
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            builder: (context) => const AddQuarter(),
+            fullscreenDialog: true,
+          ),
+        )
+        .then((value) => _loadData());
+  }
+
   Future<void> _deleteLivingQuarter(int id) async {
     await askedToDelete(
         context, _passwordController, id, SQLHelper.deleteLivingQuarter);
     await _loadData();
+
     if (!mounted) return;
     Navigator.pushReplacement(context,
         MaterialPageRoute(builder: (BuildContext context) => super.widget));
   }
 
   _hasData() => _livingQuarters.isNotEmpty;
+}
+
+class OtisFloatingButton extends StatelessWidget {
+  const OtisFloatingButton({
+    Key? key,
+    required this.callback,
+  }) : super(key: key);
+  final VoidCallback callback;
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: callback,
+      child: const Icon(Icons.add),
+    );
+  }
+}
+
+class OtisListTile extends StatelessWidget {
+  const OtisListTile(
+      {Key? key,
+      required this.callback,
+      required this.delete,
+      required this.title,
+      required this.description})
+      : super(key: key);
+  final VoidCallback callback;
+  final VoidCallback delete;
+  final String title;
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+        contentPadding: const EdgeInsets.all(0.0),
+        onTap: callback,
+        title: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Center(
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 30),
+            ),
+          ),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(description),
+          ),
+        ),
+        trailing: Container(
+          padding: const EdgeInsets.all(0),
+          width: 100.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              /* IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () async {
+                                  Lodging lodging = Lodging.fromMap(element);
+                                  var passChecker = const PasswordController(
+                                      title: "Actualisation de donnée");
+                                  await showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return passChecker;
+                                    },
+                                  ).then((value) {
+                                    if (value) {
+                                      _showForm(lodging);
+                                    }
+                                  });
+
+                                  // _showForm(lodging);
+                                }),*/
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.black),
+                onPressed: delete,
+              )
+            ],
+          ),
+        ));
+  }
 }
