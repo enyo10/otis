@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:otis/models/payment.dart';
 
@@ -158,3 +157,7 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showMessage(
 double unitHeightValue(BuildContext context) =>
     MediaQuery.of(context).size.height * 0.001;
 double multiplier = 25;
+
+double definedFontSize(BuildContext context, double multiplier) {
+  return MediaQuery.of(context).size.height * 0.001 * multiplier;
+}
