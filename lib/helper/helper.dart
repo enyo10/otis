@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:otis/models/payment.dart';
 
@@ -125,7 +126,6 @@ const kBodyTextStyle = TextStyle(
   fontSize: 22.0,
 );
 
-
 class Palette {
   static const MaterialColor kToDark = MaterialColor(
     0xffe55f48, // 0% comes in here, this will be color picked if no shade is selected when defining a Color property which doesn’t require a swatch.
@@ -154,3 +154,7 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showMessage(
     ),
   );
 }
+
+double unitHeightValue(BuildContext context) =>
+    MediaQuery.of(context).size.height * 0.001;
+double multiplier = 25;

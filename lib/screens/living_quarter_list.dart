@@ -27,13 +27,17 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
 
   @override
   Widget build(BuildContext context) {
+    double ratio = unitHeightValue(context) ;
+    print(" ratio...... $ratio");
+    double fontSize = ratio *50;
+    print("fontSize  $fontSize");
     return Scaffold(
       appBar: AppBar(
         title: Text(" Les quartiers",
             // style: TextStyle(fontSize: 25.0),
             style: GoogleFonts.charmonman(
-                textStyle: const TextStyle(
-                    fontSize: 25, fontWeight: FontWeight.w600))),
+                textStyle: TextStyle(
+                    fontSize: fontSize, fontWeight: FontWeight.w600))),
       ),
       floatingActionButton: OtisFloatingButton(callback: _navigateToAddQuarter),
       body: _isLoading
