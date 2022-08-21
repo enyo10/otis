@@ -161,3 +161,4 @@ double multiplier = 25;
 double definedFontSize(BuildContext context, double multiplier) {
   return MediaQuery.of(context).size.height * 0.001 * multiplier;
 }
+
