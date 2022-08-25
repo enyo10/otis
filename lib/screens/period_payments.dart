@@ -30,72 +30,89 @@ class PeriodPayments extends StatefulWidget {
 class _PeriodPaymentsState extends State<PeriodPayments> {
   late List<Payment> payments;
   double totalAmount = 0;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    payments = widget.payments;
-    totalAmount = getTotalAmount(payments);
+    _loadData();
   }
 
   @override
   Widget build(BuildContext context) {
     int year = DateTime.now().year;
+    var monthInt = widget.data.month;
+    var month = monthMap[monthInt];
+    double height = MediaQuery.of(context).size.height * 0.10;
     return Scaffold(
+
+      appBar: AppBar(
+        title: Text(
+          "Payements de $month",
+          style: GoogleFonts.charmonman(
+              textStyle:
+                  const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
             Navigator.of(context)
                 .push(
-                  MaterialPageRoute(
-                    builder: (context) => AddPayments(
-                      occupant: widget.occupant,
-                      rent: widget.lodging.rent,
-                      initialPaymentPeriodDate: widget.occupant.entryDate,
-                      paymentPeriod: DateTime(year, widget.data.month),
-                    ),
-                    fullscreenDialog: true,
-                  ),
-                )
-                .then((value) => _reloadData())
+              MaterialPageRoute(
+                builder: (context) => AddPayments(
+                  occupant: widget.occupant,
+                  rent: widget.lodging.rent,
+                  initialPaymentPeriodDate: widget.occupant.entryDate,
+                  paymentPeriod: DateTime(year, widget.data.month),
+                ),
+                fullscreenDialog: false,
+              ),
+            )
+                .then((value) => _loadData())
                 .onError((error, stackTrace) => null);
           }),
-      appBar: AppBar(
-        title: Text(
-          "Payements de la période",
-          style: GoogleFonts.charmonman(
-              textStyle: const TextStyle(
-            fontSize: 20,
-                fontWeight: FontWeight.bold
-          )),
-        ),
+      body: Container(
+        padding: EdgeInsets.only(bottom: height + 10),
+        child: _isLoading
+            ? Center(
+                child: Text(
+                  "...En chargement",
+                  style: GoogleFonts.charmonman(fontSize: 40),
+                ),
+              )
+            : Column(
+                children: [
+                  const PaymentTileHeader(),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: payments.length,
+                      itemBuilder: (_, index) {
+                        var payment = payments.elementAt(index);
+                        return PaymentListTile(payment: payment);
+                      },
+                    ),
+                  ),
+                ],
+              ),
       ),
-      body: Column(
-        children: [
-          const PaymentTileHeader(),
-          Expanded(
-            child: ListView.builder(
-                itemCount: payments.length,
-                itemBuilder: (_, index) {
-                  var payment = payments.elementAt(index);
-                  return PaymentListTile(payment: payment);
-                }),
-          ),
-        ],
+      bottomSheet: TotalAmountWidget(
+        amount: totalAmount,
+        height: height,
       ),
-      bottomSheet: TotalAmountWidget(amount: totalAmount),
     );
   }
 
-  Future<void> _reloadData() async {
-    var payment = payments.first;
-    var period = payment.paymentPeriod;
-    var list = await SQLHelper.getPeriodPayments(
-            payment.ownerId, period.year, period.month)
+  Future<void> _loadData() async {
+    var month = widget.data.month;
+    var ownerId = widget.occupant.id;
+    var year = DateTime.now().year;
+    var list = await SQLHelper.getPeriodPayments(ownerId, year, month)
         .then((value) => value.map((e) => Payment.fromMap(e)).toList());
     setState(() {
       payments = list;
       totalAmount = getTotalAmount(payments);
+      _isLoading = false;
     });
   }
 }

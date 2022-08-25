@@ -22,10 +22,9 @@ class PaymentListTile extends StatelessWidget {
 
     return GestureDetector(
       onDoubleTap: () {
-        Navigator.push(
-          context,
+        Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => PaymentDetails(payment: payment),
+            builder: (context) => PaymentDetails(payment: payment),
           ),
         );
       },
@@ -100,24 +99,31 @@ class PaymentTileHeader extends StatelessWidget {
 
 class TotalAmountWidget extends StatelessWidget {
   final double amount;
+  final double height;
 
-  const TotalAmountWidget({Key? key, required this.amount}) : super(key: key);
+  const TotalAmountWidget(
+      {Key? key, required this.amount, required this.height})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white70,
-      //semanticContainer: false,
-      shadowColor: Colors.green,
-      elevation: 8.0,
-      /*shape: OutlineInputBorder(*/
-      /*    borderRadius: BorderRadius.circular(10),*/
-      /*    borderSide: const BorderSide(color: Colors.white))*/
-      child: ListTile(
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-        textColor: Colors.black,
-        title: Text("  Montant total :   $amount"),
+    return SizedBox(
+      height: height,
+      child: Card(
+        color: Colors.white70,
+        //semanticContainer: false,
+        semanticContainer: true,
+        shadowColor: Colors.green,
+        elevation: 10.0,
+        /*shape: OutlineInputBorder(*/
+        /*    borderRadius: BorderRadius.circular(10),*/
+        /*    borderSide: const BorderSide(color: Colors.white))*/
+        child: ListTile(
+          /* contentPadding:
+              const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),*/
+          textColor: Colors.black,
+          title: Text("  Montant total :   $amount"),
+        ),
       ),
     );
   }
@@ -174,14 +180,13 @@ class PaymentCard extends StatelessWidget {
       elevation: 4.0,
       child: ListTile(
         trailing: SizedBox(
-            width: 10,
-            child: Text(
-              info,
-              style: const TextStyle(
-                  color: Colors.amber,
-                  fontStyle: FontStyle.italic,
-                  fontSize: 25),
-            ),),
+          width: 10,
+          child: Text(
+            info,
+            style: const TextStyle(
+                color: Colors.amber, fontStyle: FontStyle.italic, fontSize: 25),
+          ),
+        ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [Text(period), Text(amount), Text(tax), Text(date)],

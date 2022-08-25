@@ -6,6 +6,7 @@ import 'package:otis/models/living_quarter.dart';
 import 'package:otis/models/sql_helper.dart';
 import 'package:otis/screens/buildings_list.dart';
 import 'package:otis/widgets/add_quarter.dart';
+import 'package:otis/widgets/otis_widgets.dart';
 
 class LivingQuarterList extends StatefulWidget {
   const LivingQuarterList({Key? key}) : super(key: key);
@@ -27,17 +28,9 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
 
   @override
   Widget build(BuildContext context) {
-    double ratio = unitHeightValue(context) ;
-    print(" ratio...... $ratio");
-    double fontSize = ratio *50;
-    print("fontSize  $fontSize");
     return Scaffold(
       appBar: AppBar(
-        title: Text(" Les quartiers",
-            // style: TextStyle(fontSize: 25.0),
-            style: GoogleFonts.charmonman(
-                textStyle: TextStyle(
-                    fontSize: fontSize, fontWeight: FontWeight.w600))),
+        title: const AppBarTitleWidget(title: "Les quartiers", ratio: 40),
       ),
       floatingActionButton: OtisFloatingButton(callback: _navigateToAddQuarter),
       body: _isLoading

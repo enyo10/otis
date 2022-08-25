@@ -4,7 +4,6 @@ import 'package:otis/models/payment.dart';
 class Period {
   final int month;
   final int year;
-  //Payment? payment;
   List<dynamic> payments = [];
 
   Period({required this.month, required this.year});

@@ -235,6 +235,9 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     setState(() {
       _rents = list;
     });
+    for (Rent r in _rents) {
+      print(" Rent value ------- : ${r.rent}");
+    }
   }
 
   _loadLodging() async {
@@ -353,10 +356,11 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     if (payments.isNotEmpty) {
       var period = payments.elementAt(0).paymentPeriod;
       var date = DateTime(period.year, period.month);
-      var rent = _getRent(date);
+      // var rent = _getRent(date);
+      var rent = _getActualRent();
       var sum = _getSum(payments);
 
-      if (sum == rent?.rent) {
+      if (sum == rent.rent) {
         icon = const Icon(
           Icons.check,
           color: Colors.green,
@@ -372,12 +376,24 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     return icon;
   }
 
-  Rent? _getRent(DateTime dateTime) {
-    Rent? rent;
-    for (Rent value in _rents) {
-      if (value.startDate.microsecondsSinceEpoch <
-          dateTime.microsecondsSinceEpoch) {
-        rent = value;
+  /* Rent? _getRent(DateTime dateTime) {*/
+  /*   Rent? rent;*/
+  /*   for (Rent value in _rents) {*/
+  /*     if (value.startDate.microsecondsSinceEpoch <*/
+  /*         dateTime.microsecondsSinceEpoch) {*/
+  /*       rent = value;*/
+  /*     }*/
+  /*   }*/
+  /*   print(" Nulll llldl  lldl --- : ${rent?.rent}");*/
+  /*   return rent;*/
+  /* }*/
+
+  Rent _getActualRent() {
+    Rent rent = _rents.first;
+    for (Rent r in _rents) {
+      if (rent.startDate.microsecondsSinceEpoch <
+          r.startDate.microsecondsSinceEpoch) {
+        rent = r;
       }
     }
     return rent;
@@ -392,17 +408,13 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
     return GestureDetector(
       onDoubleTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => PeriodPayments(
-              payments: payments,
-              lodging: widget.lodging,
-              occupant: _occupant!,
-              data: data,
-            ),
-            fullscreenDialog: true,
-          ),
+        var page = PeriodPayments(
+          payments: payments,
+          lodging: widget.lodging,
+          occupant: _occupant!,
+          data: data,
         );
+        _navigateToPeriodPayment(page);
       },
       child: SizedBox(
         child: Card(
@@ -439,11 +451,13 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     return _isOccupied()
         ? IconButton(
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => PaymentsList(occupant: _occupant!),
-                ),
-              );
+              Navigator.of(context)
+                  .push(
+                    MaterialPageRoute(
+                      builder: (_) => PaymentsList(occupant: _occupant!),
+                    ),
+                  )
+                  .then((value) => _loadOccupantWithPayment());
             },
             icon: const Icon(
               Icons.info,
@@ -538,6 +552,17 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           ),
         )
         .then((value) => value ? _loadOccupantWithPayment() : null)
+        .onError((error, stackTrace) => null);
+  }
+
+  _navigateToPeriodPayment(StatefulWidget page) {
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            builder: (context) => page,
+          ),
+        )
+        .then((value) => _loadOccupantWithPayment())
         .onError((error, stackTrace) => null);
   }
 }

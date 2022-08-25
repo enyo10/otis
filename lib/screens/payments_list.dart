@@ -4,6 +4,7 @@ import 'package:otis/helper/helper.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/sql_helper.dart';
 import '../models/payment.dart';
+import '../widgets/otis_widgets.dart';
 import '../widgets/payment_list_tile.dart';
 
 class PaymentsList extends StatefulWidget {
@@ -17,9 +18,8 @@ class PaymentsList extends StatefulWidget {
 class _PaymentsListState extends State<PaymentsList> {
   final TextEditingController _editingController = TextEditingController();
   Icon _searchIcon = const Icon(Icons.search);
-  Widget _appBarTitle =  Text('Les payements', style: GoogleFonts.sacramento(
-    textStyle: const TextStyle(fontSize: 40)
-  ));
+
+  Widget _appBarTitle =const AppBarTitleWidget(title: "Payements", ratio: 40);
 
   List<Payment> _payments = [];
   final List<Payment> _items = [];
@@ -30,9 +30,9 @@ class _PaymentsListState extends State<PaymentsList> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height * 0.10;
     return Scaffold(
       appBar: AppBar(
         title: _appBarTitle,
@@ -45,22 +45,26 @@ class _PaymentsListState extends State<PaymentsList> {
           )
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const PaymentTileHeader(),
-          Expanded(
-            child: ListView.builder(
-                itemCount: _items.length,
-                itemBuilder: (_, index) {
-                  var payment = _items.elementAt(index);
-                  return PaymentListTile(payment: payment);
-                }),
-          ),
-        ],
+      body: Container(
+        padding: EdgeInsets.only(bottom: height +10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const PaymentTileHeader(),
+            Expanded(
+              child: ListView.builder(
+                  itemCount: _items.length,
+                  itemBuilder: (_, index) {
+                    var payment = _items.elementAt(index);
+                    return PaymentListTile(payment: payment);
+                  }),
+            ),
+          ],
+        ),
       ),
       bottomSheet: TotalAmountWidget(
         amount: getTotalAmount(_items),
+        height: height,
       ),
     );
   }
