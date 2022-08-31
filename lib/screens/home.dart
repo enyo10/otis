@@ -7,7 +7,6 @@ import 'package:otis/screens/living_quarter_list.dart';
 import 'package:otis/screens/profile.dart';
 import 'package:otis/widgets/password_controller.dart';
 
-
 import '../helper/helper.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,8 +17,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
-
   @override
   void initState() {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -99,12 +96,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           builder: (_) => const ImportExportDB(),
                         ),
                       );
-
                     } else {
                       showMessage(context, "Saisir mot de passe correcte");
                     }
                   });
-
                 },
               ),
             ],
@@ -112,8 +107,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: GestureDetector(
           onDoubleTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const LivingQuarterList()));
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const LivingQuarterList(),
+              ),
+            );
           },
           child: Center(
             child: Column(

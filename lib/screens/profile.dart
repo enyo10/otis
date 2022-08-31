@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../helper/helper.dart';
 import '../helper/password_helper.dart';
 
 class SettingsPages extends StatefulWidget {

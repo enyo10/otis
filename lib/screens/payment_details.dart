@@ -5,6 +5,8 @@ import 'package:otis/models/payment.dart';
 import '../helper/helper.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../widgets/info_widget.dart';
+
 class PaymentDetails extends StatelessWidget {
   final Payment payment;
   const PaymentDetails({Key? key, required this.payment}) : super(key: key);
@@ -104,23 +106,4 @@ class PaymentDetails extends StatelessWidget {
   }
 }
 
-class NewWidget extends StatelessWidget {
-  const NewWidget({Key? key, required this.data, required this.text})
-      : super(key: key);
 
-  final String data;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(
-        " $text: $data",
-        style: const TextStyle(
-          fontSize: 20,
-        ),
-      ),
-    );
-  }
-}

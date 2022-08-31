@@ -10,6 +10,7 @@ class SQLHelper {
   static const String _occupants = "occupants";
   static const String _payments = "payments";
   static const String _rents = "rents";
+  static const String _comments = "comments";
 
   static Future<void> _onCreateTables(Database database) async {
     await database.execute("""CREATE TABLE $_livingQuarters(
@@ -86,10 +87,21 @@ class SQLHelper {
          ON DELETE CASCADE ) 
     """);
 
-    /* ALTER TABLE table_name
-    ADD column_name datatype;*/
-    //await database.execute("""ALTER TABLE $_payments ADD desc TEXT""");
+    /*ALTER TABLE table_name
+    ADD column_name datatype;
     await database.execute("""ALTER TABLE $_payments ADD desc TEXT""");
+    await database.execute("""ALTER TABLE $_payments ADD desc TEXT""");*/
+
+    await database.execute("""CREATE TABLE $_comments(
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    comment TEXT  NOT NULL, 
+    owner_id INTEGER,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(owner_id)
+    REFERENCES $_occupants (id) 
+         ON UPDATE CASCADE
+         ON DELETE CASCADE ) 
+    """);
   }
 
   static Future _onConfigure(Database db) async {
@@ -97,14 +109,25 @@ class SQLHelper {
   }
 
   static Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < newVersion) {
+    if (oldVersion == 1) {
       await db.execute("""ALTER TABLE $_payments ADD desc TEXT""");
+    } else if (oldVersion == 2) {
+      await db.execute("""CREATE TABLE $_comments(
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    comment TEXT  NOT NULL, 
+    owner_id INTEGER,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(owner_id)
+    REFERENCES $_occupants (id) 
+         ON UPDATE CASCADE
+         ON DELETE CASCADE ) 
+    """);
     }
   }
 
   static Future<Database> db() async {
     return openDatabase(join(await getDatabasesPath(), 'otis.db'),
-        version: 2, onConfigure: _onConfigure,
+        version: 3, onConfigure: _onConfigure,
         onCreate: (Database database, int version) async {
       await _onCreateTables(database);
     }, onUpgrade: _onUpgrade);
@@ -346,5 +369,41 @@ class SQLHelper {
     final db = await SQLHelper.db();
     return db.query(_rents,
         where: "lodging_id = ?", whereArgs: [lodgingId], orderBy: "id");
+  }
+
+  static Future<int> insertComment(int ownerId, String comment) async {
+    final db = await SQLHelper.db();
+
+    final data = {'owner_id': ownerId, 'comment': comment};
+
+    final id = await db.insert(_comments, data,
+        conflictAlgorithm: ConflictAlgorithm.replace);
+    if (kDebugMode) {
+      print(" Comment with $id inserted");
+    }
+    return id;
+  }
+
+  static Future<List<Map<String, dynamic>>> getComments(int ownerId) async {
+    final db = await SQLHelper.db();
+    return db.query(_comments,
+        where: "owner_id = ?", whereArgs: [ownerId], orderBy: "id");
+  }
+
+  static Future<void> deleteComment(int id) async {
+    final db = await SQLHelper.db();
+    try {
+      await db.delete(_comments, where: "id = ?", whereArgs: [id]);
+    } catch (err) {
+      debugPrint("Something went wrong when deleting an comment: $err");
+    }
+  }
+
+  static Future<int> updateComment(int id, String comment) async {
+    final db = await SQLHelper.db();
+    final data = {'id': id, 'comment': comment};
+
+    final result = db.update(_comments, data, where: "id = ?", whereArgs: [id]);
+    return result;
   }
 }

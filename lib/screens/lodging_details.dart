@@ -4,11 +4,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:otis/helper/helper.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
+import 'package:otis/screens/occupant_note.dart';
 import 'package:otis/screens/period_payments.dart';
 import 'package:otis/screens/payments_list.dart';
+import 'package:otis/widgets/add_comment.dart';
 import 'package:otis/widgets/add_payment.dart';
 import 'package:otis/widgets/password_controller.dart';
 import '../models/lodging.dart';
+import '../models/note.dart';
 import '../models/rent_period.dart';
 import '../models/sql_helper.dart';
 import '../widgets/add_occupant.dart';
@@ -30,6 +33,8 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   //late int ownerId;
   late DateTime entryDate;
   bool _isLoading = true;
+  late String comment;
+  late Note _note;
 
   late List<Rent> _rents;
   late Lodging _lodging;
@@ -40,6 +45,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     _loadRents();
     _initMonthList();
     _loadOccupantWithPayment();
+    // _loadComment();
     super.initState();
   }
 
@@ -96,14 +102,15 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                     children: [
                       SizedBox(
                         child: Card(
-                          margin: const EdgeInsets.all(0.0),
+                          margin: const EdgeInsets.all(8.0),
                           elevation: 5,
+                          semanticContainer: true,
                           child: Padding(
-                            padding: const EdgeInsets.all(15.0),
+                            padding: const EdgeInsets.all(8.0),
                             child: Column(
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 10.0),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     children: [
                                       const Text(
@@ -125,7 +132,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                                   child: Row(
                                     children: [
                                       const Text(
-                                        "Prenom:",
+                                        "Prenom: ",
                                         style: TextStyle(
                                             fontStyle: FontStyle.italic),
                                       ),
@@ -137,16 +144,69 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 10.0),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      const Text("Date d'entrée:",
-                                          style: TextStyle(
-                                              fontStyle: FontStyle.italic)),
-                                      Text(
-                                        entryDate,
-                                        style: const TextStyle(fontSize: 20.0),
+                                      Row(
+                                        children: [
+                                          const Text(
+                                            "Date d'entrée:",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic),
+                                          ),
+                                          Text(
+                                            entryDate,
+                                            style:
+                                                const TextStyle(fontSize: 20.0),
+                                          ),
+                                        ],
                                       ),
+                                      Visibility(
+                                        visible: _hasComment(),
+                                        child: Row(
+                                          //mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            InkWell(
+                                              onTap: _navigateToOccupantNote,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 20.0),
+                                                child: Text(
+                                                  "i",
+                                                  style: GoogleFonts.charmonman(
+                                                    textStyle: const TextStyle(
+                                                        fontSize: 30.0,
+                                                        fontWeight:
+                                                            FontWeight.w300,
+                                                        color: Colors.green,
+                                                        fontStyle:
+                                                            FontStyle.italic),
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                            /*TextButton(
+                                              onPressed:
+                                                  _navigateToOccupantNote,
+                                              child:  Text(
+                                                'i',
+                                                // textAlign: TextAlign.right,
+                                                style: GoogleFonts.charmonman(
+                                                 textStyle:  const TextStyle(
+                                                     fontSize: 30.0,
+                                                     fontWeight:
+                                                     FontWeight.w300,
+                                                     color: Colors.green,
+                                                     fontStyle:
+                                                     FontStyle.italic),
+                                                )
+                                              ),
+                                            )*/
+                                          ],
+                                        ),
+                                      )
                                     ],
                                   ),
                                 ),
@@ -154,16 +214,38 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                                   padding: const EdgeInsets.only(
                                       top: 10, bottom: 10),
                                   child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      const Text(
-                                        "Mensualité:",
-                                        style: TextStyle(
-                                            fontStyle: FontStyle.italic),
+                                      Row(
+                                        children: [
+                                          const Text(
+                                            "Mensualité:",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic),
+                                          ),
+                                          Text(
+                                            " ${widget.lodging.rent} \$ ",
+                                            style:
+                                                const TextStyle(fontSize: 20.0),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        " ${widget.lodging.rent} \$ ",
-                                        style: const TextStyle(fontSize: 20.0),
-                                      ),
+                                      Visibility(
+                                        visible: !_hasComment(),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            TextButton(
+                                              onPressed: () async {
+                                                await _navigateToAddComment();
+                                              },
+                                              child: const Text("Commenter"),
+                                            )
+                                          ],
+                                        ),
+                                      )
                                     ],
                                   ),
                                 ),
@@ -235,9 +317,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     setState(() {
       _rents = list;
     });
-    for (Rent r in _rents) {
-      print(" Rent value ------- : ${r.rent}");
-    }
   }
 
   _loadLodging() async {
@@ -273,6 +352,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         _occupant = occupant;
       });
       await _loadPayments();
+      await _loadComment();
     }
 
     setState(() {
@@ -313,8 +393,8 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     });
   }
 
-  _showOccupantForm() {
-    showModalBottomSheet(
+  _showOccupantForm() async {
+    await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -354,9 +434,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       color: Colors.red,
     );
     if (payments.isNotEmpty) {
-      var period = payments.elementAt(0).paymentPeriod;
-      var date = DateTime(period.year, period.month);
-      // var rent = _getRent(date);
       var rent = _getActualRent();
       var sum = _getSum(payments);
 
@@ -375,18 +452,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
     return icon;
   }
-
-  /* Rent? _getRent(DateTime dateTime) {*/
-  /*   Rent? rent;*/
-  /*   for (Rent value in _rents) {*/
-  /*     if (value.startDate.microsecondsSinceEpoch <*/
-  /*         dateTime.microsecondsSinceEpoch) {*/
-  /*       rent = value;*/
-  /*     }*/
-  /*   }*/
-  /*   print(" Nulll llldl  lldl --- : ${rent?.rent}");*/
-  /*   return rent;*/
-  /* }*/
 
   Rent _getActualRent() {
     Rent rent = _rents.first;
@@ -565,4 +630,60 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         .then((value) => _loadOccupantWithPayment())
         .onError((error, stackTrace) => null);
   }
+
+  _loadComment() async {
+    comment = "";
+    if (_occupant != null) {
+      var value = await SQLHelper.getComments(_occupant!.id)
+          .then((value) => value.map((e) => Note.fromMap(e)).toList());
+
+      if (value.isNotEmpty) {
+        _note = value.first;
+
+        comment = _note.comment;
+      }
+    }
+    setState(() {});
+  }
+
+  _navigateToAddComment() async {
+    var passwordController = const PasswordController(title: "Commenter");
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return passwordController;
+        }).then((value) async {
+      if (value) {
+        if (_occupant != null) {
+          var ownerId = _occupant!.id;
+
+          await showModalBottomSheet(
+            context: context,
+            builder: (BuildContext context) => AddComment(ownerId: ownerId),
+            isScrollControlled: true,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(40.0),
+            ),
+          ).then((value) => _loadComment());
+        }
+      } else {
+        showMessage(context, "Saisir mot de passe correcte");
+      }
+    });
+  }
+
+  _navigateToOccupantNote() {
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            builder: (context) => OccupantNote(
+              note: _note,
+              occupant: _occupant!,
+            ),
+          ),
+        )
+        .then((value) => _loadComment());
+  }
+
+  bool _hasComment() => comment.isNotEmpty;
 }

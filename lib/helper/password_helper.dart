@@ -1,10 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'helper.dart';
 
-const kPassword = "password";
-
+/*
 Future<void> askedToDelete(
     BuildContext context,
     TextEditingController passwordController,
@@ -85,12 +83,6 @@ Future<void> _checkPasswordAndDeleteItem(
   await _checkPassword(passwordController.text).then((value) async {
     if (value) {
       await deleteFunction(id);
-
-      /* ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Successfully deleted a journal!'),
-        ),
-      );*/
       passwordController.clear();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -111,110 +103,5 @@ Future<bool> _checkPassword(String passWord) async {
     return true;
   }
   return false;
-}
-
-Future<void> askedToDelete1(
-    BuildContext context,
-    TextEditingController passwordController,
-    int id,
-    Function deleteFunction) async {
-  switch (await showDialog<CheckedValue>(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(builder: (context, setState) {
-          return AlertDialog(
-            title: const Center(
-                child: Text(
-              "Suppression de donnée",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20),
-            )),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextField(
-                    controller: passwordController,
-                    keyboardType: TextInputType.visiblePassword,
-                    decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Entrer le mot de pass',
-                        hintText: 'Mot de pass'),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      SimpleDialogOption(
-                        onPressed: () {
-                          Navigator.of(context).pop(CheckedValue.no);
-                        },
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: const Text(
-                          "Annuler",
-                          style: TextStyle(color: Colors.blue),
-                          textAlign: TextAlign.left,
-                        ),
-                      ), // button 1
-                      SimpleDialogOption(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        onPressed: () {
-                          Navigator.of(context).pop(CheckedValue.yes);
-                        },
-                        child: const Text(
-                          " Continuer",
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ), // button 2
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          );
-        });
-      })) {
-    case CheckedValue.yes:
-      _checkPasswordAndDeleteItem(
-          context, passwordController, id, deleteFunction);
-      break;
-    case CheckedValue.no:
-      break;
-    case null:
-      break;
-  }
-}
-/*
-
-_showDialogBox(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      String contentText = "Content of Dialog";
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: Text("Filter"),
-            content: _buildDialogContent,
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text("Cancel"),
-              ),
-              DialogButton(
-                onPressed: _savetoSF,
-                child: Text(
-                  "Save Changes",
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ),
-            ],
-          );
-        },
-      );
-    },
-  );
 }
 */

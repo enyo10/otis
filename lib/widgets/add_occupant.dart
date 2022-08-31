@@ -52,6 +52,7 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
           onPressed: () async {
             await _addOccupant();
             // Close the bottom sheet
+            if (!mounted) return;
             Navigator.of(context).pop();
           },
           icon: const Icon(Icons.send),

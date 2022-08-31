@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../helper/password_helper.dart';
+import '../helper/helper.dart';
 
 class PasswordController extends StatefulWidget {
   final String title;
@@ -24,7 +24,7 @@ class _PasswordControllerState extends State<PasswordController> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.title),
+      title: Center(child: Text(widget.title)),
       content: SingleChildScrollView(
         child: Column(
           children: [
@@ -46,7 +46,10 @@ class _PasswordControllerState extends State<PasswordController> {
                     onPressed: () {
                       Navigator.of(context).pop(false);
                     },
-                    child: Text(breakButtonLabel),
+                    child: Text(
+                      breakButtonLabel,
+                      style: const TextStyle(color: Colors.lightGreen),
+                    ),
                   ), // button 1
                   SimpleDialogOption(
                     padding: EdgeInsets.zero,
@@ -56,7 +59,10 @@ class _PasswordControllerState extends State<PasswordController> {
                       if (!mounted) return;
                       Navigator.of(context).pop(value);
                     },
-                    child: Text(okButtonLabel),
+                    child: Text(
+                      okButtonLabel,
+                      style: const TextStyle(color: Colors.red),
+                    ),
                   ), // button 2
                 ],
               ),
@@ -69,9 +75,7 @@ class _PasswordControllerState extends State<PasswordController> {
 
   Future<bool> _checkPassword() async {
     String password = passwordController.text;
-    if (kDebugMode) {
-      print("in check password");
-    }
+
     SharedPreferences prefs = await _prefs;
     final storedPass = prefs.get(kPassword);
 

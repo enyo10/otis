@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:otis/helper/helper.dart';
-import 'package:otis/helper/password_helper.dart';
 import 'package:otis/models/living_quarter.dart';
 import 'package:otis/models/sql_helper.dart';
 import 'package:otis/screens/buildings_list.dart';
 import 'package:otis/widgets/add_quarter.dart';
 import 'package:otis/widgets/otis_widgets.dart';
+import 'package:otis/widgets/password_controller.dart';
 
 class LivingQuarterList extends StatefulWidget {
   const LivingQuarterList({Key? key}) : super(key: key);
@@ -97,8 +96,22 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
   }
 
   Future<void> _deleteLivingQuarter(int id) async {
-    await askedToDelete(
-        context, _passwordController, id, SQLHelper.deleteLivingQuarter);
+    var title = "Suppression";
+    var passwordController = PasswordController(title: title);
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return passwordController;
+        }).then((value) async {
+      if (value!) {
+        await SQLHelper.deleteLivingQuarter(id).then((value) {
+          showMessage(context, " Le Commentaire est supprimé");
+        });
+      } else {
+        showMessage(context, "Saisir mot de passe correcte");
+      }
+    });
+
     await _loadData();
 
     if (!mounted) return;

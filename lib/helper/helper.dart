@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:otis/models/payment.dart';
 
+const kPassword = "password";
+
 List<Color> colorCollection = <Color>[
   const Color(0xFFADE2CF),
   const Color(0xFF8B1FA9),

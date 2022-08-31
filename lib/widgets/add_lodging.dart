@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:otis/models/building.dart';
@@ -30,9 +31,9 @@ class _AddLodgingState extends State<AddLodging> {
 
   @override
   Widget build(BuildContext context) {
-    // Size size = MediaQuery.of(context).size;
+     Size size = MediaQuery.of(context).size;
     return Container(
-      // height: size.height * 0.6,
+       height: size.height * 0.6,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
@@ -265,3 +266,4 @@ class _AddLodgingState extends State<AddLodging> {
     );
   }
 }
+

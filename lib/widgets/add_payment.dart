@@ -93,10 +93,10 @@ class _AddPaymentsState extends State<AddPayments> {
                             hintText: 'Enter payement en \$'),
                         style: Theme.of(context).textTheme.labelLarge,
                         keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true),
+                            signed: true, decimal: true),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                              RegExp(r'(^\d*\.?\d*)')),
+                              RegExp(r'(^-?\d*\.?\d*)')),
                         ],
                       ),
                     ),
@@ -293,14 +293,6 @@ class _AddPaymentsState extends State<AddPayments> {
     setState(() {});
   }
 
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
-  }
-
   bool _checkValues() {
     if (_amountController.text.isNotEmpty && _taxController.text.isNotEmpty) {
       return true;
@@ -326,7 +318,8 @@ class _AddPaymentsState extends State<AddPayments> {
     int id = 0;
     if (!_checkValues()) {
       var message = 'Saisir le montant';
-      _showMessage(message);
+
+      showMessage(context, message);
       return id;
     } else {
       double totalAmount = 0;
@@ -345,22 +338,27 @@ class _AddPaymentsState extends State<AddPayments> {
 
       Rent? rentData = await _loadRentMap(DateTime(year, month));
       if (rentData != null) {
-        if (totalAmount < rentData.rent) {
+        var newValue = totalAmount + amount;
+        print("       $newValue");
+        if (newValue <= rentData.rent) {
           var paymentDate = _selectedPaymentDate;
           var periodOfPayment = Period(month: month, year: year);
           double rate = double.parse(_taxController.text);
           var desc = _descController.text;
 
-          id = await SQLHelper.insertPayment(ownerId, amount, paymentDate,
-              periodOfPayment, _currency, rate, desc);
-
-          _showMessage(' Le payement est enrégistré');
+          await SQLHelper.insertPayment(ownerId, amount, paymentDate,
+                  periodOfPayment, _currency, rate, desc)
+              .then((value) {
+            id = value;
+            showMessage(context, ' Le payement est enrégistré');
+          });
 
           return id;
         }
       }
     }
-    _showMessage('Erreur: Verifiez les données');
+   /* if (!mounted) return -1;*/
+    showMessage(context, 'Erreur: Verifiez les données');
     return id;
   }
 }

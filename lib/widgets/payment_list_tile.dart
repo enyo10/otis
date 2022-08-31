@@ -8,9 +8,11 @@ class PaymentListTile extends StatelessWidget {
   const PaymentListTile({
     Key? key,
     required this.payment,
+    this.color,
   }) : super(key: key);
 
   final Payment payment;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -189,9 +191,21 @@ class PaymentCard extends StatelessWidget {
         ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [Text(period), Text(amount), Text(tax), Text(date)],
+          children: [
+            Text(period),
+            Text(
+              amount,
+              style: _isNegative()
+                  ? const TextStyle(color: Colors.redAccent)
+                  : const TextStyle(),
+            ),
+            Text(tax),
+            Text(date)
+          ],
         ),
       ),
     );
   }
+
+  bool _isNegative() => amount.contains("-");
 }
