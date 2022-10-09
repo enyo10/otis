@@ -6,8 +6,6 @@ import 'package:otis/helper/helper.dart';
 import 'package:otis/widgets/add_lodging.dart';
 import 'package:otis/widgets/password_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../helper/password_helper.dart';
 import '../models/building.dart';
 import '../models/lodging.dart';
 import '../models/sql_helper.dart';
@@ -118,12 +116,27 @@ class _LodgingListState extends State<LodgingList> {
                                         _showForm(lodging);
                                       }
                                     });
-
-                                    // _showForm(lodging);
                                   }),
                               IconButton(
                                 icon: const Icon(Icons.delete),
-                                onPressed: () => _deleteItem(element['id']),
+                                onPressed: () {
+                                  var id = element['id'];
+                                  var passwordController =
+                                      const PasswordController(
+                                          title: "Suppression");
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return passwordController;
+                                      }).then((value) async {
+                                    if (value) {
+                                      await _deleteItem(id);
+                                    } else {
+                                      showMessage(
+                                          context, "Mot de passe erroné");
+                                    }
+                                  });
+                                },
                               ),
                             ],
                           ),
@@ -171,99 +184,10 @@ class _LodgingListState extends State<LodgingList> {
         }).then((value) => _refreshData());
   }
 
-  _checkPasswordAndDeleteItem(int id) async {
-    _checkPassword().then((value) async {
-      if (value) {
-        await SQLHelper.deleteApartment(id);
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Successfully deleted a journal!'),
-          ),
-        );
-        passwordController.clear();
-        _refreshData();
-      } else {
-        if (kDebugMode) {
-          print("value $value");
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Echec, Vérifier les données'),
-          ),
-        );
-      }
-    });
-  }
-
-  // Delete an item
   Future<void> _deleteItem(int id) async {
-    _askedToDelete(id);
-  }
-
-  Future<bool> _checkPassword() async {
-    final Future<SharedPreferences> p = SharedPreferences.getInstance();
-    SharedPreferences prefs = await p;
-    final storedPass = prefs.get(kPassword);
-    final password = passwordController.text;
-    if (storedPass == password) {
-      return true;
-    }
-    return false;
-  }
-
-  Future<void> _askedToDelete(int id) async {
-    switch (await showDialog<CheckedValue>(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text(" Suppression de données"),
-            content: SingleChildScrollView(
-              child: Column(
-                children: [
-                  TextField(
-                    controller: passwordController,
-                    keyboardType: TextInputType.visiblePassword,
-                    decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Entrer le mot de pass',
-                        hintText: 'Mot de pass'),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      SimpleDialogOption(
-                        onPressed: () {
-                          Navigator.of(context).pop(CheckedValue.no);
-                        },
-                        child: const Text(
-                          "Annuler",
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ), // button 1
-                      SimpleDialogOption(
-                        onPressed: () {
-                          Navigator.of(context).pop(CheckedValue.yes);
-                        },
-                        child: const Text(
-                          " Supprimer",
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ), // button 2
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          );
-        })) {
-      case CheckedValue.yes:
-        _checkPasswordAndDeleteItem(id);
-        break;
-      case CheckedValue.no:
-        break;
-      case null:
-        break;
-    }
+    var successMessage = 'Successfully deleted a journal!';
+    await SQLHelper.deleteApartment(id)
+        .then((value) => showMessage(context, successMessage))
+        .then((value) => _refreshData());
   }
 }

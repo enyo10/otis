@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:otis/widgets/otis_appBar_title.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../helper/helper.dart';
-import '../helper/password_helper.dart';
 
 class SettingsPages extends StatefulWidget {
   const SettingsPages({Key? key}) : super(key: key);
@@ -22,23 +21,27 @@ class _SettingsPagesState extends State<SettingsPages> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(),
-        body: Container(
-          padding: const EdgeInsets.all(8.0),
-          child: SingleChildScrollView(
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Padding(padding: const EdgeInsets.all(20),
-                  child: Row(
-                    children: const [
-                      Text("Nouveau mot de pass", style: TextStyle(
-                        fontSize: 30.0,
-                      ),),
-                    ],
+                const SizedBox(
+                  height: 30,
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Text(
+                      "Changer mot de pass",
+                      style: TextStyle(
+                        fontSize: 25.0,
+                      ),
+                    ),
                   ),
                 ),
-
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(

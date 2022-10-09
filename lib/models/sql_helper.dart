@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:otis/models/payment.dart';
 import 'package:otis/models/period.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -77,6 +78,7 @@ class SQLHelper {
     amount REAL,
     currency TEXT,
     rate REAL,
+    desc TEXT,
     payment_date TEXT,
     year INTEGER,
     month INTEGER,
@@ -109,9 +111,10 @@ class SQLHelper {
   }
 
   static Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion == 1) {
+    if (oldVersion <2) {
       await db.execute("""ALTER TABLE $_payments ADD desc TEXT""");
-    } else if (oldVersion == 2) {
+    }
+    if (oldVersion < 3) {
       await db.execute("""CREATE TABLE $_comments(
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     comment TEXT  NOT NULL, 
@@ -190,6 +193,16 @@ class SQLHelper {
     final db = await SQLHelper.db();
     return db.query(_buildings,
         where: "quarter_id = ?", whereArgs: [quarterId], orderBy: "id");
+  }
+
+  static Future<int> deleteBuilding(int id) async {
+    final db = await SQLHelper.db();
+    try {
+      return await db.delete(_buildings, where: "id = ?", whereArgs: [id]);
+    } catch (err) {
+      debugPrint("Something went wrong when deleting an building: $err");
+    }
+    return 0;
   }
 
   // Create new apartment(journal)
@@ -338,6 +351,15 @@ class SQLHelper {
     return db.query(_payments,
         where: "owner_id =? AND year =? AND month=?",
         whereArgs: [ownerId, year, month]);
+  }
+
+  static Future<int> updatePayment(int id, String desc) async {
+    final db = await SQLHelper.db();
+
+    final data = {'desc': desc};
+
+    final result = db.update(_payments, data, where: "id = ?", whereArgs: [id]);
+    return result;
   }
 
   static Future<List<Map<String, dynamic>>> getOccupantsWithLodgingId(

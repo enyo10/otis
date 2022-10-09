@@ -94,41 +94,43 @@ class _AddQuarterState extends State<AddQuarter> {
 
   Widget _pickColor() {
     return AlertDialog(
+      contentPadding: const EdgeInsets.all(20.0),
       content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            padding: const EdgeInsets.all(0),
-            itemCount: colorMap.length - 1,
-            itemBuilder: (BuildContext context, int index) {
-              var colorData = colorMap.entries.elementAt(index);
+        width: double.maxFinite,
+        child: ListView.builder(
+          padding: const EdgeInsets.all(0),
+          itemCount: colorMap.length - 1,
+          itemBuilder: (BuildContext context, int index) {
+            var colorData = colorMap.entries.elementAt(index);
 
-              return ListTile(
-                contentPadding: const EdgeInsets.all(0),
-                leading: Icon(
-                  // index == _selectedColorIndex ? Icons.lens : Icons.trip_origin,
-                  colorData == _selectedColorData
-                      ? Icons.lens
-                      : Icons.trip_origin,
-                  // color: _colorCollection[index],
-                  color: colorData.value,
-                ),
-                title: //Text(_colorNames[index]),
-                    Text(colorData.key),
-                onTap: () {
-                  setState(() {
-                    // _selectedColorIndex = index;
-                    _selectedColorData = colorData;
-                  });
+            return ListTile(
+              contentPadding: const EdgeInsets.all(0),
+              leading: Icon(
+                // index == _selectedColorIndex ? Icons.lens : Icons.trip_origin,
+                colorData == _selectedColorData
+                    ? Icons.lens
+                    : Icons.trip_origin,
+                // color: _colorCollection[index],
+                color: colorData.value,
+              ),
+              title: //Text(_colorNames[index]),
+                  Text(colorData.key),
+              onTap: () {
+                setState(() {
+                  // _selectedColorIndex = index;
+                  _selectedColorData = colorData;
+                });
 
-                  // ignore: always_specify_types
-                  Future.delayed(const Duration(milliseconds: 200), () {
-                    // When task is over, close the dialog
-                    Navigator.pop(context);
-                  });
-                },
-              );
-            },
-          )),
+                // ignore: always_specify_types
+                Future.delayed(const Duration(milliseconds: 200), () {
+                  // When task is over, close the dialog
+                  Navigator.pop(context);
+                });
+              },
+            );
+          },
+        ),
+      ),
     );
   }
 

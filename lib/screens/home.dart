@@ -37,6 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         drawer: Drawer(
+          elevation: 5,
+          width: MediaQuery.of(context).size.width *0.9,
           child: ListView(
             padding: const EdgeInsets.all(4.0),
             children: [

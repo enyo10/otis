@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
 import 'package:otis/models/sql_helper.dart';
+import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
 
 import '../helper/helper.dart';
 import '../models/period.dart';
@@ -11,7 +11,7 @@ import '../models/rent_period.dart';
 
 class AddPayments extends StatefulWidget {
   final Occupant occupant;
-  final DateTime initialPaymentPeriodDate;
+  // final DateTime initialPaymentPeriodDate;
   final double rent;
   final DateTime? paymentPeriod;
 
@@ -19,7 +19,7 @@ class AddPayments extends StatefulWidget {
       {Key? key,
       required this.occupant,
       required this.rent,
-      required this.initialPaymentPeriodDate,
+      // required this.initialPaymentPeriodDate,
       this.paymentPeriod})
       : super(key: key);
 
@@ -251,26 +251,27 @@ class _AddPaymentsState extends State<AddPayments> {
     );
   }
 
-  void _showPaymentMontPicker(BuildContext context) {
+  Future<void> _showPaymentMontPicker(BuildContext context) async {
     showMonthPicker(
-            context: context,
-            initialDate: _selectedPeriodDate,
-            firstDate: widget.occupant.entryDate)
-        .then((date) => {
-              if (date != null)
-                {
-                  setState(() {
-                    _selectedPeriodDate = date;
-                  })
-                }
-            });
+      context: context,
+      initialDate: _selectedPeriodDate,
+      firstDate: widget.occupant.entryDate,
+      unselectedMonthTextColor: Colors.black,
+    ).then((date) => {
+          if (date != null)
+            {
+              setState(() {
+                _selectedPeriodDate = date;
+              })
+            }
+        });
   }
 
   void _showPaymentDatePicker() {
     showDatePicker(
       context: context,
       initialDate: _selectedPaymentDate,
-      firstDate: widget.initialPaymentPeriodDate,
+      firstDate: widget.occupant.entryDate,
       lastDate: DateTime(2050),
     ).then((date) => {
           if (date != null)
@@ -305,7 +306,7 @@ class _AddPaymentsState extends State<AddPayments> {
     Rent? rentValue;
     await SQLHelper.getRents(widget.occupant.lodgingId).then((value) {
       for (dynamic rent in value) {
-        if (Rent.formMap(rent).startDate.microsecondsSinceEpoch <
+        if (Rent.formMap(rent).startDate.microsecondsSinceEpoch <=
             dateTime.microsecondsSinceEpoch) {
           rentValue = Rent.formMap(rent);
         }
@@ -318,7 +319,6 @@ class _AddPaymentsState extends State<AddPayments> {
     int id = 0;
     if (!_checkValues()) {
       var message = 'Saisir le montant';
-
       showMessage(context, message);
       return id;
     } else {
@@ -338,12 +338,14 @@ class _AddPaymentsState extends State<AddPayments> {
 
       Rent? rentData = await _loadRentMap(DateTime(year, month));
       if (rentData != null) {
-        var newValue = totalAmount + amount;
-        print("       $newValue");
+        print("+++++++++ Load rent data not null +++++++++");
+        double rate = double.parse(_taxController.text);
+        var amountValue = amount / rate;
+        var newValue = totalAmount + amountValue;
+
         if (newValue <= rentData.rent) {
           var paymentDate = _selectedPaymentDate;
           var periodOfPayment = Period(month: month, year: year);
-          double rate = double.parse(_taxController.text);
           var desc = _descController.text;
 
           await SQLHelper.insertPayment(ownerId, amount, paymentDate,
@@ -355,10 +357,15 @@ class _AddPaymentsState extends State<AddPayments> {
 
           return id;
         }
+      }else{
+        print("+++++++++ Load rent data is null +++++++++");
       }
+
+
     }
-   /* if (!mounted) return -1;*/
-    showMessage(context, 'Erreur: Verifiez les données');
+    if (mounted) {
+      showMessage(context, 'Erreur: Verifiez les données');
+    }
     return id;
   }
 }

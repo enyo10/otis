@@ -4,7 +4,7 @@ import 'package:otis/screens/payment_details.dart';
 import '../helper/helper.dart';
 import '../models/payment.dart';
 
-class PaymentListTile extends StatelessWidget {
+class PaymentListTile extends StatefulWidget {
   const PaymentListTile({
     Key? key,
     required this.payment,
@@ -15,28 +15,34 @@ class PaymentListTile extends StatelessWidget {
   final Color? color;
 
   @override
+  State<PaymentListTile> createState() => _PaymentListTileState();
+}
+
+class _PaymentListTileState extends State<PaymentListTile> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final Payment payment = widget.payment;
     var amount = "${payment.amount} ${payment.currency}";
     var period = payment.paymentPeriod.toString();
     var tax = payment.rate.toString();
     var date = stringValue(payment.paymentDate);
-    var info = (payment.desc == '') ? " " : "i";
+    var info = (widget.payment.desc == '') ? " " : "i";
 
     return GestureDetector(
-      onDoubleTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => PaymentDetails(payment: payment),
-          ),
-        );
+      onDoubleTap: () async {
+        await Navigator.of(context)
+            .push(
+              MaterialPageRoute(
+                builder: (context) => PaymentDetails(payment: payment),
+              ),
+            )
+            .then((value) => setState(() {}));
       },
-      /* child: Card(
-        //semanticContainer: false,
-        shadowColor: Colors.green,
-        elevation: 4.0,
-
-        child: _paymentWidget(payment),
-      ),*/
       child: PaymentCard(
           period: period, amount: amount, tax: tax, date: date, info: info),
     );

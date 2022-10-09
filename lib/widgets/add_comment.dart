@@ -22,7 +22,7 @@ class _AddCommentState extends State<AddComment> {
 
   @override
   void initState() {
-    _commentTextEditor.text = widget.note!.comment;
+    _initTextEditor();
     super.initState();
   }
 
@@ -39,7 +39,7 @@ class _AddCommentState extends State<AddComment> {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.only(left: 0.0),
+        padding: const EdgeInsets.only(left: 0.0),
         // padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
         child: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
@@ -113,5 +113,11 @@ class _AddCommentState extends State<AddComment> {
       showMessage(context, "Vérifier le contenu");
     }
     _commentTextEditor.clear();
+  }
+
+  _initTextEditor() {
+    if (widget.note != null) {
+      _commentTextEditor.text = widget.note!.comment;
+    }
   }
 }

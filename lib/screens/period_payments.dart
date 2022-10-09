@@ -63,7 +63,7 @@ class _PeriodPaymentsState extends State<PeriodPayments> {
                 builder: (context) => AddPayments(
                   occupant: widget.occupant,
                   rent: widget.lodging.rent,
-                  initialPaymentPeriodDate: widget.occupant.entryDate,
+                //  initialPaymentPeriodDate: widget.occupant.entryDate,
                   paymentPeriod: DateTime(year, widget.data.month),
                 ),
                 fullscreenDialog: false,

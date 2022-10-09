@@ -29,12 +29,11 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   Occupant? _occupant;
 
   late List<Data> monthDataList;
-  List<Payment> payments = [];
+  //List<Payment> payments = [];
   //late int ownerId;
   late DateTime entryDate;
   bool _isLoading = true;
-  late String comment;
-  late Note _note;
+  Note? _note;
 
   late List<Rent> _rents;
   late Lodging _lodging;
@@ -45,7 +44,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     _loadRents();
     _initMonthList();
     _loadOccupantWithPayment();
-    // _loadComment();
     super.initState();
   }
 
@@ -232,7 +230,8 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                                         ],
                                       ),
                                       Visibility(
-                                        visible: !_hasComment(),
+                                        visible:
+                                            _isOccupied() && !_hasComment(),
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,
@@ -408,15 +407,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
   bool _isOccupied() => _lodging.occupantId != null;
 
-  double _getSum(List<Payment> payments) {
-    var sum = 0.0;
-
-    for (Payment payment in payments) {
-      sum += payment.amount / payment.rate;
-    }
-    return sum;
-  }
-
   bool _isVisible(int index, List<Payment> payments) {
     var actualMonth = DateTime.now().month;
 
@@ -451,6 +441,15 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     }
 
     return icon;
+  }
+
+  double _getSum(List<Payment> payments) {
+    var sum = 0.0;
+
+    for (Payment payment in payments) {
+      sum += payment.amount / payment.rate;
+    }
+    return sum;
   }
 
   Rent _getActualRent() {
@@ -611,7 +610,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
             builder: (context) => AddPayments(
               occupant: _occupant!,
               rent: widget.lodging.rent,
-              initialPaymentPeriodDate: _occupant!.entryDate,
+             // initialPaymentPeriodDate: _occupant!.entryDate,
             ),
             fullscreenDialog: true,
           ),
@@ -632,16 +631,18 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   }
 
   _loadComment() async {
-    comment = "";
     if (_occupant != null) {
-      var value = await SQLHelper.getComments(_occupant!.id)
-          .then((value) => value.map((e) => Note.fromMap(e)).toList());
-
-      if (value.isNotEmpty) {
-        _note = value.first;
-
-        comment = _note.comment;
-      }
+      await SQLHelper.getComments(_occupant!.id)
+          .then((value) => value.map((e) => Note.fromMap(e)).toList())
+          .then((value) {
+        if (value.isNotEmpty) {
+          _note = value.first;
+        } else {
+          _note = null;
+        }
+      });
+    } else {
+      _note = null;
     }
     setState(() {});
   }
@@ -677,7 +678,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         .push(
           MaterialPageRoute(
             builder: (context) => OccupantNote(
-              note: _note,
+              note: _note!,
               occupant: _occupant!,
             ),
           ),
@@ -685,5 +686,11 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         .then((value) => _loadComment());
   }
 
-  bool _hasComment() => comment.isNotEmpty;
+  bool _hasComment() {
+    if (!_isOccupied()) {
+      return false;
+    } else {
+      return _note != null;
+    }
+  }
 }

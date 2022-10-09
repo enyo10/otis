@@ -66,21 +66,6 @@ class _OccupantNoteState extends State<OccupantNote> {
                             Text(lastname, style: const TextStyle(fontSize: 20),)
                           ],
                         )
-                        /* NewWidget(
-                          data: payment.paymentPeriod.toString(),
-                          text: 'Mois',
-                        ),
-                        NewWidget(
-                            data: payment.amount.toString(), text: "Montant"),
-                        NewWidget(data: payment.currency, text: "Devise"),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            NewWidget(
-                                data: stringValue(payment.paymentDate),
-                                text: "Date payement"),
-                          ],
-                        ),*/
                       ],
                     ),
                   ),

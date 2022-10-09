@@ -1,1 +1,0 @@
-enum Type { apartment, studio }

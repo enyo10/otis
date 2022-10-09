@@ -112,14 +112,12 @@ class _AddBuildingState extends State<AddBuilding> {
                   colorData == _selectedColorData
                       ? Icons.lens
                       : Icons.trip_origin,
-                  // color: _colorCollection[index],
+
                   color: colorData.value,
                 ),
-                title: //Text(_colorNames[index]),
-                    Text(colorData.key),
+                title: Text(colorData.key),
                 onTap: () {
                   setState(() {
-                    // _selectedColorIndex = index;
                     _selectedColorData = colorData;
                   });
 

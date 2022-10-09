@@ -4,8 +4,10 @@ import 'package:otis/models/living_quarter.dart';
 import 'package:otis/models/sql_helper.dart';
 import 'package:otis/screens/buildings_list.dart';
 import 'package:otis/widgets/add_quarter.dart';
-import 'package:otis/widgets/otis_widgets.dart';
+import 'package:otis/widgets/otis_appBar_title.dart';
 import 'package:otis/widgets/password_controller.dart';
+
+import '../widgets/otis_widgets.dart';
 
 class LivingQuarterList extends StatefulWidget {
   const LivingQuarterList({Key? key}) : super(key: key);
@@ -17,7 +19,6 @@ class LivingQuarterList extends StatefulWidget {
 class _LivingQuarterListState extends State<LivingQuarterList> {
   List<Map<String, dynamic>> _livingQuarters = [];
   bool _isLoading = true;
-  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void initState() {
@@ -31,7 +32,8 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
       appBar: AppBar(
         title: const AppBarTitleWidget(title: "Les quartiers", ratio: 40),
       ),
-      floatingActionButton: OtisFloatingButton(callback: _navigateToAddQuarter),
+      floatingActionButton:
+          OtisAddFloatingButton(callback: _navigateToAddQuarter),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(),
@@ -105,7 +107,7 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
         }).then((value) async {
       if (value!) {
         await SQLHelper.deleteLivingQuarter(id).then((value) {
-          showMessage(context, " Le Commentaire est supprimé");
+          showMessage(context, " Le quartier est supprimé");
         });
       } else {
         showMessage(context, "Saisir mot de passe correcte");
@@ -117,91 +119,5 @@ class _LivingQuarterListState extends State<LivingQuarterList> {
     if (!mounted) return;
     Navigator.pushReplacement(context,
         MaterialPageRoute(builder: (BuildContext context) => super.widget));
-  }
-
-  _hasData() => _livingQuarters.isNotEmpty;
-}
-
-class OtisFloatingButton extends StatelessWidget {
-  const OtisFloatingButton({
-    Key? key,
-    required this.callback,
-  }) : super(key: key);
-  final VoidCallback callback;
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: callback,
-      child: const Icon(Icons.add),
-    );
-  }
-}
-
-class OtisListTile extends StatelessWidget {
-  const OtisListTile(
-      {Key? key,
-      required this.callback,
-      required this.delete,
-      required this.title,
-      required this.description})
-      : super(key: key);
-  final VoidCallback callback;
-  final VoidCallback delete;
-  final String title;
-  final String description;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-        contentPadding: const EdgeInsets.all(0.0),
-        onTap: callback,
-        title: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Center(
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 30),
-            ),
-          ),
-        ),
-        subtitle: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Text(description),
-          ),
-        ),
-        trailing: Container(
-          padding: const EdgeInsets.all(0),
-          width: 100.0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              /* IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () async {
-                                  Lodging lodging = Lodging.fromMap(element);
-                                  var passChecker = const PasswordController(
-                                      title: "Actualisation de donnée");
-                                  await showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return passChecker;
-                                    },
-                                  ).then((value) {
-                                    if (value) {
-                                      _showForm(lodging);
-                                    }
-                                  });
-
-                                  // _showForm(lodging);
-                                }),*/
-              IconButton(
-                icon: const Icon(Icons.delete, color: Colors.black),
-                onPressed: delete,
-              )
-            ],
-          ),
-        ));
   }
 }

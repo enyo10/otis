@@ -4,7 +4,7 @@ import 'package:otis/helper/helper.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/sql_helper.dart';
 import '../models/payment.dart';
-import '../widgets/otis_widgets.dart';
+import '../widgets/otis_appBar_title.dart';
 import '../widgets/payment_list_tile.dart';
 
 class PaymentsList extends StatefulWidget {
