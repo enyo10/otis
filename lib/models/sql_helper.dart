@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:otis/models/payment.dart';
 import 'package:otis/models/period.dart';
+import 'package:otis/models/rent_period.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -104,6 +105,8 @@ class SQLHelper {
          ON UPDATE CASCADE
          ON DELETE CASCADE ) 
     """);
+
+    await database.execute("""ALTER TABLE $_rents ADD end_date TEXT""");
   }
 
   static Future _onConfigure(Database db) async {
@@ -111,7 +114,9 @@ class SQLHelper {
   }
 
   static Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion <2) {
+    print("version ---- $oldVersion");
+    print("new version ----$newVersion");
+    if (oldVersion < 2) {
       await db.execute("""ALTER TABLE $_payments ADD desc TEXT""");
     }
     if (oldVersion < 3) {
@@ -126,11 +131,14 @@ class SQLHelper {
          ON DELETE CASCADE ) 
     """);
     }
+    if (oldVersion < 4) {
+      await db.execute("""ALTER TABLE $_rents ADD end_date TEXT""");
+    }
   }
 
   static Future<Database> db() async {
     return openDatabase(join(await getDatabasesPath(), 'otis.db'),
-        version: 3, onConfigure: _onConfigure,
+        version: 4, onConfigure: _onConfigure,
         onCreate: (Database database, int version) async {
       await _onCreateTables(database);
     }, onUpgrade: _onUpgrade);
@@ -381,16 +389,33 @@ class SQLHelper {
 
     final id = await db.insert(_rents, data,
         conflictAlgorithm: ConflictAlgorithm.replace);
-    if (kDebugMode) {
-      print(" Rent with $id inserted");
-    }
     return id;
   }
 
   static Future<List<Map<String, dynamic>>> getRents(int lodgingId) async {
     final db = await SQLHelper.db();
     return db.query(_rents,
-        where: "lodging_id = ?", whereArgs: [lodgingId], orderBy: "id");
+        where: "lodging_id = ? ", whereArgs: [lodgingId], orderBy: "id");
+  }
+
+  static Future<List<Map<String, dynamic>>> getLastRent(int lodgingId) async {
+    final db = await SQLHelper.db();
+    var value = "IS NULL";
+    return db.query(
+      _rents,
+      where: "lodging_id = ? AND end_date =?",
+      whereArgs: [lodgingId, value],
+    );
+  }
+
+  static Future<int> updateRent(int rentId, Map<String, dynamic> data) async {
+    final db = await SQLHelper.db();
+    //final data = {'id': id, 'comment': comment};
+    print("update rent");
+
+    final result =
+        db.update(_rents, data, where: "id = ?", whereArgs: [rentId]);
+    return result;
   }
 
   static Future<int> insertComment(int ownerId, String comment) async {
@@ -400,9 +425,6 @@ class SQLHelper {
 
     final id = await db.insert(_comments, data,
         conflictAlgorithm: ConflictAlgorithm.replace);
-    if (kDebugMode) {
-      print(" Comment with $id inserted");
-    }
     return id;
   }
 

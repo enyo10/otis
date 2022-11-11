@@ -1,8 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:otis/helper/helper.dart';
 import 'package:otis/models/building.dart';
 import '../models/lodging.dart';
+import '../models/rent_period.dart';
 import '../models/sql_helper.dart';
 
 class AddLodging extends StatefulWidget {
@@ -20,20 +21,26 @@ class _AddLodgingState extends State<AddLodging> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _rentController = TextEditingController();
   final TextEditingController _floorController = TextEditingController();
-  String date = "";
-  DateTime selectedDate = DateTime.now();
+  DateTime _selectedDate = DateTime.now();
+  late Rent? _actualRent;
+  DateTime _rentModificationDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     _setValue();
+    if (widget.lodging != null) {
+      _getLastRent(widget.lodging!.id).then((value) {
+        _actualRent = value;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-     Size size = MediaQuery.of(context).size;
+    Size size = MediaQuery.of(context).size;
     return Container(
-       height: size.height * 0.6,
+      height: size.height * 0.6,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
@@ -134,8 +141,10 @@ class _AddLodgingState extends State<AddLodging> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
-                        _selectDate(context);
+                      onPressed: () async {
+                        widget.lodging == null
+                            ? await _selectRentalDate(context)
+                            : await _selectRentModificationDate(context);
                       },
                       child: Text(widget.lodging == null
                           ? 'Mise en service'
@@ -145,7 +154,7 @@ class _AddLodgingState extends State<AddLodging> {
                       width: 40.0,
                     ),
                     Text(
-                      "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
+                      stringValueOfDateTime(_selectedDate),
                     )
                   ],
                 ),
@@ -160,7 +169,7 @@ class _AddLodgingState extends State<AddLodging> {
                 child: ElevatedButton(
                   onPressed: () async {
                     widget.lodging != null
-                        ? await _updateItem(widget.lodging!)
+                        ? await _updateApartmentRent(widget.lodging!)
                         : await _addApartment();
                     _addressController.text = '';
                     _descriptionController.text = '';
@@ -195,31 +204,30 @@ class _AddLodgingState extends State<AddLodging> {
     _floorController.clear();
   }
 
-  Future<void> _updateItem(Lodging lodging) async {
-    final int id = lodging.id;
-    int? occupantId = lodging.occupantId;
-    if (_apartmentHasData()) {
-      double rent = double.parse(_rentController.text);
-      int floor = int.parse(_floorController.text);
-      await SQLHelper.updateApartment(id, floor, rent, _addressController.text,
-              _descriptionController.text, occupantId)
-          .then((value) async {
-        await SQLHelper.insertRent(id, selectedDate, rent);
+  Future<void> _selectRentalDate(BuildContext context) async {
+    final DateTime? selected = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2040),
+    );
+    if (selected != null && selected != _selectedDate) {
+      setState(() {
+        _selectedDate = selected;
       });
-      _clearController();
     }
   }
 
-  _selectDate(BuildContext context) async {
+  Future<void> _selectRentModificationDate(BuildContext context) async {
     final DateTime? selected = await showDatePicker(
       context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2040),
+      initialDate: _actualRent!.startDate,
+      firstDate: _actualRent!.startDate,
+      lastDate: DateTime(2050),
     );
-    if (selected != null && selected != selectedDate) {
+    if (selected != null && selected != _rentModificationDate) {
       setState(() {
-        selectedDate = selected;
+        _rentModificationDate = selected;
       });
     }
   }
@@ -235,7 +243,7 @@ class _AddLodgingState extends State<AddLodging> {
     }
   }
 
-  // Insert a new journal to the database
+  /// Insert a new apartment to the database
   Future<void> _addApartment() async {
     if (_apartmentHasData()) {
       await SQLHelper.insertApartment(
@@ -247,9 +255,9 @@ class _AddLodgingState extends State<AddLodging> {
           .then((lodgingId) async {
         print(" apartement with id $lodgingId inserted");
         await SQLHelper.insertRent(
-                lodgingId, selectedDate, double.parse(_rentController.text))
+                lodgingId, _selectedDate, double.parse(_rentController.text))
             .then((id) {
-          _showMessage("Création réussie");
+          showMessage(context, "Création réussie");
         });
       });
       _clearController();
@@ -257,13 +265,62 @@ class _AddLodgingState extends State<AddLodging> {
     }
   }
 
-  ScaffoldFeatureController<SnackBar, SnackBarClosedReason> _showMessage(
-      String message) {
-    return ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
+  Future<void> _updateApartmentRent(Lodging lodging) async {
+    if (_actualRent != null) {
+      if (_rentController.text.isNotEmpty) {
+        double rentValue = double.parse(_rentController.text);
+        await SQLHelper.insertRent(lodging.id, _selectedDate, rentValue)
+            .then((value) async {
+          _actualRent!.endDate = _selectedDate;
+          await SQLHelper.updateRent(_actualRent!.id!, _actualRent!.toMap());
+          await SQLHelper.updateApartment(lodging.id, lodging.floor, rentValue,
+              lodging.address, lodging.description, lodging.occupantId);
+        });
+      }
+    }
+    var rents = await SQLHelper.getRents(lodging.id);
+
+    List<Rent> rentList = rents.map((e) => Rent.formMap(e)).toList();
+
+    // if (rentList.isNotEmpty) {
+    for (int i = 0; i < rentList.length; i++) {
+      if (rentList[i].endDate == null) {
+        Rent actualRent = rentList[i];
+
+        if (_rentController.text.isNotEmpty) {
+          double rentValue = double.parse(_rentController.text);
+          await SQLHelper.insertRent(lodging.id, _selectedDate, rentValue)
+              .then((value) async {
+            actualRent.endDate = _selectedDate;
+            await SQLHelper.updateRent(actualRent.id!, actualRent.toMap());
+            await SQLHelper.updateApartment(
+                lodging.id,
+                lodging.floor,
+                rentValue,
+                lodging.address,
+                lodging.description,
+                lodging.occupantId);
+          });
+        }
+      }
+      // }
+      _clearController();
+    }
+  }
+
+  Future<Rent?> _getLastRent(int lodgingId) async {
+    var rents = await SQLHelper.getRents(lodgingId);
+    List<Rent> rentList = rents.map((e) => Rent.formMap(e)).toList();
+    if (rentList.isNotEmpty) {
+      for (int i = 0; i < rentList.length; i++) {
+        if (rentList[i].endDate == null) {
+          Rent actualRent = rentList[i];
+          print("actual ....${actualRent.toMap()}");
+          return actualRent;
+        }
+      }
+    }
+
+    return null;
   }
 }
-

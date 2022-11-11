@@ -1,3 +1,5 @@
+import 'package:otis/models/rent_period.dart';
+
 class Lodging {
   final int id;
   String description;
@@ -21,6 +23,48 @@ class Lodging {
         rent = map['rent'],
         floor = map['floor'],
         occupantId = map['occupant_id'];
+
+  /// This method to retrieve the actual rent.
+ /* Rent rent(int year, int month) {
+    var date = DateTime(year, month);
+    for (Rent rent in rents) {
+      if (rent.endDate == null) {
+        if (date.isAfter(rent.startDate)) {
+          return rent;
+        }
+      }
+      if (date.isAfter(rent.startDate) && date.isBefore(rent.endDate!)) {
+        return rent;
+      }
+    }
+
+    return rents.first;
+  }
+
+  void modifyRent(Rent rent) {
+    if (rents.isEmpty) {
+      rents.add(rent);
+      return;
+    }
+    for (Rent r in rents) {
+      if (r.endDate == null) {
+        r.endDate = rent.startDate;
+        rents.add(rent);
+        return;
+      }
+    }
+  }
+
+  Rent getActualRent() {
+    Rent rent = rents.first;
+    for (Rent r in rents) {
+      if (r.endDate == null) {
+        rent = r;
+      }
+    }
+    return rent;
+  }
+*/
 
   @override
   String toString() {

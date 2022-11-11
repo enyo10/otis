@@ -64,7 +64,7 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             NewWidget(
-                                data: stringValue(widget.payment.paymentDate),
+                                data: stringValueOfDateTime(widget.payment.paymentDate),
                                 text: "Date payement"),
                           ],
                         ),

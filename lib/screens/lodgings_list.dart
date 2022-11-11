@@ -5,7 +5,6 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:otis/helper/helper.dart';
 import 'package:otis/widgets/add_lodging.dart';
 import 'package:otis/widgets/password_controller.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/building.dart';
 import '../models/lodging.dart';
 import '../models/sql_helper.dart';

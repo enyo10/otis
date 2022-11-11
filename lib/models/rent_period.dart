@@ -2,7 +2,7 @@ class Rent {
   int? id;
   final int lodgingId;
   final DateTime startDate;
-  final DateTime? endDate;
+  DateTime? endDate;
   final double rent;
 
   Rent(

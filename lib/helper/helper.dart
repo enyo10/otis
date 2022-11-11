@@ -99,7 +99,7 @@ double getTotalAmount(List<Payment> payments) {
   return amount;
 }
 
-String stringValue(DateTime dateTime) {
+String stringValueOfDateTime(DateTime dateTime) {
   var yearShortCut = dateTime.year.toString().substring(2);
   return dateTime.day < 10
       ? "0${dateTime.day}/${dateTime.month}/$yearShortCut"

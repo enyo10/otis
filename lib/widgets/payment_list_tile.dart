@@ -30,7 +30,7 @@ class _PaymentListTileState extends State<PaymentListTile> {
     var amount = "${payment.amount} ${payment.currency}";
     var period = payment.paymentPeriod.toString();
     var tax = payment.rate.toString();
-    var date = stringValue(payment.paymentDate);
+    var date = stringValueOfDateTime(payment.paymentDate);
     var info = (widget.payment.desc == '') ? " " : "i";
 
     return GestureDetector(
@@ -61,7 +61,7 @@ class _PaymentListTileState extends State<PaymentListTile> {
           ),
           MyTextWidget(text: "${payment.amount} ${payment.currency}"),
           MyTextWidget(text: payment.rate.toString()),
-          MyTextWidget(text: stringValue(payment.paymentDate)),
+          MyTextWidget(text: stringValueOfDateTime(payment.paymentDate)),
           MyTextWidget(text: info),
         ],
       ),

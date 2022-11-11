@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:otis/helper/helper.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
+import 'package:otis/models/period.dart';
 import 'package:otis/screens/occupant_note.dart';
 import 'package:otis/screens/period_payments.dart';
 import 'package:otis/screens/payments_list.dart';
@@ -29,6 +30,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
   Occupant? _occupant;
 
   late List<Data> monthDataList;
+
   //List<Payment> payments = [];
   //late int ownerId;
   late DateTime entryDate;
@@ -361,6 +363,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
   _loadPayments() async {
     List<Payment> paymentList = [];
+    var dateTime = DateTime.now();
     _initMonthList();
     if (_occupant != null) {
       await SQLHelper.getCurrentYearPayment(_occupant!.id).then((value) {
@@ -371,7 +374,8 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         for (var i = 0; i < monthDataList.length; i++) {
           for (var j = 0; j < paymentList.length; j++) {
             if (monthDataList.elementAt(i).month ==
-                paymentList.elementAt(j).paymentPeriod.month) {
+                    paymentList.elementAt(j).paymentPeriod.month &&
+                dateTime.year == paymentList.elementAt(j).paymentPeriod.year) {
               monthDataList.elementAt(i).addPayment(paymentList.elementAt(j));
             }
           }
@@ -417,14 +421,16 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     }
   }
 
-  Widget _paymentsStatus(List<Payment> paymentList) {
+  Widget _paymentsStatus(List<Payment> paymentList, int year, int month) {
     var payments = paymentList;
+
     var icon = const Icon(
       Icons.close,
       color: Colors.red,
     );
     if (payments.isNotEmpty) {
-      var rent = _getActualRent();
+      //  var rent = _getActualRent();
+      var rent = _getRent(year, month);
       var sum = _getSum(payments);
 
       if (sum == rent.rent) {
@@ -452,23 +458,13 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     return sum;
   }
 
-  Rent _getActualRent() {
-    Rent rent = _rents.first;
-    for (Rent r in _rents) {
-      if (rent.startDate.microsecondsSinceEpoch <
-          r.startDate.microsecondsSinceEpoch) {
-        rent = r;
-      }
-    }
-    return rent;
-  }
-
   Widget _newListItem(int index) {
     var data = monthDataList.elementAt(index);
     var month = monthMap[data.month];
+    var year = DateTime.now().year;
 
     List<Payment> payments = data.payments;
-    var icon = _paymentsStatus(payments);
+    var icon = _paymentsStatus(payments, year, data.month);
 
     return GestureDetector(
       onDoubleTap: () {
@@ -610,7 +606,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
             builder: (context) => AddPayments(
               occupant: _occupant!,
               rent: widget.lodging.rent,
-             // initialPaymentPeriodDate: _occupant!.entryDate,
+              // initialPaymentPeriodDate: _occupant!.entryDate,
             ),
             fullscreenDialog: true,
           ),
@@ -693,4 +689,57 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       return _note != null;
     }
   }
+
+
+  Rent _getRent(int year, int month) {
+    var date = DateTime(year, month);
+    var rent = _rents[0];
+    for (int i = 0; i < _rents.length; i++) {
+      if (_rents[i].endDate == null) {
+        if (date.microsecondsSinceEpoch >=
+            _rents[i].startDate.microsecondsSinceEpoch) {
+          rent = _rents[i];
+        }
+      } else {
+        if (date.microsecondsSinceEpoch >=
+                _rents[i].startDate.microsecondsSinceEpoch &&
+            date.microsecondsSinceEpoch <=
+                _rents[i].endDate!.microsecondsSinceEpoch) {
+          rent = _rents[i];
+        }
+      }
+    }
+    return rent;
+  }
+
+  /// This method to retrieve the actual rent.
+/* Rent rent(int year, int month) {
+    var date = DateTime(year, month);
+    for (Rent rent in rents) {
+      if (rent.endDate == null) {
+        if (date.isAfter(rent.startDate)) {
+          return rent;
+        }
+      }
+      if (date.isAfter(rent.startDate) && date.isBefore(rent.endDate!)) {
+        return rent;
+      }
+    }
+
+    return rents.first;
+  }*/
+
+/* void modifyRent(Rent rent) {
+    if (_rents.isEmpty) {
+      _rents.add(rent);
+      return;
+    }
+    for (Rent r in _rents) {
+      if (r.endDate == null) {
+        r.endDate = rent.startDate;
+        _rents.add(rent);
+        return;
+      }
+    }
+  }*/
 }
