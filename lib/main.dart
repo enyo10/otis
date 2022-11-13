@@ -3,9 +3,9 @@ import 'package:otis/screens/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'helper/helper.dart';
 
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
   initPassword();
 
   runApp(const MyApp());
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
           // backgroundColor: Colors.black12
           ),
 
-      home: const HomeScreen(),
+     home: const HomeScreen(),
 
     );
   }

@@ -101,9 +101,14 @@ double getTotalAmount(List<Payment> payments) {
 
 String stringValueOfDateTime(DateTime dateTime) {
   var yearShortCut = dateTime.year.toString().substring(2);
+  var month = dateTime.month < 10 ? "0${dateTime.month}" : "${dateTime.month}";
   return dateTime.day < 10
-      ? "0${dateTime.day}/${dateTime.month}/$yearShortCut"
-      : "${dateTime.day}/${dateTime.month}/$yearShortCut";
+      ? "0${dateTime.day}/$month/$yearShortCut"
+      : "${dateTime.day}/$month/$yearShortCut";
+}
+
+String periodFormat(DateTime dateTime) {
+  return stringValueOfDateTime(dateTime).substring(3);
 }
 
 List<String> currencies = ['\$', 'FC'];
@@ -112,6 +117,7 @@ const kBottomContainerHeight = 80.0;
 const kBottomContainerColor = Color(0xFFEB1555);
 const kActiveCardColor = Color(0xFF1D1E33);
 const kInactiveCardColor = Color(0xFF111328);
+const kRedColor = Color(0xFBE14D2A);
 
 const kLabelTextStyle = TextStyle(
     fontSize: 15.0, color: Color(0xFF8D8E98), fontStyle: FontStyle.italic);

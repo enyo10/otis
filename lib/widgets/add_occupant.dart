@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:otis/helper/helper.dart';
 import 'package:otis/models/lodging.dart';
 
 import '../models/rent_period.dart';
@@ -106,7 +107,8 @@ class _AddOccupantFormState extends State<AddOccupantForm> {
                       width: 40.0,
                     ),
                     Text(
-                      "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
+                      stringValueOfDateTime(selectedDate),
+
                     )
                   ],
                 ),

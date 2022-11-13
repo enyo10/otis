@@ -203,8 +203,10 @@ class _AddPaymentsState extends State<AddPayments> {
                         const SizedBox(
                           width: 15.0,
                         ),
-                        Text("${_selectedPeriodDate.month}/"
-                            "${_selectedPeriodDate.year}")
+                        Text(
+                          periodFormat(_selectedPeriodDate),
+
+                        )
                       ],
                     ),
                   )),

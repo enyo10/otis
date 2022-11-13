@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         drawer: Drawer(
           elevation: 5,
-          width: MediaQuery.of(context).size.width *0.9,
+          width: MediaQuery.of(context).size.width * 0.9,
           child: ListView(
             padding: const EdgeInsets.all(4.0),
             children: [
@@ -125,7 +125,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: TextLiquidFill(
                     text: 'F.K.Otis',
                     waveColor: Colors.blueAccent,
-                    boxBackgroundColor: Colors.red,
+                   // boxBackgroundColor: Colors.deepOrange,
+                    boxBackgroundColor: const Color(0xAAFF530F),
+
                     textStyle: const TextStyle(
                       fontSize: 50.0,
                       fontWeight: FontWeight.bold,
@@ -136,7 +138,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const Text(
                   "Developed with ❤️ by Enyo",
-                  //style: TextStyle(fontStyle: FontStyle.italic),
                   style: kLabelTextStyle,
                 )
               ],
