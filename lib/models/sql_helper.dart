@@ -348,6 +348,13 @@ class SQLHelper {
         where: "owner_id =? AND year= ?", whereArgs: [ownerId, year]);
   }
 
+  static Future<List<Map<String, dynamic>>> getYearPayment(
+      int ownerId, int year) async {
+    final db = await SQLHelper.db();
+    return db.query(_payments,
+        where: "owner_id =? AND year= ?", whereArgs: [ownerId, year]);
+  }
+
   static Future<List<Map<String, dynamic>>> getPayments(int ownerId) async {
     final db = await SQLHelper.db();
     return db.query(_payments, where: "owner_id=?", whereArgs: [ownerId]);
@@ -410,8 +417,6 @@ class SQLHelper {
 
   static Future<int> updateRent(int rentId, Map<String, dynamic> data) async {
     final db = await SQLHelper.db();
-    //final data = {'id': id, 'comment': comment};
-    print("update rent");
 
     final result =
         db.update(_rents, data, where: "id = ?", whereArgs: [rentId]);

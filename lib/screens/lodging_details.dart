@@ -4,18 +4,19 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:otis/helper/helper.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
-import 'package:otis/models/period.dart';
 import 'package:otis/screens/occupant_note.dart';
 import 'package:otis/screens/period_payments.dart';
 import 'package:otis/screens/payments_list.dart';
 import 'package:otis/widgets/add_comment.dart';
 import 'package:otis/widgets/add_payment.dart';
+import 'package:otis/widgets/number_picker.dart';
 import 'package:otis/widgets/password_controller.dart';
 import '../models/lodging.dart';
 import '../models/note.dart';
 import '../models/rent_period.dart';
 import '../models/sql_helper.dart';
 import '../widgets/add_occupant.dart';
+import '../widgets/label_value_widget.dart';
 
 class LodgingDetails extends StatefulWidget {
   final Lodging lodging;
@@ -37,14 +38,16 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
   late List<Rent> _rents;
   late Lodging _lodging;
+  late int _year;
 
   @override
   initState() {
-    _lodging = widget.lodging;
-    _loadRents();
-    _initMonthList();
-    _loadOccupantWithPayment();
     super.initState();
+    _lodging = widget.lodging;
+    _year = _getPeriodYear();
+    _initMonthList();
+    _loadRents();
+    _loadOccupantWithPayment();
   }
 
   @override
@@ -58,8 +61,37 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                   const TextStyle(fontSize: 25, fontWeight: FontWeight.w600)),
         ),
         actions: [
-          _actionIcon(),
-          Visibility(visible: _isOccupied(), child: _changedOwner())
+          Theme(
+            data: Theme.of(context).copyWith(
+                textTheme: const TextTheme().apply(bodyColor: Colors.black),
+                dividerColor: Colors.white,
+                iconTheme: const IconThemeData(color: Colors.white)),
+            child: PopupMenuButton<int>(
+              color: Colors.black,
+              itemBuilder: (context) => [
+                PopupMenuItem<int>(value: 0, child: Text(_itemValue)),
+                const PopupMenuItem<int>(
+                    value: 1, child: Text("Liste des paiements")),
+                const PopupMenuDivider(),
+                PopupMenuItem<int>(
+                  value: 2,
+                  child: Row(
+                    children: const [
+                      Icon(
+                        Icons.date_range,
+                        color: Colors.red,
+                      ),
+                      SizedBox(
+                        width: 7,
+                      ),
+                      Text("Year")
+                    ],
+                  ),
+                ),
+              ],
+              onSelected: (item) => _selectedItem(context, item),
+            ),
+          ),
         ],
       ),
       floatingActionButton: Visibility(
@@ -111,13 +143,14 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                               Expanded(
                                 child: Column(
                                   children: [
-                                    InfoWidget(label: "Nom", value: firstname),
-                                    InfoWidget(
+                                    LabelValueWidget(
+                                        label: "Nom", value: firstname),
+                                    LabelValueWidget(
                                         label: "Prenom", value: lastname),
-                                    InfoWidget(
+                                    LabelValueWidget(
                                         label: "Date d'entrée",
                                         value: entryDate),
-                                    InfoWidget(
+                                    LabelValueWidget(
                                         label: "Mensualité:",
                                         value: "${widget.lodging.rent} \$ "),
                                   ],
@@ -167,7 +200,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                                   style: TextStyle(fontSize: 20.0),
                                 ),
                               ),
-                              //const SizedBox(width: 40,),
                               const Text(
                                 "Status",
                                 style: TextStyle(
@@ -208,7 +240,11 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     );
   }
 
-  _loadRents() async {
+  int _getPeriodYear() {
+    return DateTime.now().year;
+  }
+
+  Future<void> _loadRents() async {
     int lodgingId = _lodging.id;
     List<Rent> list = [];
     await SQLHelper.getRents(lodgingId).then((value) {
@@ -219,7 +255,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     });
   }
 
-  _loadLodging() async {
+  Future<void> _loadLodging() async {
     Lodging lodging = _lodging;
     Occupant? occupant;
     await SQLHelper.getApartment(lodging.id).then((value) async {
@@ -238,7 +274,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     });
   }
 
-  _loadOccupantWithPayment() async {
+  Future<void> _loadOccupantWithPayment() async {
     Occupant? occupant;
     if (_lodging.occupantId != null) {
       var id = _lodging.occupantId;
@@ -260,12 +296,11 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     });
   }
 
-  _loadPayments() async {
+  Future<void> _loadPayments() async {
     List<Payment> paymentList = [];
-    var dateTime = DateTime.now();
     _initMonthList();
     if (_occupant != null) {
-      await SQLHelper.getCurrentYearPayment(_occupant!.id).then((value) {
+      await SQLHelper.getYearPayment(_occupant!.id, _year).then((value) {
         for (var paymentMap in value) {
           paymentList.add(Payment.fromMap(paymentMap));
         }
@@ -274,7 +309,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           for (var j = 0; j < paymentList.length; j++) {
             if (monthDataList.elementAt(i).month ==
                     paymentList.elementAt(j).paymentPeriod.month &&
-                dateTime.year == paymentList.elementAt(j).paymentPeriod.year) {
+                _year == paymentList.elementAt(j).paymentPeriod.year) {
               monthDataList.elementAt(i).addPayment(paymentList.elementAt(j));
             }
           }
@@ -285,19 +320,18 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     setState(() {});
   }
 
-  _initMonthList() {
+  void _initMonthList() {
     List<Data> list = [];
     for (var i = 1; i < 13; i++) {
       list.add(Data(month: i));
     }
     //  setState(() {
     monthDataList = list;
-    print("month list ${monthDataList.length}");
 
     // });
   }
 
-  _showOccupantForm() async {
+  Future<void> _showOccupantForm() async {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -362,10 +396,10 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     var data = monthDataList.elementAt(index);
 
     var month = monthMap[data.month];
-    var year = DateTime.now().year;
+    //var year = DateTime.now().year;
 
     List<Payment> payments = data.payments;
-    var icon = _paymentsStatus(payments, year, data.month);
+    var icon = _paymentsStatus(payments, _year, data.month);
 
     return GestureDetector(
       onDoubleTap: () {
@@ -426,25 +460,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
               _showOccupantForm();
             },
             icon: const Icon(Icons.add));
-  }
-
-  Widget _changedOwner() {
-    return IconButton(
-      onPressed: () async {
-        var passwordController = const PasswordController(title: "Résiliation");
-
-        await showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return passwordController;
-            }).then((value) {
-          if (value) {
-            _showRemoveOwnerDialog();
-          }
-        });
-      },
-      icon: const Icon(Icons.remove_circle_rounded),
-    );
   }
 
   Future<void> _showRemoveOwnerDialog() async {
@@ -540,7 +555,21 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     setState(() {});
   }
 
-  _navigateToAddComment() async {
+  Future<void> _terminateLease() async {
+    var passwordController = const PasswordController(title: "Résiliation");
+
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return passwordController;
+        }).then((value) async {
+      if (value) {
+        await _showRemoveOwnerDialog();
+      }
+    });
+  }
+
+  Future<void> _navigateToAddComment() async {
     var passwordController = const PasswordController(title: "Commenter");
     await showDialog(
         context: context,
@@ -607,36 +636,55 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     }
     return rent;
   }
-}
 
-class InfoWidget extends StatelessWidget {
-  const InfoWidget({
-    Key? key,
-    required this.label,
-    required this.value,
-  }) : super(key: key);
-  final String label;
-  final String value;
+  Future<void> _addRemoveOccupant() async {
+    _isOccupied() ? await _terminateLease() : await _showOccupantForm();
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Row(
-        children: [
-          Text(
-            "$label: ",
-            style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
-          )
-        ],
+  String get _itemValue =>
+      _isOccupied() ? "Resilier bail " : "Ajouter locataire";
+
+  void _selectedItem(BuildContext context, item) {
+    switch (item) {
+      case 0:
+        _addRemoveOccupant();
+        break;
+      case 1:
+        if (_isOccupied()) {
+          Navigator.of(context)
+              .push(
+                MaterialPageRoute(
+                  builder: (_) => PaymentsList(occupant: _occupant!),
+                ),
+              )
+              .then((value) => _loadOccupantWithPayment());
+        }
+        break;
+      case 2:
+        //  _showYearPicker();
+        _selectYear();
+        break;
+    }
+  }
+
+  Future<void> _selectYear() async {
+    await showModalBottomSheet(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(25.0),
+        ),
       ),
-    );
+      context: context,
+      builder: (context) {
+        return SizedBox(height: 400, child: PickedNumber(currentValue: _year));
+      },
+    ).then((value) {
+      if (value != null) {
+        setState(() {
+          _year = value;
+          _loadPayments();
+        });
+      }
+    });
   }
 }

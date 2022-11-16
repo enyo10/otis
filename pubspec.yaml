@@ -42,6 +42,8 @@ dependencies:
   google_fonts: ^3.0.1
   month_picker_dialog_2: ^0.5.5
   flutter_native_splash: ^2.2.14
+  month_year_picker: ^0.2.0+3
+  numberpicker: ^2.1.1
 
 
 #  google_fonts: ^3.0.1
