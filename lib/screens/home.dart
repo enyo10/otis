@@ -1,6 +1,7 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:otis/screens/import-export.dart';
 
 import 'package:otis/screens/living_quarter_list.dart';
@@ -33,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: const Color(0xFFEFFFFD),
           elevation: 0.0,
           iconTheme: const IconThemeData(
-            color: Colors.red,
+            color: Palette.kToDark
           ),
         ),
         drawer: Drawer(
@@ -127,12 +128,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     waveColor: Colors.blueAccent,
                    // boxBackgroundColor: Colors.deepOrange,
                     boxBackgroundColor: const Color(0xAAFF530F),
-
-                    textStyle: const TextStyle(
-                      fontSize: 50.0,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
+                    textStyle: GoogleFonts.charmonman(
+                      fontSize: 50,
+                      color: Colors.blue
                     ),
+
+                    // textStyle: const TextStyle(
+                    //   fontSize: 50.0,
+                    //   fontWeight: FontWeight.bold,
+                    //   fontStyle: FontStyle.italic,
+                    // ),
                     boxHeight: 300.0,
                   ),
                 ),

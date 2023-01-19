@@ -184,7 +184,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                           ),
                         ),
                       ),
-                      Padding(
+                      /* Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 0),
                         child: Container(
@@ -209,7 +209,30 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                             ],
                           ),
                         ),
+                      ),*/
+                     Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 0),
+                        child: Container(
+                          color: Colors.black12,
+                          height: 40.0,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.only(left: 10),
+
+                                child:  Text(
+                                  "Status des payements en $_year",
+                                  style: const TextStyle(fontSize: 20.0),
+                                ),
+                              ),
+
+                            ],
+                          ),
+                        ),
                       ),
+
                       const SizedBox(
                         height: 10,
                       ),
@@ -346,16 +369,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
 
   bool _isOccupied() => _lodging.occupantId != null;
 
-  bool _isVisible(int index, List<Payment> payments) {
-    var actualMonth = DateTime.now().month;
-
-    if (index < actualMonth || payments.isNotEmpty) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   Widget _paymentsStatus(List<Payment> paymentList, int year, int month) {
     var payments = paymentList;
 
@@ -390,6 +403,21 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       sum += payment.amount / payment.rate;
     }
     return sum;
+  }
+
+  bool _isVisible(int index, List<Payment> payments) {
+    var actualYear = DateTime.now();
+    var actualMonth = actualYear.month;
+
+    if (_year < actualYear.year) {
+      return true;
+    }
+
+    if (index < actualMonth || payments.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Widget _newListItem(int index) {
@@ -429,7 +457,10 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                     style: const TextStyle(fontSize: 20.0),
                   ),
                 ),
-                icon
+                Visibility(
+                  visible: _isVisible(index, payments),
+                  child: icon,
+                )
               ],
             ),
           ),

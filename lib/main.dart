@@ -27,14 +27,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Otis',
       theme: ThemeData(
-          primarySwatch: Colors.red,
-          scaffoldBackgroundColor: const Color(0xFFEFFFFD)
-          //primaryColor: Colors.orange
-          // backgroundColor: Colors.black12
-          ),
+        primarySwatch: Palette.kToDark,
+        scaffoldBackgroundColor: const Color(0xFFEFFFFD),
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+            backgroundColor: Palette.kToDark),
+      ),
 
-     home: const HomeScreen(),
-
+      home: const HomeScreen(),
     );
   }
 }
