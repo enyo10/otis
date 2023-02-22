@@ -61,44 +61,46 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                   const TextStyle(fontSize: 25, fontWeight: FontWeight.w600)),
         ),
         actions: [
-          Theme(
-            data: Theme.of(context).copyWith(
-                textTheme: const TextTheme().apply(bodyColor: Colors.black),
-                dividerColor: Colors.white,
-                iconTheme: const IconThemeData(color: Colors.white)),
-            child: PopupMenuButton<int>(
-              color: Colors.black,
-              itemBuilder: (context) => [
-                PopupMenuItem<int>(value: 0, child: Text(_itemValue)),
-                const PopupMenuItem<int>(
-                    value: 1, child: Text("Liste des paiements")),
-                const PopupMenuDivider(),
-                PopupMenuItem<int>(
-                  value: 2,
-                  child: Row(
-                    children: const [
-                      Icon(
-                        Icons.date_range,
-                        color: Colors.red,
-                      ),
-                      SizedBox(
-                        width: 7,
-                      ),
-                      Text("Year")
-                    ],
+          Visibility(
+            visible: _isOccupied(),
+            child: Theme(
+              data: Theme.of(context).copyWith(
+                  textTheme: const TextTheme().apply(bodyColor: Colors.black),
+                  dividerColor: Colors.white,
+                  iconTheme: const IconThemeData(color: Colors.white)),
+              child: PopupMenuButton<int>(
+                color: Colors.black,
+                itemBuilder: (context) => [
+                  PopupMenuItem<int>(value: 0, child: Text(_itemValue)),
+                  const PopupMenuItem<int>(
+                      value: 1, child: Text("Liste des paiements")),
+                  const PopupMenuDivider(),
+                  PopupMenuItem<int>(
+                    value: 2,
+                    child: Row(
+                      children: const [
+                        Icon(
+                          Icons.date_range,
+                          color: Colors.red,
+                        ),
+                        SizedBox(
+                          width: 7,
+                        ),
+                        Text("Year")
+                      ],
+                    ),
                   ),
-                ),
-              ],
-              onSelected: (item) => _selectedItem(context, item),
+                ],
+                onSelected: (item) => _selectedItem(context, item),
+              ),
             ),
           ),
         ],
       ),
       floatingActionButton: Visibility(
-        visible: _isOccupied(),
         child: FloatingActionButton(
           elevation: 10,
-          onPressed: _navigateToAddPayment,
+          onPressed: _isOccupied() ? _navigateToAddPayment : _showOccupantForm,
           child: const Icon(Icons.add),
         ),
       ),
@@ -210,7 +212,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                           ),
                         ),
                       ),*/
-                     Padding(
+                      Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 0),
                         child: Container(
@@ -221,18 +223,15 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                             children: [
                               Container(
                                 padding: const EdgeInsets.only(left: 10),
-
-                                child:  Text(
+                                child: Text(
                                   "Status des payements en $_year",
                                   style: const TextStyle(fontSize: 20.0),
                                 ),
                               ),
-
                             ],
                           ),
                         ),
                       ),
-
                       const SizedBox(
                         height: 10,
                       ),
@@ -707,7 +706,13 @@ class _LodgingDetailsState extends State<LodgingDetails> {
       ),
       context: context,
       builder: (context) {
-        return SizedBox(height: 400, child: PickedNumber(currentValue: _year));
+        return SizedBox(
+          height: 400,
+          child: OtisPickedNumber(
+            currentValue: _year,
+            minValue: _occupant?.entryDate.year ?? _year,
+          ),
+        );
       },
     ).then((value) {
       if (value != null) {

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
 
-class PickedNumber extends StatefulWidget {
-  const PickedNumber({Key? key, required this.currentValue}) : super(key: key);
+class OtisPickedNumber extends StatefulWidget {
+  const OtisPickedNumber(
+      {Key? key, required this.currentValue, required this.minValue})
+      : super(key: key);
   final int currentValue;
+  final int minValue;
 
   @override
-  State<PickedNumber> createState() => _PickedNumberState();
+  State<OtisPickedNumber> createState() => _OtisPickedNumberState();
 }
 
-class _PickedNumberState extends State<PickedNumber> {
+class _OtisPickedNumberState extends State<OtisPickedNumber> {
   late int _currentIntValue;
   @override
   void initState() {
@@ -48,7 +51,7 @@ class _PickedNumberState extends State<PickedNumber> {
             ),
             NumberPicker(
               value: _currentIntValue,
-              minValue: 2000,
+              minValue: widget.minValue,
               maxValue: 2040,
               step: 1,
               haptics: true,
