@@ -5,7 +5,6 @@ import 'package:otis/models/note.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/sql_helper.dart';
 import 'package:otis/widgets/add_comment.dart';
-import 'package:otis/widgets/info_widget.dart';
 import 'package:otis/widgets/password_controller.dart';
 
 class OccupantNote extends StatefulWidget {
