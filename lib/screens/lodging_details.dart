@@ -7,7 +7,6 @@ import 'package:otis/models/payment.dart';
 import 'package:otis/screens/occupant_note.dart';
 import 'package:otis/screens/period_payments.dart';
 import 'package:otis/screens/payments_list.dart';
-import 'package:otis/widgets/add_comment.dart';
 import 'package:otis/widgets/add_payment.dart';
 import 'package:otis/widgets/number_picker.dart';
 import 'package:otis/widgets/password_controller.dart';
@@ -468,30 +467,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
     );
   }
 
-  Widget _actionIcon() {
-    return _isOccupied()
-        ? IconButton(
-            onPressed: () {
-              Navigator.of(context)
-                  .push(
-                    MaterialPageRoute(
-                      builder: (_) => PaymentsList(occupant: _occupant!),
-                    ),
-                  )
-                  .then((value) => _loadOccupantWithPayment());
-            },
-            icon: const Icon(
-              Icons.info,
-              size: 25.0,
-            ),
-          )
-        : IconButton(
-            onPressed: () {
-              _showOccupantForm();
-            },
-            icon: const Icon(Icons.add));
-  }
-
   Future<void> _showRemoveOwnerDialog() async {
     return showDialog<void>(
       context: context,
@@ -595,32 +570,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
         }).then((value) async {
       if (value) {
         await _showRemoveOwnerDialog();
-      }
-    });
-  }
-
-  Future<void> _navigateToAddComment() async {
-    var passwordController = const PasswordController(title: "Commenter");
-    await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return passwordController;
-        }).then((value) async {
-      if (value) {
-        if (_occupant != null) {
-          var ownerId = _occupant!.id;
-
-          await showModalBottomSheet(
-            context: context,
-            builder: (BuildContext context) => AddComment(ownerId: ownerId),
-            isScrollControlled: true,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(40.0),
-            ),
-          ).then((value) => _loadComment());
-        }
-      } else {
-        showMessage(context, "Saisir mot de passe correcte");
       }
     });
   }
