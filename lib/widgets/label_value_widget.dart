@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class LabelValueWidget extends StatelessWidget {
   const LabelValueWidget({
     Key? key,
@@ -16,14 +17,20 @@ class LabelValueWidget extends StatelessWidget {
         children: [
           Text(
             "$label: ",
-            style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
+            style: const TextStyle(
+              fontSize: 20,
+              fontStyle: FontStyle.italic,
+            ),
           ),
           const SizedBox(
             width: 10,
           ),
           Text(
             value,
-            style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
+            style: const TextStyle(
+              fontSize: 20,
+              fontStyle: FontStyle.italic,
+            ),
           )
         ],
       ),

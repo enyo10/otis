@@ -14,6 +14,7 @@ import '../models/lodging.dart';
 import '../models/note.dart';
 import '../models/rent_period.dart';
 import '../models/sql_helper.dart';
+import '../widgets/add_comment.dart';
 import '../widgets/add_occupant.dart';
 import '../widgets/label_value_widget.dart';
 
@@ -158,26 +159,46 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                                 ),
                               ),
                               Visibility(
-                                visible: _hasComment(),
+                                //visible: _hasComment(),
+                                visible: _isOccupied(),
                                 child: Row(
                                   children: [
-                                    InkWell(
-                                      onTap: _navigateToOccupantNote,
-                                      child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 20.0),
-                                        child: Text(
-                                          "i",
-                                          style: GoogleFonts.charmonman(
-                                            textStyle: const TextStyle(
-                                                fontSize: 30.0,
-                                                fontWeight: FontWeight.w700,
-                                                color: Colors.red,
-                                                fontStyle: FontStyle.italic),
+                                    _hasComment()
+                                        ? InkWell(
+                                            onTap: _navigateToOccupantNote,
+                                            child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 20.0),
+                                                child: Text(
+                                                  "i",
+                                                  style: GoogleFonts.charmonman(
+                                                    textStyle: const TextStyle(
+                                                        fontSize: 30.0,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color: Colors.red,
+                                                        fontStyle:
+                                                            FontStyle.italic),
+                                                  ),
+                                                )),
+                                          )
+                                        : TextButton(
+                                            onPressed: () {
+                                              _addOccupantNote().then(
+                                                (value) => setState(() {}),
+                                              );
+                                            },
+                                            child: Text(
+                                              "C",
+                                              style: GoogleFonts.charmonman(
+                                                textStyle: const TextStyle(
+                                                  fontSize: 30.0,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                    )
                                   ],
                                 ),
                               ),
@@ -185,32 +206,6 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                           ),
                         ),
                       ),
-                      /* Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 0),
-                        child: Container(
-                          color: Colors.black12,
-                          height: 40.0,
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.only(left: 10),
-                                width: 150.0,
-                                child: const Text(
-                                  "Mois",
-                                  style: TextStyle(fontSize: 20.0),
-                                ),
-                              ),
-                              const Text(
-                                "Status",
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),*/
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 0),
@@ -585,6 +580,30 @@ class _LodgingDetailsState extends State<LodgingDetails> {
           ),
         )
         .then((value) => _loadComment());
+  }
+
+  Future<void> _addOccupantNote() async {
+    var passwordController = const PasswordController(title: "Actualiser note");
+
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return passwordController;
+        }).then((value) async {
+      if (value!) {
+        showModalBottomSheet(
+            isScrollControlled: true,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(40.0),
+            ),
+            context: context,
+            builder: (BuildContext ctx) {
+              return AddComment(ownerId: _occupant!.id, note: _note);
+            }).then((value) => _loadComment());
+      } else {
+        showMessage(context, "Saisir mot de passe correcte");
+      }
+    });
   }
 
   bool _hasComment() {

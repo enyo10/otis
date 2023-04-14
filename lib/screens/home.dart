@@ -20,9 +20,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-    ));
+   /* SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+      ),
+    );*/
     super.initState();
   }
 
@@ -33,9 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           backgroundColor: const Color(0xFFEFFFFD),
           elevation: 0.0,
-          iconTheme: const IconThemeData(
-            color: Palette.kToDark
-          ),
+          iconTheme: const IconThemeData(color: Palette.kToDark),
         ),
         drawer: Drawer(
           elevation: 5,
@@ -121,29 +121,24 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(
-                  width: 250.0,
-                  child: TextLiquidFill(
-                    text: 'F.K.Otis',
-                    waveColor: Colors.blueAccent,
-                   // boxBackgroundColor: Colors.deepOrange,
-                    boxBackgroundColor: const Color(0xAAFF530F),
-                    textStyle: GoogleFonts.charmonman(
-                      fontSize: 50,
-                      color: Colors.blue
-                    ),
-
-                    // textStyle: const TextStyle(
-                    //   fontSize: 50.0,
-                    //   fontWeight: FontWeight.bold,
-                    //   fontStyle: FontStyle.italic,
-                    // ),
-                    boxHeight: 300.0,
+                TextLiquidFill(
+                  text: 'F.K.Otis',
+                 // waveColor: Colors.blueAccent,
+                  boxBackgroundColor: Colors.deepOrange,
+                  textStyle: GoogleFonts.charmonman(
+                    fontSize: 60,
+                  fontWeight: FontWeight.w900,
+                    color: Colors.blue
                   ),
+                  boxWidth: 250,
+                  boxHeight: 300.0,
                 ),
-                const Text(
-                  "Developed with ❤️ by Enyo",
-                  style: kLabelTextStyle,
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Developed with ❤️ by Enyo",
+                    style: kLabelTextStyle,
+                  ),
                 )
               ],
             ),
