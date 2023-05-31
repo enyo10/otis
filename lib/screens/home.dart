@@ -8,6 +8,7 @@ import 'package:otis/screens/import-export.dart';
 import 'package:otis/screens/living_quarter_list.dart';
 import 'package:otis/screens/profile.dart';
 import 'package:otis/widgets/password_controller.dart';
+import 'package:sqflite/sqflite.dart';
 import '../helper/helper.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -40,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     dividerColor: Colors.white,
                     iconTheme: const IconThemeData(color: Colors.red)),
                 child: PopupMenuButton<int>(
-                  color: Colors.black,
+                  color: Colors.red,
                   itemBuilder: (context) => [
                     const PopupMenuItem<int>(
                         value: 0, child: Text("Enrégister BD")),

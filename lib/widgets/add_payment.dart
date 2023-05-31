@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:month_picker_dialog/month_picker_dialog.dart';
+//import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
 import 'package:otis/models/sql_helper.dart';
@@ -255,7 +255,7 @@ class _AddPaymentsState extends State<AddPayments> {
   }
 
   Future<void> _showPaymentMontPicker(BuildContext context) async {
-    showMonthPicker(
+   /* showMonthPicker(
       context: context,
       initialDate: _selectedPeriodDate,
       firstDate: widget.occupant.entryDate,
@@ -267,7 +267,7 @@ class _AddPaymentsState extends State<AddPayments> {
                 _selectedPeriodDate = date;
               })
             }
-        });
+        });*/
   }
 
   void _showPaymentDatePicker() {

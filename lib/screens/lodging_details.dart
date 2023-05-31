@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:otis/helper/helper.dart';
@@ -69,7 +68,7 @@ class _LodgingDetailsState extends State<LodgingDetails> {
                   dividerColor: Colors.white,
                   iconTheme: const IconThemeData(color: Colors.white)),
               child: PopupMenuButton<int>(
-                color: Colors.black,
+                color: Colors.white,
                 itemBuilder: (context) => [
                   PopupMenuItem<int>(value: 0, child: Text(_itemValue)),
                   const PopupMenuItem<int>(
