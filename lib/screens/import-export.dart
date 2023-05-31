@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:external_path/external_path.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite/sqflite.dart';
@@ -23,6 +23,14 @@ class _ImportExportDBState extends State<ImportExportDB> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "Gestion de Base de données",
+          style: GoogleFonts.charmonman(
+              textStyle:
+                  const TextStyle(fontSize: 25, fontWeight: FontWeight.w600)),
+        ),
+      ),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -93,9 +101,6 @@ class _ImportExportDBState extends State<ImportExportDB> {
                   await _copyDatabaseFromStorage().then((value) {
                     if (value != null && value.existsSync()) {
                       message = " Restauration avec réussite. Bravo";
-                      if (kDebugMode) {
-                        print(" Value path ${value.path}");
-                      }
                     } else {
                       message = " Erreur lors de la restauration";
                     }
@@ -192,7 +197,6 @@ class _ImportExportDBState extends State<ImportExportDB> {
       print(e);
     }
   }
-  //deleteFile(File(your file path))
 
   Future<void> _requestPermission() async {
     Map<Permission, PermissionStatus> status =
@@ -200,8 +204,4 @@ class _ImportExportDBState extends State<ImportExportDB> {
   }
 
   bool _fileSelected() => selectedFilePath != null && selectedFile != null;
-}
-
-void main() {
-  runApp(const ImportExportDB());
 }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
 import 'package:otis/models/sql_helper.dart';
-import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
+//import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
 
 import '../helper/helper.dart';
 import '../models/period.dart';
@@ -258,7 +259,7 @@ class _AddPaymentsState extends State<AddPayments> {
       context: context,
       initialDate: _selectedPeriodDate,
       firstDate: widget.occupant.entryDate,
-      unselectedMonthTextColor: Colors.black,
+      //unselectedMonthTextColor: Colors.black,
     ).then((date) => {
           if (date != null)
             {

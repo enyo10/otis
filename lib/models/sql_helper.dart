@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
-import 'package:otis/models/payment.dart';
 import 'package:otis/models/period.dart';
-import 'package:otis/models/rent_period.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite/sql.dart';
+import 'package:sqflite/sqlite_api.dart';
 
 class SQLHelper {
   static const String _livingQuarters = "living_quarters";
@@ -90,10 +90,6 @@ class SQLHelper {
          ON DELETE CASCADE ) 
     """);
 
-    /*ALTER TABLE table_name
-    ADD column_name datatype;
-    await database.execute("""ALTER TABLE $_payments ADD desc TEXT""");
-    await database.execute("""ALTER TABLE $_payments ADD desc TEXT""");*/
 
     await database.execute("""CREATE TABLE $_comments(
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -455,4 +451,6 @@ class SQLHelper {
     final result = db.update(_comments, data, where: "id = ?", whereArgs: [id]);
     return result;
   }
+
+
 }
