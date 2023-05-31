@@ -2,8 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:otis/models/period.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqflite/sql.dart';
-import 'package:sqflite/sqlite_api.dart';
 
 class SQLHelper {
   static const String _livingQuarters = "living_quarters";
