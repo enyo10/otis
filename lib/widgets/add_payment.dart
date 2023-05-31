@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-//import 'package:month_picker_dialog/month_picker_dialog.dart';
+
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:otis/models/occupant.dart';
 import 'package:otis/models/payment.dart';
 import 'package:otis/models/sql_helper.dart';
-//import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
 
 import '../helper/helper.dart';
 import '../models/period.dart';
@@ -206,7 +206,6 @@ class _AddPaymentsState extends State<AddPayments> {
                         ),
                         Text(
                           periodFormat(_selectedPeriodDate),
-
                         )
                       ],
                     ),
@@ -255,19 +254,18 @@ class _AddPaymentsState extends State<AddPayments> {
   }
 
   Future<void> _showPaymentMontPicker(BuildContext context) async {
-   /* showMonthPicker(
-      context: context,
-      initialDate: _selectedPeriodDate,
-      firstDate: widget.occupant.entryDate,
-      //unselectedMonthTextColor: Colors.black,
-    ).then((date) => {
-          if (date != null)
-            {
-              setState(() {
-                _selectedPeriodDate = date;
-              })
-            }
-        });*/
+    showMonthPicker(
+            context: context,
+            initialDate: _selectedPeriodDate,
+            firstDate: widget.occupant.entryDate)
+        .then((date) => {
+              if (date != null)
+                {
+                  setState(() {
+                    _selectedPeriodDate = date;
+                  })
+                }
+            });
   }
 
   void _showPaymentDatePicker() {
@@ -360,11 +358,9 @@ class _AddPaymentsState extends State<AddPayments> {
 
           return id;
         }
-      }else{
+      } else {
         print("+++++++++ Load rent data is null +++++++++");
       }
-
-
     }
     if (mounted) {
       showMessage(context, 'Erreur: Verifiez les données');
